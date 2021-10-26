@@ -4,6 +4,7 @@ from _team import Team
 from _standardgame import StandardGame
 
 '''
+TODO:
 - How to implment scoring:
     - Play through all five tricks first
     - Check that each player played every card in there hand (and nothing new)
@@ -17,6 +18,30 @@ from _standardgame import StandardGame
   - Instead pass game object to player?
       - You might want to eventually create a Game superclass and have
           StandardGame extend it
+
+- Short term
+    - First to 10 declared winner
+    - Reneging
+
+- Medium Term
+    - Going alone
+    - messaging to player for if they get reneged, telling them what happens
+    AFTER they play there card (rather than globally printing)
+
+- Once fundemental game works:
+    - Clean up code,
+    - organize methods,
+    - create doc strings
+    - DisplayAscii() function for Card() to be used in consoleplayer
+        - Colored emojis for suits and ranks
+    - Make Euchre() class as driver instead
+
+- Long Term
+    - APIPlayer for interfacing with a webapp through javascript
+    - Create a Game Class that can be extended to create variations of euchre
+    - MLPlayer that makes decisions from a trained ML/ interfaces with one
+    to train it? Along with a driver class that will train the network by
+    running through the game?
 '''
 
 
