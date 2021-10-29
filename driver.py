@@ -5,14 +5,9 @@ from _standardgame import StandardGame
 
 '''
 TODO:
-- How to implment scoring:
-    - Play through all five tricks first
-    - Check that each player played every card in there hand (and nothing new)
-    - validate that each play was valid
-        - Create a method that checks which cards in hand were valid to play.
-            Perform a simple "was card played in valid cards", unless there were
-            no valid cards, then return True
-        - Start from front playing cards that player played.
+- Remove unnecessary functions from every class.
+- Finish up scoring for whoever takes majority tricks
+    - Possibly finish up scoring for everything
 
 - Have taker and trick saved in StandardGame (and reset where appropriate)
   - Instead pass game object to player?

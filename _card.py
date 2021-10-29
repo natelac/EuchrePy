@@ -39,6 +39,11 @@ class Card:
     def suit(self):
         return self._suit[0]
 
+    def getSuit(self, trump):
+        if self._isLeftBower(trump):
+            return self._offSuit[self.suit]
+        return self.suit
+
     def __str__(self) -> str:
         """
         Returns

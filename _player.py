@@ -15,8 +15,6 @@ class Player(abc.ABC):
     """
     def __init__(self, name=''):
         self.name = name
-        self._points = 0
-
         self.team = None
         self.hand = None
         self._playedCards= []
@@ -48,9 +46,9 @@ class Player(abc.ABC):
     @abc.abstractmethod
     def orderTrump(self, orderInfo):
         pass
-
+        
     @abc.abstractmethod
-    def callTrump(self, orderInfo):
+    def playCard(self, leader, cardsPlayed, trump):
         pass
 
     @abc.abstractmethod
@@ -58,12 +56,13 @@ class Player(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def playTrick(self):
+    def passError(self, error):
         pass
 
     @abc.abstractmethod
-    def recieveError(self, error):
+    def passMsg(self, msg):
         pass
+
 
     # @abc.abstractmethod
     # def inform(self,msg):

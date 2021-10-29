@@ -23,21 +23,21 @@ class BasicAIPlayer(Player, abc.ABC):
     def orderTrumpResults(self, players, deniedOrderTrump):
         return
 
-    def playTrick(self,orderInfo, playedCards, downCards):
-        card = self.hand.pop(0)
-        self._playedCards.append(card)
-        return card
-
-    def playCard(self, cardsPlayed, game):
-        card = self.hand.pop()
+    def playCard(self, leader, cardsPlayed, trump):
+        if leader is self:
+            card = self.hand.pop()
+        else:
+            leadSuit = cardsPlayed[leader][-1].suit
+            playable = [card for card in self.hand if card.getSuit(trump) == leadSuit]
+            if playable:
+                card = playable[0]
+            else:
+                card = self.hand.pop()
         print(self.name, "played", card)
         return card
 
-    def recieveError(self, error):
+    def passError(self, error):
         print("Error for",self.name,":",error)
 
-    def recieveUpdate(self, update):
-        print(update)
-
-    def callTrump(self, orderInfo):
+    def passMsg(self, msg):
         pass

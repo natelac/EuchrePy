@@ -19,20 +19,6 @@ class HumanPlayer(Player, abc.ABC):
         else:
             return False
 
-    def _printCards(self):
-        print('Cards: ', end="")
-        print(*self.hand,sep=", ")
-
-    def _recoverTrick(self, orderInfo, firstPass):
-        if firstPass:
-            print("The top card is", orderInfo['topCard'])
-        players = orderInfo['players']
-        for player in orderInfo['players']:
-            if player is self:
-                break
-            else:
-                print(f"{player} passed ordering {'up' if firstPass else 'trump'}")
-
     def orderUpResults(self, players, deniedOrderUp):
         seen = False
         for player in players:
@@ -54,22 +40,10 @@ class HumanPlayer(Player, abc.ABC):
         ans = input('Go alone? y/n\n')
         return ans == 'y'
 
-    def playTrick(self, orderInfo, playedCards, downCards):
-        cards = [str(card) for card in self.hand]
-        print('Your cards:', cards)
-        ans = input('Enter card to play\n')
-        while ans not in cards:
-            ans = input('Not a card in your hand.\n')
-        cardIndex = cards.index(ans)
-        card = self.hand.pop(cardIndex)
-        self._playedCards.append(card)
-        return card
-
-    def playCard(self, cardsPlayed, game):
+    def playCard(self, leader, cardsPlayed, trump):
         cards = [str(card) for card in self.hand]
         # print(cardsPlayed)
-        print("Top Card:", game.topCard)
-        print("Trump Suit:", game.trump)
+        print("Trump Suit:", trump)
         print('Your cards:', cards)
         ans = input('Enter card to play\n')
         while ans not in cards:
@@ -79,12 +53,24 @@ class HumanPlayer(Player, abc.ABC):
         self._playedCards.append(card)
         return card
 
-    def recieveError(self,error):
+    def passError(self,error):
         print(error)
 
-    def recieveUpdate(self, update):
-        print(update)
+    def passMsg(self, msg):
+        """Messages are directly printed
+        """
+        print(msg)
 
-    def callTrump(self, orderInfo):
-        ans = input('What suit? (C,S,H,D) \n')
-        return ans
+    def _printCards(self):
+        print('Cards: ', end="")
+        print(*self.hand,sep=", ")
+
+    def _recoverTrick(self, orderInfo, firstPass):
+        if firstPass:
+            print("The top card is", orderInfo['topCard'])
+        players = orderInfo['players']
+        for player in orderInfo['players']:
+            if player is self:
+                break
+            else:
+                print(f"{player} passed ordering {'up' if firstPass else 'trump'}")
