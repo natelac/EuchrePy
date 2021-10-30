@@ -13,6 +13,9 @@ class BasicAIPlayer(Player, abc.ABC):
         return False
         # if self == orderInfo['players'][3]
 
+    def callTrump(self, orderInfo):
+        return None
+
     def goAlone(self):
         # print(self.name, "didn't go alone")
         return False

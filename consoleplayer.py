@@ -19,6 +19,15 @@ class HumanPlayer(Player, abc.ABC):
         else:
             return False
 
+    def callTrump(self, orderInfo):
+        """
+        Need to implement so user cannot pick top card as trump
+        """
+        ans = input('Enter suit to pick\n')
+        while   ans not in ['C','S','H','D'] and ans != orderInfo['topCard'].suit:
+            ans = input('Not a valid suit.\n')
+        return ans
+
     def orderUpResults(self, players, deniedOrderUp):
         seen = False
         for player in players:
@@ -69,8 +78,8 @@ class HumanPlayer(Player, abc.ABC):
         if firstPass:
             print("The top card is", orderInfo['topCard'])
         players = orderInfo['players']
-        for player in orderInfo['players']:
-            if player is self:
-                break
-            else:
-                print(f"{player} passed ordering {'up' if firstPass else 'trump'}")
+        # for player in orderInfo['players']:
+        #     if player is self:
+        #         break
+        #     else:
+        #         print(f"{player} passed ordering {'up' if firstPass else 'trump'}")

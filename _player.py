@@ -30,11 +30,6 @@ class Player(abc.ABC):
     @points.setter
     def points(self, points):
         self._points = points
-        # if self.team:
-        #     self.team._updatePoints()
-
-    def getTeamPoints(self):
-        return self.team.points
 
     def getTeammate(self):
         return self.team.getTeammate(self)
@@ -46,7 +41,11 @@ class Player(abc.ABC):
     @abc.abstractmethod
     def orderTrump(self, orderInfo):
         pass
-        
+
+    @abc.abstractmethod
+    def callTrump(self, orderInfo):
+        pass
+
     @abc.abstractmethod
     def playCard(self, leader, cardsPlayed, trump):
         pass
