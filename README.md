@@ -1,6 +1,9 @@
 # EuchrePy: Euchre Game With Modifiable Player Interface
 
+An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. EuchrePy was created to train AI and interface easily with a web app to display AI information and player IO.
+
 ## TODO:
+
 ### Short Term
 - Remove unnecessary functions from every class.
 - Finish up scoring for whoever takes majority tricks
@@ -11,6 +14,7 @@
 - organize methods,
 - create doc strings
 - Make Euchre() class as driver instead
+
 ### Long Term
 - APIPlayer for interfacing with a webapp through javascript
 - Create a Game Class that can be extended to create variations of euchre
