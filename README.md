@@ -1,6 +1,9 @@
 # EuchrePy: Euchre Game With Modifiable Player Interface
 
+
+
 ## TODO:
+
 ### Short Term
 - Remove unnecessary functions from every class.
 - Finish up scoring for whoever takes majority tricks
@@ -11,6 +14,7 @@
 - organize methods,
 - create doc strings
 - Make Euchre() class as driver instead
+- 
 ### Long Term
 - APIPlayer for interfacing with a webapp through javascript
 - Create a Game Class that can be extended to create variations of euchre
