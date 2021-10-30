@@ -34,7 +34,7 @@ class StandardGame:
             self._msgPlayers(f"Team1 has {self.team1.points} points\tTeam2 has {self.team2.points} points")
             makerSelected = self._dealPhase()
             if makerSelected:
-                self.playTricks()
+                self._playTricks()
             else:
                 self._newDealer()
                 continue
