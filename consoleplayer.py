@@ -1,4 +1,4 @@
-from _player import Player
+from player import Player
 import abc
 
 class HumanPlayer(Player, abc.ABC):
