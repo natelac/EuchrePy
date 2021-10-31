@@ -31,7 +31,7 @@ class StandardGame:
         if len(self.players) != 4:
             raise AssertionError("Euchre requires 4 players to play")
         while (not self._getWinner()):
-            self._msgPlayers(f"Team1 has {self.team1.points} points\tTeam2 has {self.team2.points} points")
+            self._msgPlayers("points", (self.team1, self.team2))
             makerSelected = self._dealPhase()
             if makerSelected:
                 self._playTricks()
@@ -47,7 +47,7 @@ class StandardGame:
         # Player to left of dealer starts
         taker = self.players[1]
         leaderList = []
-        self._msgPlayers(f"{taker} starts the first trick")
+        self._msgPlayers("leader", taker)
         # There are 5 tricks
         for j in range(5):
             # Each player plays
@@ -57,10 +57,11 @@ class StandardGame:
                 player = self.players[idx]
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
+                self._msgPlayers("played", (player, card), exclude=player)
             trick = {player:cards[j] for player,cards in cardsPlayed.items()}
             ledSuit = trick[taker].suit
             taker = max(trick, key=lambda player: trick[player].value(ledSuit, self.trump))
-            self._msgPlayers(f"{taker} takes the hand")
+            self._msgPlayers("taker", taker)
             tricksTaken[taker] += 1
 
         # Check for reneging
@@ -70,10 +71,10 @@ class StandardGame:
             self._penalize(renegers)
         return
 
-    def _msgPlayers(self, msg, exclude=None):
+    def _msgPlayers(self, msg, content=None, exclude=None):
         for player in self.players:
             if player is not exclude:
-                player.passMsg(msg)
+                player.passMsg(msg, content)
 
     def _penalize(self, renegers):
         for player in renegers:
@@ -95,7 +96,7 @@ class StandardGame:
                     valid = True
                 if not valid:
                     # Inform all players who messed up
-                    print(player, "played an invalid card:",cards[0])
+                    self._msgPlayers("penalty",(player,cards[0]))
                     renegers.append(player) if player not in renegers else renegers
         return renegers
 
@@ -165,7 +166,7 @@ class StandardGame:
                 return False
             else:
                 self.deniedOrderUp[player] = True
-                self._msgPlayers(f"{player} denied ordering up.", exclude=player )
+                self._msgPlayers("deniedUp", player, exclude=player )
         return True
 
     def _trumpPhase(self):
@@ -183,14 +184,14 @@ class StandardGame:
             if orderTrump:
                 call = player.callTrump(orderInfo)
                 while not self._validTrump(call):
-                    player.recieveError("Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
+                    player.passMsg("invalidSuit")
                     call = player.callTrump(orderInfo)
                 self.maker = player
                 self.trump = call
                 return False
             else:
                 self.deniedOrderTrump[player] = True
-                self._msgPlayers(f"{player} denied ordering up.", exclude=player )
+                self._msgPlayers("deniedTrump", player, exclude=player )
         return True
 
     def _validTrump(self, suit):

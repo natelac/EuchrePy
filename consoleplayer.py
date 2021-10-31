@@ -65,10 +65,41 @@ class HumanPlayer(Player, abc.ABC):
     def passError(self,error):
         print(error)
 
-    def passMsg(self, msg):
+    def passMsg(self, msg, content=None):
         """Messages are directly printed
         """
-        print(msg)
+
+        def points():
+            print(f"Team1 has {content[0]} points\tTeam2 has {content[1]} points")
+        def misdeal():
+            print("Misdeal, new dealer")
+        def leader():
+            print(f"{content} starts the first trick")
+        def played():
+            print(f"{content[0].points} played {content[1].points}")
+        def taker():
+            print(f"{content} takes the hand")
+        def deniedUp():
+            print(f"{content} denied ordering up")
+        def deniedTrump():
+            print(f"{content} denied ordering trump")
+        def penalty():
+            if content[0] is self:
+                print(f"You reneged by playing {content[1]} and your team was penalized 4 points")
+            else:
+                print(f"{content[0]} reneged by playing {content[1]} and their team was penalized 4 points")
+        def invalidSuit():
+            print("Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
+        options = { "points" : points,
+                    "misdeal" : misdeal,
+                    "leader" : leader,
+                    "played" : played,
+                    "taker" : taker,
+                    "deniedUp" : deniedUp,
+                    "deniedTrump" : deniedTrump,
+                    "penalty" : penalty,
+                    "invalidSuit" : invalidSuit}
+        options[msg]()
 
     def _printCards(self):
         print('Cards: ', end="")
@@ -78,8 +109,3 @@ class HumanPlayer(Player, abc.ABC):
         if firstPass:
             print("The top card is", orderInfo['topCard'])
         players = orderInfo['players']
-        # for player in orderInfo['players']:
-        #     if player is self:
-        #         break
-        #     else:
-        #         print(f"{player} passed ordering {'up' if firstPass else 'trump'}")

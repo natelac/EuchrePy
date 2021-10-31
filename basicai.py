@@ -36,11 +36,11 @@ class BasicAIPlayer(Player, abc.ABC):
                 card = playable[0]
             else:
                 card = self.hand.pop()
-        print(self.name, "played", card)
+        # print(self.name, "played", card)
         return card
 
     def passError(self, error):
         print("Error for",self.name,":",error)
 
-    def passMsg(self, msg):
+    def passMsg(self, msg, content):
         pass

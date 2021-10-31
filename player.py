@@ -59,13 +59,28 @@ class Player(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def passMsg(self, msg):
+    def passMsg(self, msg, content=None):
+        """
+        msg:
+            "points":
+                content: (team1 points, team2 points)
+            "misdeal"
+                content: None
+            "leader":
+                content: Player
+            "played":
+                content: (player, card)
+            "taker":
+                content: Player
+            "deniedUp":
+                content: Player
+            "allPassed":
+                content: isTrump
+            "deniedTrump":
+                content: Player
+            "penalty"
+                content: (Player, points)
+            "invalidSuit"
+                content: None
+        """
         pass
-
-
-    # @abc.abstractmethod
-    # def inform(self,msg):
-    """Inform the player object that something has happened, like that everyone
-    passed ordering trump
-    """
-    #     pass
