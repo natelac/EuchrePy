@@ -27,6 +27,12 @@ class Card:
             '10':2,
             '9':1
         }
+        self._symbols: dict = {
+            'C':'♣',
+            'S':'♠',
+            'H':'♥',
+            'D':'♦'
+        }
 
     @property
     def rank(self):
@@ -95,3 +101,9 @@ class Card:
             Full name of a card, for example 'Ace of Clubs'
         """
         return self._rank + ' of ' + self._suit
+
+    def prettyString(self):
+        if self.suit in ['D','H']:
+            return "\u001b[31m[ " + self.rank[0] + self.suit[0] + " ]\033[0m"
+        else:
+            return "[ " + self.__str__() + " ]"

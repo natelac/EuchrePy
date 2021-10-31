@@ -7,12 +7,10 @@ class HumanPlayer(Player, abc.ABC):
 
     def orderUp(self, orderInfo):
         self._printCards()
-        self._recoverTrick(orderInfo, True)
         ans = input('Order up? y/n\n')
         return ans == 'y'
 
     def orderTrump(self, orderInfo):
-        self._recoverTrick(orderInfo, False)
         ans = input('Call trump? y/n\n')
         if ans == 'y':
             return True
@@ -36,7 +34,7 @@ class HumanPlayer(Player, abc.ABC):
         cards = [str(card) for card in self.hand]
         # print(cardsPlayed)
         print("Trump Suit:", trump)
-        print('Your cards:', cards)
+        self._printCards()
         ans = input('Enter card to play\n')
         while ans not in cards:
             ans = input('Not a card in your hand.\n')
@@ -56,7 +54,7 @@ class HumanPlayer(Player, abc.ABC):
         def leader():
             print(f"{content} starts the first trick")
         def played():
-            print(f"{content[0]} played {content[1]}")
+            print(f"{content[0]} played {content[1].prettyString()}")
         def taker():
             print(f"{content} takes the hand")
         def deniedUp():
@@ -83,9 +81,7 @@ class HumanPlayer(Player, abc.ABC):
 
     def _printCards(self):
         print('Cards: ', end="")
-        print(*self.hand,sep=", ")
-
-    def _recoverTrick(self, orderInfo, firstPass):
-        if firstPass:
-            print("The top card is", orderInfo['topCard'])
-        players = orderInfo['players']
+        cards = []
+        for card in self.hand:
+            cards.append(card.prettyString())
+        print(*cards,sep=", ")
