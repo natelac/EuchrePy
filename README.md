@@ -7,7 +7,6 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 ## TODO:
 
 ### Short Term
-- Remove unnecessary functions from every class.
 - Finish up scoring for whoever takes majority tricks
   - Possibly finish up scoring for everything
 - First to 10 declared getWinner
