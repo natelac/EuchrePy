@@ -28,23 +28,6 @@ class HumanPlayer(Player, abc.ABC):
             ans = input('Not a valid suit.\n')
         return ans
 
-    def orderUpResults(self, players, deniedOrderUp):
-        seen = False
-        for player in players:
-            if player is self:
-                seen = True
-            elif seen == True:
-                print(f"""{player} {'did' if deniedOrderUp[player] else "didn't"} pass ordering up""")
-
-
-    def orderTrumpResults(self, players, deniedOrderTrump):
-        seen = False
-        for player in players:
-            if player is self:
-                seen = True
-            elif seen == True:
-                print(f"""{player} {'did' if deniedOrderTrump[player] else "didn't"} pass ordering trump""")
-
     def goAlone(self):
         ans = input('Go alone? y/n\n')
         return ans == 'y'
@@ -61,9 +44,6 @@ class HumanPlayer(Player, abc.ABC):
         card = self.hand.pop(cardIndex)
         self._playedCards.append(card)
         return card
-
-    def passError(self,error):
-        print(error)
 
     def passMsg(self, msg, content=None):
         """Messages are directly printed

@@ -20,12 +20,6 @@ class BasicAIPlayer(Player, abc.ABC):
         # print(self.name, "didn't go alone")
         return False
 
-    def orderUpResults(self, players, deniedOrderUp):
-        return
-
-    def orderTrumpResults(self, players, deniedOrderTrump):
-        return
-
     def playCard(self, leader, cardsPlayed, trump):
         if leader is self:
             card = self.hand.pop()
@@ -36,11 +30,7 @@ class BasicAIPlayer(Player, abc.ABC):
                 card = playable[0]
             else:
                 card = self.hand.pop()
-        # print(self.name, "played", card)
         return card
-
-    def passError(self, error):
-        print("Error for",self.name,":",error)
 
     def passMsg(self, msg, content):
         pass

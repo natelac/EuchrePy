@@ -55,10 +55,6 @@ class Player(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def passError(self, error):
-        pass
-
-    @abc.abstractmethod
     def passMsg(self, msg, content=None):
         """
         msg:
