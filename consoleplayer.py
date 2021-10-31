@@ -50,13 +50,13 @@ class HumanPlayer(Player, abc.ABC):
         """
 
         def points():
-            print(f"Team1 has {content[0]} points\tTeam2 has {content[1]} points")
+            print(f"Team1 has {content[0].points} points\tTeam2 has {content[1].points} points")
         def misdeal():
             print("Misdeal, new dealer")
         def leader():
             print(f"{content} starts the first trick")
         def played():
-            print(f"{content[0].points} played {content[1].points}")
+            print(f"{content[0]} played {content[1]}")
         def taker():
             print(f"{content} takes the hand")
         def deniedUp():
