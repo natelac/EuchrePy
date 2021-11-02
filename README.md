@@ -4,7 +4,9 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 
 [Monte Carlo Tree Search (MCTS)](https://github.com/matgrioni/Euchre-bot) and [Neural Fictitious Self-Play (NFSP)](https://arxiv.org/pdf/1603.01121.pdf) have been used to different levels of success to create AI for imperfect-information games (Euchre and Poker respectively). I am looking to use Monte Carlo Neural Fictitious Self-Play (MC-NFSP) to create an AI for playing Euchre. My goal is to implement the methods used for poker described by [Zhang et. al](https://arxiv.org/pdf/1903.09569.pdf) to create an MC-NFSP Euchre AI.
 
-(I couldn't find any resources that explicitly used NFSP for Euchre so I might try that alone first. Maybe I'll implement MCTS, then NFSP, then MC-NFSP)
+(Maybe I'll implement MCTS, then NFSP, then MC-NFSP)
+
+*NSFP was implemented https://github.com/elipugh/euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. I think either the NFSP or MCTS didn't explicitly have feature selection, and I think they trained it on the raw features. I think I could get better performance by creating better features. There was another paper that talked about what features to select, so I think that would be a good reference. I forget which paper it is (I don't think it was explicitly euchre, maybe just poker.*
 
 ## TODO:
 
