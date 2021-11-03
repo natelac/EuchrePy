@@ -14,8 +14,11 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 - Add # comments, in same style as was started in _standardgame.py
 - Finish up scoring for whoever takes majority tricks
   - Possibly finish up scoring for everything
-- Clean up code
 - Going Alone
+  - If a player is going alone, just skip over their partner. You might also need to update the code for checking reneges
+- Clean up code
+  - I don't think you need the "deniedOrderUp" and "deniedOrderTrump" vars
+
 - Create doc strings
 - Organize methods
 - Figure out when to use _ for method and class names

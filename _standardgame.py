@@ -56,7 +56,7 @@ class StandardGame:
         for j in range(5):
             leaderList.append(taker)
 
-            # Play Single Trick
+            # A trick
             for i in range(4):
                 idx = ( self.players.index(taker) + i ) % 4
                 player = self.players[idx]
