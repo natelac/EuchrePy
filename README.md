@@ -9,13 +9,14 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 ## TODO:
 
 ### Short Term
+- Add # comments, in same style as was started in _standardgame.py
 - Finish up scoring for whoever takes majority tricks
   - Possibly finish up scoring for everything
-- First to 10 declared getWinner
+- Clean up code
 - Going Alone
-- Clean up code,
-- organize methods,
-- create doc strings
+- Create doc strings
+- Organize methods
+- Figure out when to use _ for method and class names
 - Make Euchre() class as driver instead
 
 ### Long Term

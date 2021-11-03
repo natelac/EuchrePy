@@ -30,6 +30,8 @@ class StandardGame:
         """
         if len(self.players) != 4:
             raise AssertionError("Euchre requires 4 players to play")
+
+        # Game Loop
         while (not self._getWinner()):
             self._msgPlayers("points", (self.team1, self.team2))
             makerSelected = self._dealPhase()
@@ -40,35 +42,40 @@ class StandardGame:
                 continue
 
     def _playTricks(self):
+        # Initialize Lists/Dicts
         goingAlone = self.maker.goAlone()
         cardsPlayed = {player: [] for player in self.players}
         tricksTaken = {player: 0 for player in self.players}
 
-        # Player to left of dealer starts
+        # Start Deal
         taker = self.players[1]
         leaderList = []
         self._msgPlayers("leader", taker)
-        # There are 5 tricks
+
+        # Play Tricks
         for j in range(5):
-            # Each player plays
             leaderList.append(taker)
+
+            # Play Single Trick
             for i in range(4):
                 idx = ( self.players.index(taker) + i ) % 4
                 player = self.players[idx]
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
                 self._msgPlayers("played", (player, card), exclude=player)
+
+            # Decide Taker
             trick = {player:cards[j] for player,cards in cardsPlayed.items()}
             ledSuit = trick[taker].suit
             taker = max(trick, key=lambda player: trick[player].value(ledSuit, self.trump))
             self._msgPlayers("taker", taker)
             tricksTaken[taker] += 1
 
-        # Check for reneging
+        # Reneging
         renegers = self._checkForReneges(leaderList, cardsPlayed, )
-
         if renegers:
             self._penalize(renegers)
+
         return
 
     def _msgPlayers(self, msg, content=None, exclude=None):
@@ -83,10 +90,13 @@ class StandardGame:
 
     def _checkForReneges(self, leaderList, cardsPlayed):
         renegers = []
-        # Check each trick
+
+        # Check Tricks
         for j in range(5):
             leader = leaderList[j]
             leadSuit = cardsPlayed[leader][j].getSuit(self.trump)
+
+            # Check Players Card
             for player in self.players:
                 cards = cardsPlayed[player][j:]
                 playable = [card for card in cards if card.getSuit(self.trump) == leadSuit]
@@ -95,7 +105,6 @@ class StandardGame:
                 else:
                     valid = True
                 if not valid:
-                    # Inform all players who messed up
                     self._msgPlayers("penalty",(player,cards[0]))
                     renegers.append(player) if player not in renegers else renegers
         return renegers
@@ -133,7 +142,7 @@ class StandardGame:
         self.topCard
         self.allPassed
         """
-        # Distributing cards
+        # Distribute Cards
         self.deck.shuffle()
         hands = self.deck.deal()
         for i in range(4):
@@ -141,10 +150,11 @@ class StandardGame:
         self.kitty = hands[4]
         self.topCard = self.kitty[0]
 
-        # Ordering up or selecting trump
+        # Order Up and Trump
         allPassed = self._orderPhase()
         if allPassed:
             allPassed = self._trumpPhase()
+
         return not allPassed
 
     def _orderPhase(self):
