@@ -1,6 +1,6 @@
-from _deck import Deck
-from _card import Card
-from _team import Team
+from deck import Deck
+from card import Card
+from team import Team
 # from consolehuman import HumanPlayer
 # from basicai import BasicAIPlayer
 import numpy as np
@@ -16,7 +16,7 @@ class StandardGame:
         self.team1 = team1
         self.team2 = team2
         self.oppoTeam = {team1: team2, team2: team1}
-        self._seatPlayers()
+        self.seatPlayers()
 
         # Trick Info
         self.topCard = None
@@ -32,16 +32,16 @@ class StandardGame:
             raise AssertionError("Euchre requires 4 players to play")
 
         # Game Loop
-        while (not self._getWinner()):
-            self._msgPlayers("points", (self.team1, self.team2))
-            makerSelected = self._dealPhase()
+        while (not self.getWinner()):
+            self.msgPlayers("points", (self.team1, self.team2))
+            makerSelected = self.dealPhase()
             if makerSelected:
-                self._playTricks()
+                self.playTricks()
             else:
-                self._newDealer()
+                self.newDealer()
                 continue
 
-    def _playTricks(self):
+    def playTricks(self):
         # Initialize Lists/Dicts
         goingAlone = self.maker.goAlone()
         cardsPlayed = {player: [] for player in self.players}
@@ -50,7 +50,7 @@ class StandardGame:
         # Start Deal
         taker = self.players[1]
         leaderList = []
-        self._msgPlayers("leader", taker)
+        self.msgPlayers("leader", taker)
 
         # Play Tricks
         for j in range(5):
@@ -62,33 +62,33 @@ class StandardGame:
                 player = self.players[idx]
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
-                self._msgPlayers("played", (player, card), exclude=player)
+                self.msgPlayers("played", (player, card), exclude=player)
 
             # Decide Taker
             trick = {player:cards[j] for player,cards in cardsPlayed.items()}
             ledSuit = trick[taker].suit
             taker = max(trick, key=lambda player: trick[player].value(ledSuit, self.trump))
-            self._msgPlayers("taker", taker)
+            self.msgPlayers("taker", taker)
             tricksTaken[taker] += 1
 
         # Reneging
-        renegers = self._checkForReneges(leaderList, cardsPlayed, )
+        renegers = self.checkForReneges(leaderList, cardsPlayed, )
         if renegers:
-            self._penalize(renegers)
+            self.penalize(renegers)
 
         return
 
-    def _msgPlayers(self, msg, content=None, exclude=None):
+    def msgPlayers(self, msg, content=None, exclude=None):
         for player in self.players:
             if player is not exclude:
                 player.passMsg(msg, content)
 
-    def _penalize(self, renegers):
+    def penalize(self, renegers):
         for player in renegers:
             team = self.oppoTeam[player.team]
             team.points += 4
 
-    def _checkForReneges(self, leaderList, cardsPlayed):
+    def checkForReneges(self, leaderList, cardsPlayed):
         renegers = []
 
         # Check Tricks
@@ -96,7 +96,7 @@ class StandardGame:
             leader = leaderList[j]
             leadSuit = cardsPlayed[leader][j].getSuit(self.trump)
 
-            # Check Players Card
+            # Check Player's Card
             for player in self.players:
                 cards = cardsPlayed[player][j:]
                 playable = [card for card in cards if card.getSuit(self.trump) == leadSuit]
@@ -105,18 +105,18 @@ class StandardGame:
                 else:
                     valid = True
                 if not valid:
-                    self._msgPlayers("penalty",(player,cards[0]))
+                    self.msgPlayers("penalty",(player,cards[0]))
                     renegers.append(player) if player not in renegers else renegers
         return renegers
 
-    def _resetTrick(self):
+    def resetTrick(self):
         self.topCard = None
         self.trump = None
         self.maker = None
         self.deniedOrderUp = {player: False for player in self.players}
         self.deniedOrderTrump = {player: False for player in self.players}
 
-    def _seatPlayers(self):
+    def seatPlayers(self):
         """Seats the players randomly around table (preserving teams)
         """
         self.players = []
@@ -131,7 +131,7 @@ class StandardGame:
         self.players.append(teams[0][1])
         self.players.append(teams[1][1])
 
-    def _dealPhase(self):
+    def dealPhase(self):
         """Enters the dealing phase, returns False if no maker selected
 
         Modifies
@@ -151,13 +151,13 @@ class StandardGame:
         self.topCard = self.kitty[0]
 
         # Order Up and Trump
-        allPassed = self._orderPhase()
+        allPassed = self.orderPhase()
         if allPassed:
-            allPassed = self._trumpPhase()
+            allPassed = self.trumpPhase()
 
         return not allPassed
 
-    def _orderPhase(self):
+    def orderPhase(self):
         """Handles the order up phase, returns True if everyone
         passes ordering up
 
@@ -168,7 +168,7 @@ class StandardGame:
         self.deniedOrderUp
         """
         for player in self.players:
-            orderInfo = self._orderInfo(player)
+            orderInfo = self.orderInfo(player)
             orderUp = player.orderUp(orderInfo)
             if orderUp:
                 self.maker = player
@@ -176,10 +176,10 @@ class StandardGame:
                 return False
             else:
                 self.deniedOrderUp[player] = True
-                self._msgPlayers("deniedUp", player, exclude=player )
+                self.msgPlayers("deniedUp", player, exclude=player )
         return True
 
-    def _trumpPhase(self):
+    def trumpPhase(self):
         """Handles the order trump phase, returns true
 
         Modifies
@@ -189,11 +189,11 @@ class StandardGame:
         self.deniedOrderTrump
         """
         for player in self.players:
-            orderInfo = self._orderInfo(player)
+            orderInfo = self.orderInfo(player)
             orderTrump = player.orderTrump(orderInfo)
             if orderTrump:
                 call = player.callTrump(orderInfo)
-                while not self._validTrump(call):
+                while not self.validTrump(call):
                     player.passMsg("invalidSuit")
                     call = player.callTrump(orderInfo)
                 self.maker = player
@@ -201,23 +201,23 @@ class StandardGame:
                 return False
             else:
                 self.deniedOrderTrump[player] = True
-                self._msgPlayers("deniedTrump", player, exclude=player )
+                self.msgPlayers("deniedTrump", player, exclude=player )
         return True
 
-    def _validTrump(self, suit):
+    def validTrump(self, suit):
         """Returns True if a card is a valid trump call
         """
         if not suit in ['C','S','H','D']:
             return False
         return suit != self.topCard.suit
 
-    def _newDealer(self):
+    def newDealer(self):
         """Rotates the player order so the player to the left of the dealer is the dealer
         """
         newDealer = self.players.pop(0)
         self.players.append(newDealer)
 
-    def _orderInfo(self,player):
+    def orderInfo(self,player):
         """Dictionary of info about the trick for player to make a decision with
 
         Contains enough information for the Player class to understand the
@@ -243,7 +243,7 @@ class StandardGame:
         }
         return orderInfo
 
-    def _getWinner(self):
+    def getWinner(self):
         """Returns the winning player or None
         """
         return None

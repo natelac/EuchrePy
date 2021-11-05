@@ -1,5 +1,5 @@
 import random
-from _card import Card
+from card import Card
 
 class Deck:
     """Deck consisting of 24 cards for the game of Euchre.

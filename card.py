@@ -46,7 +46,7 @@ class Card:
         return self._suit[0]
 
     def getSuit(self, trump):
-        if self._isLeftBower(trump):
+        if self.isLeftBower(trump):
             return self._offSuit[self.suit]
         return self.suit
 
@@ -66,9 +66,9 @@ class Card:
 
     def value(self, ledSuit, trumpSuit):
         val = self._values[self.rank]
-        if self._isRightBower(trumpSuit):
+        if self.isRightBower(trumpSuit):
             return 52
-        elif self._isLeftBower(trumpSuit):
+        elif self.isLeftBower(trumpSuit):
             return 51
         elif self.suit == trumpSuit:
             return val + 6
@@ -77,13 +77,13 @@ class Card:
         else:
             return 0
 
-    def _isLeftBower(self, trumpSuit):
+    def isLeftBower(self, trumpSuit):
         if self.rank == 'J' and self.suit == self._offSuit[trumpSuit]:
             return True
         else:
             return False
 
-    def _isRightBower(self, trumpSuit):
+    def isRightBower(self, trumpSuit):
         if self.rank == 'J' and self.suit == trumpSuit:
             return True
         else:
