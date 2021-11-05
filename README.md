@@ -17,8 +17,7 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 - Going Alone
   - If a player is going alone, just skip over their partner. You might also need to update the code for checking reneges
 - Clean up code
-  - I don't think you need the "deniedOrderUp" and "deniedOrderTrump" vars
-
+  - instead of passing a dictionary (orderInfo), just pass the raw values.
 - Create doc strings
 - Organize methods
 - Figure out when to use _ for method and class names
