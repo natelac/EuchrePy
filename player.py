@@ -1,5 +1,6 @@
 import abc
 
+
 class Player(abc.ABC):
     """Base Player class
 
@@ -13,12 +14,12 @@ class Player(abc.ABC):
         List of cards in the players hand
 
     """
+
     def __init__(self, name=''):
         self.name = name
         self.team = None
         self.hand = None
-        self._playedCards= []
-
+        self._playedCards = []
 
     def __str__(self):
         return self.name

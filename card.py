@@ -1,7 +1,9 @@
 import random
 
+
 class Card:
     """Card object used to construct a deck"""
+
     def __init__(self, rank: str, suit: str):
         """
         Parameters
@@ -14,24 +16,24 @@ class Card:
         self._rank: str = rank
         self._suit: str = suit
         self._offSuit: dict = {
-            'C':'S',
-            'S':'C',
-            'H':'D',
-            'D':'H'
+            'C': 'S',
+            'S': 'C',
+            'H': 'D',
+            'D': 'H'
         }
         self._values: dict = {
-            'A':6,
-            'K':5,
-            'Q':4,
-            'J':3,
-            '10':2,
-            '9':1
+            'A': 6,
+            'K': 5,
+            'Q': 4,
+            'J': 3,
+            '10': 2,
+            '9': 1
         }
         self._symbols: dict = {
-            'C':'♣',
-            'S':'♠',
-            'H':'♥',
-            'D':'♦'
+            'C': '♣',
+            'S': '♠',
+            'H': '♥',
+            'D': '♦'
         }
 
     @property
@@ -103,7 +105,7 @@ class Card:
         return self._rank + ' of ' + self._suit
 
     def prettyString(self):
-        if self.suit in ['D','H']:
+        if self.suit in ['D', 'H']:
             return "\u001b[31m[ " + self.rank[0] + self.suit[0] + " ]\033[0m"
         else:
             return "[ " + self.__str__() + " ]"

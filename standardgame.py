@@ -1,14 +1,16 @@
+import numpy as np
 from deck import Deck
-from card import Card
-from team import Team
+# from card import Card
+# from team import Team
 # from consolehuman import HumanPlayer
 # from basicai import BasicAIPlayer
-import numpy as np
+
 
 class StandardGame:
     """Standard game of euchre
     Source: https://en.wikipedia.org/wiki/Euchre
     """
+
     def __init__(self, team1, team2):
         # Game info
         self.deck = Deck()
@@ -29,10 +31,11 @@ class StandardGame:
         """Starts the game
         """
         if len(self.players) != 4:
-            raise AssertionError("Euchre requires 4 players to play")
+            raise AssertionError(
+                f"Euchre requires 4 players to play")
 
         # Game Loop
-        while (not self.getWinner()):
+        while not self.getWinner():
             self.msgPlayers("points", (self.team1, self.team2))
             makerSelected = self.dealPhase()
             if makerSelected:
@@ -58,16 +61,17 @@ class StandardGame:
 
             # A trick
             for i in range(4):
-                idx = ( self.players.index(taker) + i ) % 4
+                idx = (self.players.index(taker) + i) % 4
                 player = self.players[idx]
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
                 self.msgPlayers("played", (player, card), exclude=player)
 
             # Decide Taker
-            trick = {player:cards[j] for player,cards in cardsPlayed.items()}
+            trick = {player: cards[j] for player, cards in cardsPlayed.items()}
             ledSuit = trick[taker].suit
-            taker = max(trick, key=lambda player: trick[player].value(ledSuit, self.trump))
+            taker = max(trick, key=lambda player: trick[player].value(
+                ledSuit, self.trump))
             self.msgPlayers("taker", taker)
             tricksTaken[taker] += 1
 
@@ -99,14 +103,16 @@ class StandardGame:
             # Check Player's Card
             for player in self.players:
                 cards = cardsPlayed[player][j:]
-                playable = [card for card in cards if card.getSuit(self.trump) == leadSuit]
+                playable = [card for card in cards if card.getSuit(
+                    self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
                     valid = False
                 else:
                     valid = True
                 if not valid:
-                    self.msgPlayers("penalty",(player,cards[0]))
-                    renegers.append(player) if player not in renegers else renegers
+                    self.msgPlayers("penalty", (player, cards[0]))
+                    renegers.append(
+                        player) if player not in renegers else renegers
         return renegers
 
     def resetTrick(self):
@@ -176,7 +182,7 @@ class StandardGame:
                 return False
             else:
                 self.deniedOrderUp[player] = True
-                self.msgPlayers("deniedUp", player, exclude=player )
+                self.msgPlayers("deniedUp", player, exclude=player)
         return True
 
     def trumpPhase(self):
@@ -201,13 +207,13 @@ class StandardGame:
                 return False
             else:
                 self.deniedOrderTrump[player] = True
-                self.msgPlayers("deniedTrump", player, exclude=player )
+                self.msgPlayers("deniedTrump", player, exclude=player)
         return True
 
     def validTrump(self, suit):
         """Returns True if a card is a valid trump call
         """
-        if not suit in ['C','S','H','D']:
+        if not suit in ['C', 'S', 'H', 'D']:
             return False
         return suit != self.topCard.suit
 
@@ -217,7 +223,7 @@ class StandardGame:
         newDealer = self.players.pop(0)
         self.players.append(newDealer)
 
-    def orderInfo(self,player):
+    def orderInfo(self, player):
         """Dictionary of info about the trick for player to make a decision with
 
         Contains enough information for the Player class to understand the
@@ -235,11 +241,11 @@ class StandardGame:
             topCard: Card
                 The card that was turned over
         """
-        orderInfo ={
+        orderInfo = {
             'team1': self.team1,
             'team2': self.team2,
             'players': self.players,
-            'topCard' : self.topCard
+            'topCard': self.topCard
         }
         return orderInfo
 

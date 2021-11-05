@@ -1,6 +1,7 @@
 import random
 from card import Card
 
+
 class Deck:
     """Deck consisting of 24 cards for the game of Euchre.
 
@@ -27,8 +28,8 @@ class Deck:
         Prints every card in the deck's full name
     """
 
-    ranks = ['Ace','King','Queen','Jack','10','9']
-    suits = ['Clubs','Spades','Hearts','Diamonds']
+    ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
+    suits = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
     # shortRanks = ['A','K','Q','J','10','9']
     # shortSuits = ['C','S','H','D']
 
@@ -37,7 +38,7 @@ class Deck:
         self.size = 24
         for suit in Deck.suits:
             for rank in Deck.ranks:
-                self.cards.append(Card(rank,suit))
+                self.cards.append(Card(rank, suit))
 
     def deal(self) -> tuple:
         """Returns four hands and a kitty selected in order from the deck and an up card.
@@ -50,7 +51,7 @@ class Deck:
             First element is a list of list of cards, second element
             is the up card
         """
-        hands = [[],[],[],[],[]]
+        hands = [[], [], [], [], []]
         for i in range(self.size):
             hands[i % 5].append(self.cards[i])
         return hands

@@ -1,6 +1,7 @@
 from player import Player
 import abc
 
+
 class BasicAIPlayer(Player, abc.ABC):
     def __init__(self, name='AI'):
         Player.__init__(self, name)
@@ -25,7 +26,8 @@ class BasicAIPlayer(Player, abc.ABC):
             card = self.hand.pop()
         else:
             leadSuit = cardsPlayed[leader][-1].suit
-            playable = [card for card in self.hand if card.getSuit(trump) == leadSuit]
+            playable = [card for card in self.hand if card.getSuit(
+                trump) == leadSuit]
             if playable:
                 card = playable[0]
             else:

@@ -14,15 +14,6 @@ class Team:
     def points(self, points):
         self._points = points
 
-    # def _updatePoints(self):
-    #     self._points = self._p1.points + self._p2.points
-
-    # def getOpponentTeam(self):
-    #     for team in Team.teams:
-    #         if player not in team.getPlayers():
-    #             return team
-    #     return None
-
     def getPlayers(self):
         return [self._p1, self._p2]
 
@@ -35,6 +26,6 @@ class Team:
             return None
 
     def msgPlayers(self, msg):
-        _p1.passMsg(msg)
-        _p2.passMsg(msg)
+        self._p1.passMsg(msg)
+        self._p2.passMsg(msg)
         return
