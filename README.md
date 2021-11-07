@@ -6,27 +6,23 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 
 (Maybe I'll implement MCTS, then NFSP, then MC-NFSP)
 
-*NSFP was implemented https://github.com/elipugh/euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. I think either the NFSP or MCTS didn't explicitly have feature selection, and I think they trained it on the raw features. I think I could get better performance by creating better features. There was another paper that talked about what features to select, so I think that would be a good reference. I forget which paper it is (I don't think it was explicitly euchre, maybe just poker.*
+*NSFP was [already implemented](https://github.com/elipugh/euchre) in Euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. The MCTS and NFSP papers do not explicitly discuss feature selection. I think I could get better performance by creating better features. There was [another paper](https://sites.ualberta.ca/~amw8/hearts.pdf) that talked about what features to select for a game of hearts, which might be a good reference.*
 
 ## TODO:
+- Scoring
+- Going alone
+  - If a player is going alone, just skip over their partner. You might also need to update the code for checking reneges
+- Simple intelligent plays for BasicAI rather than just random valid plays.
 
 ### Short Term
-- Add # comments, in same style as was started in _standardgame.py
-- Finish up scoring for whoever takes majority tricks
-  - Possibly finish up scoring for everything
-- Going Alone
-  - If a player is going alone, just skip over their partner. You might also need to update the code for checking reneges
-- Clean up code
-  - instead of passing a dictionary (orderInfo), just pass the raw values.
-- Create doc strings
-- Organize methods
-- Figure out when to use _ for method and class names
-- Make Euchre() class as driver instead
+- Make a Euchre() class as a driver instead
+  - Let's you select what type of game to play, easy control of
 - Add checking for whether a player played cards only from their hand.
 
 ### Long Term
-- APIPlayer for interfacing with a webapp through javascript
-- Create a Game Class that can be extended to create variations of euchre
+- JSPlayer for interfacing with a webapp through javascript
+- Game Class that can be extended to create variations of euchre
+  - Refactor code so StandardGame extends Game
 - MLPlayer that makes decisions from a trained ML/ interfaces with one
 to train it? Along with a driver class that will train the network by
 running through the game?
