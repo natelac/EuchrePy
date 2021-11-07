@@ -2,10 +2,10 @@ import random
 
 
 class Card:
-    """Card object used to construct a deck
+    """Card object used to construct a deck.
 
     Attributes:
-        rank: The shorthand rank of the card, i.e. 'Ace' is 'A'
+        rank: The shorthand rank of the card, i.e. 'Ace' is 'A'.
         suit: The shorthand suit of the card, i.e. 'Clubs' is 'C'.
     """
 

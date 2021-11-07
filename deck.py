@@ -7,25 +7,11 @@ class Deck:
 
     ...
 
-    Attributes
-    ----------
-    ranks : list
-        Contains all possible ranks (str) for the game of Euchre
-    suits : list
-        Contains all possible suits (str) for the game of Euchre
-    cards : list
-        Contains every unique card that can be made from ranks and suits
-
-    Methods
-    -------
-    deal
-        Return 5 hands of 4 cards each
-    shuffle
-        Randomizes the order of the cards in the deck
-    print
-        Prints every card in the deck's shorthand name
-    printFull
-        Prints every card in the deck's full name
+    Attributes:
+        ranks: List containing all possible ranks (str) for the game of Euchre.
+        suits: List containing all possible suits (str) for the game of Euchre.
+        cards: List containing every unique card that can be made from ranks and suits.
+        size: Number of cards in the deck.
     """
 
     ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
@@ -36,20 +22,20 @@ class Deck:
     def __init__(self):
         self.cards: List[Card] = []
         self.size = 24
+
+        # Construct deck with each card.
         for suit in Deck.suits:
             for rank in Deck.ranks:
                 self.cards.append(Card(rank, suit))
 
-    def deal(self) -> tuple:
+    def deal(self):
         """Returns four hands and a kitty selected in order from the deck and an up card.
 
         Remember to shuffle before you deal if you want to randomize the cards.
 
-        Returns
-        -------
-        tuple
-            First element is a list of list of cards, second element
-            is the up card
+        Returns:
+            Tuple where first element is a list of list of cards,
+                and second element is the up card
         """
         hands = [[], [], [], [], []]
         for i in range(self.size):

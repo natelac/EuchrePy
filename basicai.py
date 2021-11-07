@@ -3,35 +3,33 @@ import abc
 
 
 class BasicAIPlayer(Player, abc.ABC):
+    """A Player class that returns valid responses."""
     def __init__(self, name='AI'):
         Player.__init__(self, name)
 
-    def orderUp(self, orderInfo):
-        # print(self.name, "didn't order up")
+    def orderUp(self):
         return False
 
-    def orderTrump(self, orderInfo):
+    def orderTrump(self):
         return False
-        # if self == orderInfo['players'][3]
 
-    def callTrump(self, orderInfo):
+    def callTrump(self):
         return None
 
     def goAlone(self):
-        # print(self.name, "didn't go alone")
         return False
 
     def playCard(self, leader, cardsPlayed, trump):
+        # Play an arbitrary card if player is leader
         if leader is self:
             card = self.hand.pop()
         else:
+            # Play an arbitrary valid card
             leadSuit = cardsPlayed[leader][-1].suit
             playable = [card for card in self.hand if card.getSuit(
                 trump) == leadSuit]
-            if playable:
-                card = playable[0]
-            else:
-                card = self.hand.pop()
+            card = playable[0] if playable else self.hand.pop()
+
         return card
 
     def passMsg(self, msg, content):

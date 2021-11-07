@@ -22,6 +22,7 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 - Organize methods
 - Figure out when to use _ for method and class names
 - Make Euchre() class as driver instead
+- Add checking for whether a player played cards only from their hand.
 
 ### Long Term
 - APIPlayer for interfacing with a webapp through javascript

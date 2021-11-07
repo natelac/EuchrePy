@@ -3,27 +3,23 @@ import abc
 
 
 class HumanPlayer(Player, abc.ABC):
+    """A Player class that prints to and takes input from the console."""
+
     def __init__(self, name='Human'):
         Player.__init__(self, name)
 
-    def orderUp(self, orderInfo):
+    def orderUp(self):
         self.printCards()
         ans = input('Order up? y/n\n')
         return ans == 'y'
 
-    def orderTrump(self, orderInfo):
+    def orderTrump(self):
         ans = input('Call trump? y/n\n')
-        if ans == 'y':
-            return True
-        else:
-            return False
+        return ans == 'y'
 
-    def callTrump(self, orderInfo):
-        """
-        Need to implement so user cannot pick top card as trump
-        """
+    def callTrump(self):
         ans = input('Enter suit to pick\n')
-        while ans not in ['C', 'S', 'H', 'D'] and ans != orderInfo['topCard'].suit:
+        while ans not in ['C', 'S', 'H', 'D'] and ans != topCard['topCard'].suit:
             ans = input('Not a valid suit.\n')
         return ans
 
@@ -32,22 +28,26 @@ class HumanPlayer(Player, abc.ABC):
         return ans == 'y'
 
     def playCard(self, leader, cardsPlayed, trump):
-        cards = [str(card) for card in self.hand]
-        # print(cardsPlayed)
+        # Print trump and cards
         print("Trump Suit:", trump)
+        cards = [str(card) for card in self.hand]
         self.printCards()
+
+        # Get card to play from user
         ans = input('Enter card to play\n')
         while ans not in cards:
             ans = input('Not a card in your hand.\n')
+
+        # Remove card from hand, add to playedCards
         cardIndex = cards.index(ans)
         card = self.hand.pop(cardIndex)
         self._playedCards.append(card)
+
         return card
 
     def passMsg(self, msg, content=None):
-        """Messages are directly printed
+        """Prints information to console.
         """
-
         def points():
             print(
                 f"Team1 has {content[0].points} points\tTeam2 has {content[1].points} points")
@@ -81,6 +81,7 @@ class HumanPlayer(Player, abc.ABC):
         def invalidSuit():
             print(
                 "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
+
         options = {"points": points,
                    "misdeal": misdeal,
                    "leader": leader,
@@ -93,6 +94,7 @@ class HumanPlayer(Player, abc.ABC):
         options[msg]()
 
     def printCards(self):
+        """Prints 'nice' view of player's hand to console."""
         print('Cards: ', end="")
         cards = []
         for card in self.hand:

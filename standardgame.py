@@ -44,7 +44,7 @@ class StandardGame:
 
     def playTricks(self):
         """Plays the 5 tricks."""
-        # Initialize Lists/Dicts
+        # Initialize trick information
         goingAlone = self.maker.goAlone()
         cardsPlayed = {player: [] for player in self.players}
         tricksTaken = {player: 0 for player in self.players}
@@ -79,19 +79,15 @@ class StandardGame:
         renegers = self.checkForReneges(leaderList, cardsPlayed, )
         if renegers:
             self.penalize(renegers)
-        return
 
-    def msgPlayers(self,
-                   msg: str,
-                   content: str = None,
-                   exclude: list = None):
-        """Messages all players with a type of message and it's contentself.
+    def msgPlayers(self, msg, content = None, exclude = None):
+        """Messages all players with a type of message and it's content.
 
-        See Player.passMsg() for valid strings for msg.
+        See Player.passMsg() for valid values for msg.
 
         Args:
-            msg: Message type to send.
-            content: Content of message to be send.
+            msg: A string identifying type of message.
+            content: Content of message to be sent.
             exclude: Players that should NOT recieve the message.
         """
         for player in self.players:
@@ -99,21 +95,34 @@ class StandardGame:
                 player.passMsg(msg, content)
 
     def penalize(self, renegers):
-        """Penalizes the renegers by giving 4 points to the opposing team."""
+        """Penalizes the renegers by giving 4 points to the opposing team.
+
+        Args:
+            renegers: A list of players to be penalized
+        """
         for player in renegers:
             team = self.oppoTeam[player.team]
             team.points += 4
 
     def checkForReneges(self, leaderList, cardsPlayed):
-        """Returns a list of players that reneged during the last round."""
+        """Figures out who reneged.
+
+        Args:
+            leaderList: A list of players ordered by when they lead the trick.
+            cardsPlayed: A dict mapping players to a list of cards played.
+                The list of cards is ordered by trick.
+
+        Returns:
+            A list of players that reneged and need to be penalized.
+        """
         renegers = []
 
-        # Check Tricks
+        # Check each trick
         for j in range(5):
             leader = leaderList[j]
             leadSuit = cardsPlayed[leader][j].getSuit(self.trump)
 
-            # Check Player's Card
+            # Check the card each player put down
             for player in self.players:
                 cards = cardsPlayed[player][j:]
                 playable = [card for card in cards if card.getSuit(
@@ -129,13 +138,13 @@ class StandardGame:
         return renegers
 
     def resetTrick(self):
-        """Resets the information used in each trick"""
+        """Resets the information used in each trick."""
         self.topCard = None
         self.trump = None
         self.maker = None
 
     def seatPlayers(self):
-        """Seats the players randomly around table (preserving teams)
+        """Seats the players randomly around table (preserving teams).
         """
         self.players = []
         t1 = self.team1.getPlayers()
@@ -156,15 +165,10 @@ class StandardGame:
         self.players.append(teams[1][1])
 
     def dealPhase(self):
-        """Enters the dealing phase, returns False if no maker selected
+        """Deals cards and determines trump.
 
-        Modifies
-        ---------------------
-        self.deck
-        self.players
-        self.kitty
-        self.topCard
-        self.allPassed
+        Returns:
+            True if there was a misdeal, False otherwise.
         """
         # Distribute Cards
         self.deck.shuffle()
@@ -182,13 +186,14 @@ class StandardGame:
         return not allPassed
 
     def orderPhase(self):
-        """Handles the order up phase, returns True if everyone
-        passes ordering up
+        """Asks all players if they want to order up the top card.
+
+        Returns:
+            True if everyone passes ordering up, otherwise False.
         """
         # Ask players if they want to order up top card
         for player in self.players:
-            orderInfo = self.orderInfo(player)
-            orderUp = player.orderUp(orderInfo)
+            orderUp = player.orderUp()
             if orderUp:
                 self.maker = player
                 self.trump = self.topCard.suit
@@ -198,25 +203,21 @@ class StandardGame:
         return True
 
     def trumpPhase(self):
-        """Handles the order trump phase, returns true
+        """Asks all players if they want to order trump.
 
-        Modifies
-        -----------------------
-        self.trump
-        self.maker
-        self.deniedTrump
+        Returns:
+            True if everyone passes ordering trump, otherwise False
         """
         # Ask players if they want to order trump
         for player in self.players:
-            orderInfo = self.orderInfo(player)
-            orderTrump = player.orderTrump(orderInfo)
+            orderTrump = player.orderTrump()
             if orderTrump:
-                call = player.callTrump(orderInfo)
+                call = player.callTrump()
 
                 # Require valid trump that isn't top card suit
                 while not self.validTrump(call):
                     player.passMsg("invalidSuit")
-                    call = player.callTrump(orderInfo)
+                    call = player.callTrump()
 
                 self.maker = player
                 self.trump = call
@@ -227,45 +228,30 @@ class StandardGame:
         return True
 
     def validTrump(self, suit):
-        """Returns True if a card is a valid trump call
+        """Checks if a trump call is valid.
+
+        Args:
+            The suit that a player has called.
+
+        Returns:
+            True if the trump is valid, otherwise False.
         """
         if not suit in ['C', 'S', 'H', 'D']:
             return False
         return suit != self.topCard.suit
 
     def newDealer(self):
-        """Rotates the player order so the player to the left of the dealer is the dealer
+        """Selects the new dealer.
+
+        Rotates the player order so the player to the left of the dealer is the new dealer.
         """
         newDealer = self.players.pop(0)
         self.players.append(newDealer)
 
-    def orderInfo(self, player):
-        """Dictionary of info about the trick for player to make a decision with
-
-        Contains enough information for the Player class to understand the
-        current state of the trick during the dealing phase
-
-        Returns
-        ----------
-        dict
-            team1: Team
-                The first team (arbitrary)
-            team2: Team
-                The second team (arbitrary)
-            players: list(Player)
-                All 4 players, in order of turn (idx=3 is dealer)
-            topCard: Card
-                The card that was turned over
-        """
-        orderInfo = {
-            'team1': self.team1,
-            'team2': self.team2,
-            'players': self.players,
-            'topCard': self.topCard
-        }
-        return orderInfo
-
     def getWinner(self):
-        """Returns the winning player or None
+        """Fetches the winner.
+
+        Returns:
+            Player that won, or if there is no winner, None.
         """
         return None

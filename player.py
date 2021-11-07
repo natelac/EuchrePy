@@ -4,15 +4,10 @@ import abc
 class Player(abc.ABC):
     """Base Player class
 
-    Attributes
-    ----------
-    name : str
-        Name of the player
-    team : Team
-        Team that the player is on
-    hand : list(Card)
-        List of cards in the players hand
-
+    Attributes:
+        name: Name of the player
+        team: Team that the player is on
+        hand: List of cards in the players hand
     """
 
     def __init__(self, name=''):
@@ -22,43 +17,66 @@ class Player(abc.ABC):
         self._playedCards = []
 
     def __str__(self):
+        """Gets name of player"""
         return self.name
 
-    @property
-    def points(self):
-        return self._points
-
-    @points.setter
-    def points(self, points):
-        self._points = points
-
     def getTeammate(self):
+        """Gets teammate
+
+        Returns:
+            Player that is on the same team as this Player."""
         return self.team.getTeammate(self)
 
     @abc.abstractmethod
-    def orderUp(self, orderUpInfo):
+    def orderUp(self):
+        """Determines whether player will order up.
+
+        Returns:
+            True if player is ordering up, otherwise False.
+        """
         pass
 
     @abc.abstractmethod
-    def orderTrump(self, orderInfo):
+    def orderTrump(self):
+        """Determines whether player will order trump.
+
+        Returns:
+            True if player is ordering trump, otherwise False.
+        """
         pass
 
     @abc.abstractmethod
-    def callTrump(self, orderInfo):
+    def callTrump(self):
+        """Gets players call for trump.
+
+        Returns:
+            Suit that player will call for trump.
+        """
         pass
 
     @abc.abstractmethod
-    def playCard(self, leader, cardsPlayed, trump):
+    def playCard(self):
+        """Gets players card to be played during a trick.
+
+        Returns:
+            A card that player selects.
+        """
         pass
 
     @abc.abstractmethod
     def goAlone(self):
+        """Gets whether player is going alone.
+
+        Returns:
+            True if player is going alone, otherwise False.
+        """
         pass
 
     @abc.abstractmethod
     def passMsg(self, msg, content=None):
-        """
-        msg:
+        """Recieves messages that pass game information to the player.
+
+        Valid values for msg:
             "points":
                 content: (team1 points, team2 points)
             "misdeal"
