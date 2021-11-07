@@ -15,9 +15,9 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 - Simple intelligent plays for BasicAI rather than just random valid plays.
 
 ### Short Term
-- Make a Euchre() class as a driver instead
+- Euchre() class as a driver instead
   - Let's you select what type of game to play, easy control of
-- Add checking for whether a player played cards only from their hand.
+- Check for whether a player played cards only from their hand.
 
 ### Long Term
 - JSPlayer for interfacing with a webapp through javascript
