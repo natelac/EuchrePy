@@ -16,8 +16,6 @@ class Deck:
 
     ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
     suits = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
-    # shortRanks = ['A','K','Q','J','10','9']
-    # shortSuits = ['C','S','H','D']
 
     def __init__(self):
         self.cards: List[Card] = []

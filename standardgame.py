@@ -46,22 +46,34 @@ class StandardGame:
         """Plays the 5 tricks."""
         # Initialize trick information
         goingAlone = self.maker.goAlone()
-        cardsPlayed = {player: [] for player in self.players}
-        tricksTaken = {player: 0 for player in self.players}
+        cardsPlayed = {}
+        tricksTaken = {}
+        if goingAlone:
+            for player in self.players:
+                if self.maker.getTeammate() is not player:
+                    cardsPlayed[player] = []
+                    tricksTaken[player] = 0
+        else:
+            cardsPlayed = {player: [] for player in self.players}
+            tricksTaken = {player: 0 for player in self.players}
 
-        # Start Deal
+        # Start deal
         taker = self.players[1]
         leaderList = []
         self.msgPlayers("leader", taker)
 
-        # Play Tricks
+        # Play tricks
         for j in range(5):
             leaderList.append(taker)
 
-            # A trick
+            # Play a trick
             for i in range(4):
                 idx = (self.players.index(taker) + i) % 4
                 player = self.players[idx]
+                if goingAlone and self.maker.getTeammate() is player:
+                    # print(player)
+                    continue
+                # print(player)
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
                 self.msgPlayers("played", (player, card), exclude=player)
@@ -76,11 +88,22 @@ class StandardGame:
             tricksTaken[taker] += 1
 
         # Reneging
-        renegers = self.checkForReneges(leaderList, cardsPlayed, )
+        renegers = self.checkForReneges(leaderList, cardsPlayed, goingAlone)
         if renegers:
             self.penalize(renegers)
 
-    def msgPlayers(self, msg, content = None, exclude = None):
+        # Award points to teams
+        teamTricks = {self.team1: 0, self.team2: 0}
+        for player, taken in tricksTaken.items():
+            teamTricks[player.team] += taken
+        takingTeam = max(teamTricks, key=teamTricks.get)
+        tp = takingTeam.getPlayers()
+        print("{} and {} win the round with {} tricks taken"
+            .format(tp[0],tp[1],teamTricks[takingTeam]))
+
+
+
+    def msgPlayers(self, msg, content=None, exclude=None):
         """Messages all players with a type of message and it's content.
 
         See Player.passMsg() for valid values for msg.
@@ -104,7 +127,7 @@ class StandardGame:
             team = self.oppoTeam[player.team]
             team.points += 4
 
-    def checkForReneges(self, leaderList, cardsPlayed):
+    def checkForReneges(self, leaderList, cardsPlayed, goingAlone):
         """Figures out who reneged.
 
         Args:
@@ -122,8 +145,10 @@ class StandardGame:
             leader = leaderList[j]
             leadSuit = cardsPlayed[leader][j].getSuit(self.trump)
 
-            # Check the card each player put down
+            # Add player to renengers if invalid card played
             for player in self.players:
+                if goingAlone and self.maker.getTeammate() is player:
+                    continue
                 cards = cardsPlayed[player][j:]
                 playable = [card for card in cards if card.getSuit(
                     self.trump) == leadSuit]

@@ -10,6 +10,8 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 
 ## TODO:
 - Scoring
+- Add msg for getting players the top card
+- Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
 - Going alone
   - If a player is going alone, just skip over their partner. You might also need to update the code for checking reneges
 - Simple intelligent plays for BasicAI rather than just random valid plays.

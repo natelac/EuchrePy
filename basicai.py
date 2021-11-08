@@ -27,8 +27,9 @@ class BasicAIPlayer(Player, abc.ABC):
             # Play an arbitrary valid card
             leadSuit = cardsPlayed[leader][-1].suit
             playable = [card for card in self.hand if card.getSuit(
-                trump) == leadSuit]
-            card = playable[0] if playable else self.hand.pop()
+                        trump) == leadSuit]
+            card = playable[0] if playable else self.hand[0]
+            self.hand.remove(card)
 
         return card
 
