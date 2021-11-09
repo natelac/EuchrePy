@@ -9,11 +9,8 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 *NSFP was [already implemented](https://github.com/elipugh/euchre) in Euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. The MCTS and NFSP papers do not explicitly discuss feature selection. I think I could get better performance by creating better features. There was [another paper](https://sites.ualberta.ca/~amw8/hearts.pdf) that talked about what features to select for a game of hearts, which might be a good reference.*
 
 ## TODO:
-- Scoring
 - Add msg for getting players the top card
 - Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
-- Going alone
-  - If a player is going alone, just skip over their partner. You might also need to update the code for checking reneges
 - Simple intelligent plays for BasicAI rather than just random valid plays.
 
 ### Short Term

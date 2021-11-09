@@ -97,5 +97,9 @@ class Player(abc.ABC):
                 content: (Player, points)
             "invalidSuit"
                 content: None
+            "roundResults:"
+                content: (winningTeam, pointsWon)
+            "gameResults:"
+                content: (winningTeam, losingTeam)
         """
         pass

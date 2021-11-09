@@ -92,14 +92,32 @@ class StandardGame:
         if renegers:
             self.penalize(renegers)
 
-        # Award points to teams
+        # Otherwise score
+        else:
+            self.scoreRound(tricksTaken, goingAlone)
+
+    def scoreRound(self, tricksTaken, goingAlone):
+        """Messages players winner and points won."""
+        # Count tricks taken per team
         teamTricks = {self.team1: 0, self.team2: 0}
         for player, taken in tricksTaken.items():
             teamTricks[player.team] += taken
         takingTeam = max(teamTricks, key=teamTricks.get)
-        tp = takingTeam.getPlayers()
-        print("{} and {} win the round with {} tricks taken"
-            .format(tp[0],tp[1],teamTricks[takingTeam]))
+
+        # Figure out points
+        points = 1
+        if self.maker in takingTeam.getPlayers():
+            if goingAlone and teamTricks[takingTeam] == 5:
+                points = 4
+            elif teamTricks[takingTeam] == 5:
+                points = 2
+        else:
+            points = 2
+
+        # Finalize results
+        takingTeam.points += points
+        self.msgPlayers("roundResults",
+                        content=(takingTeam, points, teamTricks[takingTeam]))
 
 
 
@@ -126,6 +144,8 @@ class StandardGame:
         for player in renegers:
             team = self.oppoTeam[player.team]
             team.points += 4
+
+
 
     def checkForReneges(self, leaderList, cardsPlayed, goingAlone):
         """Figures out who reneged.

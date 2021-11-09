@@ -46,11 +46,18 @@ class HumanPlayer(Player, abc.ABC):
         return card
 
     def passMsg(self, msg, content=None):
-        """Prints information to console.
-        """
         def points():
             print(
                 f"Team1 has {content[0].points} points\tTeam2 has {content[1].points} points")
+
+        def roundResults():
+            winningTeam, points, tricks = content
+            winners = content[0].getPlayers()
+            print("{} and {} win the round with {} points and {} trick taken"
+                  .format(winners[0], winners[1], points, tricks))
+
+        def gameResults():
+            print("TODO")
 
         def misdeal():
             print("Misdeal, new dealer")
@@ -90,7 +97,9 @@ class HumanPlayer(Player, abc.ABC):
                    "deniedUp": deniedUp,
                    "deniedTrump": deniedTrump,
                    "penalty": penalty,
-                   "invalidSuit": invalidSuit}
+                   "invalidSuit": invalidSuit,
+                   "roundResults": roundResults,
+                   "gameResults": gameResults}
         options[msg]()
 
     def printCards(self):
