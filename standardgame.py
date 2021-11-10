@@ -71,9 +71,7 @@ class StandardGame:
                 idx = (self.players.index(taker) + i) % 4
                 player = self.players[idx]
                 if goingAlone and self.maker.getTeammate() is player:
-                    # print(player)
                     continue
-                # print(player)
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
                 self.msgPlayers("played", (player, card), exclude=player)
@@ -92,7 +90,7 @@ class StandardGame:
         if renegers:
             self.penalize(renegers)
 
-        # Otherwise score
+        # Otherwise score round
         else:
             self.scoreRound(tricksTaken, goingAlone)
 
@@ -119,8 +117,6 @@ class StandardGame:
         self.msgPlayers("roundResults",
                         content=(takingTeam, points, teamTricks[takingTeam]))
 
-
-
     def msgPlayers(self, msg, content=None, exclude=None):
         """Messages all players with a type of message and it's content.
 
@@ -144,8 +140,6 @@ class StandardGame:
         for player in renegers:
             team = self.oppoTeam[player.team]
             team.points += 4
-
-
 
     def checkForReneges(self, leaderList, cardsPlayed, goingAlone):
         """Figures out who reneged.
