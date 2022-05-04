@@ -2,6 +2,10 @@
 
 An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. EuchrePy was created to train AI and interface easily with a web app to display AI information and player IO.
 
+Furthermore, this is meant to be able to run as an instance of a euchre game running on a flask server between 4 players.
+
+The goal of the 'rework' branch is to simplify the game logic, and simplify how information is passed between objects.
+
 [Monte Carlo Tree Search (MCTS)](https://github.com/matgrioni/Euchre-bot) and [Neural Fictitious Self-Play (NFSP)](https://arxiv.org/pdf/1603.01121.pdf) have been used to different levels of success to create AI for imperfect-information games (Euchre and Poker respectively). I am looking to use Monte Carlo Neural Fictitious Self-Play (MC-NFSP) to create an AI for playing Euchre. My goal is to implement the methods used for poker described by [Zhang et. al](https://arxiv.org/pdf/1903.09569.pdf) to create an MC-NFSP Euchre AI.
 
 (Maybe I'll implement MCTS, then NFSP, then MC-NFSP)
@@ -10,16 +14,17 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 
 ## TODO:
 - Add msg for getting players the top card
+- Modify Player.passMsg so it passes a single dictionary msg with a type, and named variables
 - Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
 - Simple intelligent plays for BasicAI rather than just random valid plays.
 
 ### Short Term
 - Euchre() class as a driver instead
-  - Let's you select what type of game to play, easy control of
 - Check for whether a player played cards only from their hand.
 
 ### Long Term
-- JSPlayer for interfacing with a webapp through javascript
+- Add game save states in the event of crashes
+- Add WebPlayer that is a separate thread that sends messages to a client
 - Game Class that can be extended to create variations of euchre
   - Refactor code so StandardGame extends Game
 - MLPlayer that makes decisions from a trained ML/ interfaces with one
