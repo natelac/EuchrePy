@@ -29,26 +29,27 @@ class StandardGame:
     def play(self):
         """Plays a game of euchre until a team reaches 10 points."""
         if len(self.players) != 4:
-            raise AssertionError(
-                f"Euchre requires 4 players to play")
+            raise AssertionError(f"Euchre requires 4 players to play")
 
         # Game Loop
         while not self.getWinner():
-            self.msgPlayers("points", (self.team1, self.team2))
+            self.msgPlayers({'type': 'points',
+                             'teams': (self.team1, self.team2)})
             makerSelected = self.dealPhase()
             if makerSelected:
                 self.playTricks()
             else:
-                self.msgPlayers("misdeal")
+                self.msgPlayers({'type':'misdeal'})
             self.newDealer()
 
     def playTricks(self):
         """Plays the 5 tricks."""
         # Initialize trick information
         goingAlone = self.maker.goAlone()
-        cardsPlayed = {}
-        tricksTaken = {}
+        cardsPlayed = {} # Maps player to cards played
+        tricksTaken = {} # Maps players to tricks taken
         if goingAlone:
+            # Skip team-mate of player going alone
             for player in self.players:
                 if self.maker.getTeammate() is not player:
                     cardsPlayed[player] = []
@@ -57,24 +58,27 @@ class StandardGame:
             cardsPlayed = {player: [] for player in self.players}
             tricksTaken = {player: 0 for player in self.players}
 
-        # Start deal
-        taker = self.players[1]
-        leaderList = []
-        self.msgPlayers("leader", taker)
+        taker = self.players[1] # Init taker to player left of dealer
+        leaderList = [] # List of players that lead for all 5 tricks
+        self.msgPlayers({'type': 'new_leader', 'leader': player})
 
         # Play tricks
         for j in range(5):
-            leaderList.append(taker)
+            leaderList.append(taker) # Taker of previous round leads
 
             # Play a trick
             for i in range(4):
                 idx = (self.players.index(taker) + i) % 4
                 player = self.players[idx]
                 if goingAlone and self.maker.getTeammate() is player:
+                    # Skip teammate of player going alone
                     continue
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
-                self.msgPlayers("played", (player, card), exclude=player)
+                self.msgPlayers({'type': 'card_played',
+                                 'player': player,
+                                 'card': card},
+                                exclude=player)
 
             # Decide Taker
             trick = {player: cards[j] for player, cards in cardsPlayed.items()}
@@ -82,7 +86,7 @@ class StandardGame:
             taker = max(trick,
                         key=lambda player: trick[player].value(
                             ledSuit, self.trump))
-            self.msgPlayers("taker", taker)
+            self.msgPlayers({'type': 'new_taker', 'taker': taker})
             tricksTaken[taker] += 1
 
         # Reneging
@@ -114,10 +118,14 @@ class StandardGame:
 
         # Finalize results
         takingTeam.points += points
-        self.msgPlayers("roundResults",
-                        content=(takingTeam, points, teamTricks[takingTeam]))
+        self.msgPlayers({
+                         'type': 'roundResults',
+                         'taking_team': takingTeam,
+                         'points': points,
+                         'team_tricks': teamTricks[takingTeam]
+                        })
 
-    def msgPlayers(self, msg, content=None, exclude=None):
+    def msgPlayers(self, msg exclude=None):
         """Messages all players with a type of message and it's content.
 
         See Player.passMsg() for valid values for msg.
@@ -129,17 +137,17 @@ class StandardGame:
         """
         for player in self.players:
             if player is not exclude:
-                player.passMsg(msg, content)
+                player.passMsg(msg)
 
     def penalize(self, renegers):
-        """Penalizes the renegers by giving 4 points to the opposing team.
+        """Penalizes the renegers by giving 2 points to the opposing team.
 
         Args:
             renegers: A list of players to be penalized
         """
         for player in renegers:
             team = self.oppoTeam[player.team]
-            team.points += 4
+            team.points += 2
 
     def checkForReneges(self, leaderList, cardsPlayed, goingAlone):
         """Figures out who reneged.
@@ -171,9 +179,10 @@ class StandardGame:
                 else:
                     valid = True
                 if not valid:
-                    self.msgPlayers("penalty", (player, cards[0]))
-                    renegers.append(
-                        player) if player not in renegers else renegers
+                    self.msgPlayers({'type': 'penalty',
+                                     'player': player,
+                                     'card': cards[0]})
+                    renegers.append(player) if player not in renegers else renegers
         return renegers
 
     def resetTrick(self):
@@ -238,7 +247,8 @@ class StandardGame:
                 self.trump = self.topCard.suit
                 return False
             else:
-                self.msgPlayers("deniedUp", player, exclude=player)
+                self.msgPlayers({'type': 'denied_up', 'player': player},
+                                exclude=player)
         return True
 
     def trumpPhase(self):
@@ -255,14 +265,15 @@ class StandardGame:
 
                 # Require valid trump that isn't top card suit
                 while not self.validTrump(call):
-                    player.passMsg("invalidSuit")
+                    player.passMsg({'type':'invalid_suit'})
                     call = player.callTrump()
 
                 self.maker = player
                 self.trump = call
                 return False
             else:
-                self.msgPlayers("deniedTrump", player, exclude=player)
+                self.msgPlayers({'type': 'denied_trump', 'player': player},
+                                exclude=player)
 
         return True
 
