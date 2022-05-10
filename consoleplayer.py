@@ -8,6 +8,9 @@ class HumanPlayer(Player, abc.ABC):
     def __init__(self, name='Human'):
         Player.__init__(self, name)
 
+    def updateHand(self, cards):
+        self.hand = cards
+
     def orderUp(self):
         self.printCards()
         ans = input('Order up? y/n\n')
@@ -17,9 +20,9 @@ class HumanPlayer(Player, abc.ABC):
         ans = input('Call trump? y/n\n')
         return ans == 'y'
 
-    def callTrump(self):
+    def callTrump(self, topSuit):
         ans = input('Enter suit to pick\n')
-        while ans not in ['C', 'S', 'H', 'D'] and ans != topCard['topCard'].suit:
+        while ans not in ['C', 'S', 'H', 'D'] and ans != topSuit:
             ans = input('Not a valid suit.\n')
         return ans
 
@@ -48,13 +51,15 @@ class HumanPlayer(Player, abc.ABC):
     def passMsg(self, msg):
         def points():
             team1, team2 = msg['teams']
-            print(f"Team1 has {team1.points} points\tTeam2 has {team2.points} points")
+            print()
+            print(f"{team1._p1}, {team1._p2} have {team1.points} points\t {team2._p1}, {team2._p2} have {team2.points} points")
+            print('-'*50)
 
         def roundResults():
-            winningTeam, points, tricks = content
-            winners = content[0].getPlayers()
+            winners = msg['taking_team'].getPlayers()
             print("{} and {} win the round with {} points and {} trick taken"
-                  .format(winners[0], winners[1], points, tricks))
+                  .format(winners[0], winners[1],
+                          msg['points'], msg['team_tricks']))
 
         def gameResults():
             print("TODO")
@@ -77,7 +82,14 @@ class HumanPlayer(Player, abc.ABC):
         def deniedTrump():
             print(f"{msg['player']} denied ordering trump")
 
+        def orderedUp():
+            print(f"{msg['player']} ordered up {msg['top_card']}")
+
+        def orderedTrump():
+            print(f"{msg['player']} chose {msg['trump_suit']} as the trump suit")
+
         def penalty():
+            #TODO: Check if other player is teammate
             if msg['player'] is self:
                 print(
                     f"You reneged by playing {msg['card']} and the opposing team was awarded 2 points")
@@ -89,17 +101,32 @@ class HumanPlayer(Player, abc.ABC):
             print(
                 "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
 
+        def topCard():
+            print(f"The top card is {msg['top_card'].prettyString()}")
+
+        def trickStart():
+            #TODO:
+            print()
+
+        def dealer():
+            print(f"The dealer is {msg['player']}")
+
         options = {'points': points,
                    'misdeal': misdeal,
                    'new_leader': leader,
-                   'played': played,
+                   'card_played': played,
                    'new_taker': taker,
                    'denied_up': deniedUp,
                    'denied_trump': deniedTrump,
                    'penalty': penalty,
                    'invalid_suit': invalidSuit,
                    'roundResults': roundResults,
-                   'gameResults': gameResults}
+                   'gameResults': gameResults,
+                   'top_card': topCard,
+                   'ordered_up': orderedUp,
+                   'ordered_trump': orderedTrump,
+                   'trick_start': trickStart,
+                   'dealer': dealer}
         options[msg['type']]()
 
     def printCards(self):

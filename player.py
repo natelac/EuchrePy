@@ -28,6 +28,12 @@ class Player(abc.ABC):
         return self.team.getTeammate(self)
 
     @abc.abstractmethod
+    def updateHand(self, cards):
+        """Updates cards in players hand
+        """
+        pass
+
+    @abc.abstractmethod
     def orderUp(self):
         """Determines whether player will order up.
 
@@ -73,9 +79,10 @@ class Player(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def passMsg(self, msg, content=None):
+    def passMsg(self, msg):
         """Recieves messages that pass game information to the player.
 
+        #TODO: This is all invalid with dictionary changes
         Valid values for msg:
             "points":
                 content: (team1 points, team2 points)
@@ -101,5 +108,7 @@ class Player(abc.ABC):
                 content: (winningTeam, pointsWon)
             "gameResults:"
                 content: (winningTeam, losingTeam)
+            "top_card_selected":
+                content: top_card
         """
         pass

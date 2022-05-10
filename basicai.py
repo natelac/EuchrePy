@@ -7,13 +7,16 @@ class BasicAIPlayer(Player, abc.ABC):
     def __init__(self, name='AI'):
         Player.__init__(self, name)
 
+    def updateHand(self, cards):
+        self.hand = cards
+
     def orderUp(self):
         return False
 
     def orderTrump(self):
         return False
 
-    def callTrump(self):
+    def callTrump(self, upSuit):
         return None
 
     def goAlone(self):
@@ -33,5 +36,5 @@ class BasicAIPlayer(Player, abc.ABC):
 
         return card
 
-    def passMsg(self, msg, content):
+    def passMsg(self, msg):
         pass

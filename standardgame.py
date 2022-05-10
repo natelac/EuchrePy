@@ -15,10 +15,12 @@ class StandardGame:
     def __init__(self, team1, team2):
         # Game info
         self.deck = Deck()
-        self.players = []
         self.team1 = team1
         self.team2 = team2
         self.oppoTeam = {team1: team2, team2: team1}
+        self.players = [] # List of players, initially equivelant to self.table
+        self.table = [] # Ordered players where index 3 is dealer
+        self.play_order = [] # Ordered plaeyrs where index 0 is leader
         self.seatPlayers()
 
         # Trick Info
@@ -30,46 +32,119 @@ class StandardGame:
         """Plays a game of euchre until a team reaches 10 points."""
         if len(self.players) != 4:
             raise AssertionError(f"Euchre requires 4 players to play")
-
         # Game Loop
         while not self.getWinner():
             self.msgPlayers({'type': 'points',
                              'teams': (self.team1, self.team2)})
+            self.msgPlayers({'type': 'dealer',
+                             'player': self.table[3]})
             makerSelected = self.dealPhase()
             if makerSelected:
                 self.playTricks()
             else:
                 self.msgPlayers({'type':'misdeal'})
-            self.newDealer()
+            self.updateTableOrder()
+
+    def dealPhase(self):
+        """Deals cards and determines trump.
+
+        Returns:
+            True if there was a misdeal, False otherwise.
+        """
+        # Distribute Cards
+        self.deck.shuffle()
+        hands = self.deck.deal()
+        self.kitty = hands[4]
+        self.topCard = self.kitty[0]
+        for i in range(4):
+            self.play_order[i].updateHand(hands[i])
+        self.msgPlayers({'type': 'top_card', 'top_card': self.topCard})
+
+        # Order up and order trump phases
+        allPassed = self.orderPhase()
+        if allPassed:
+            allPassed = self.trumpPhase()
+
+        return not allPassed
+
+    def orderPhase(self):
+        """Asks all players if they want to order up the top card.
+
+        Returns:
+            True if everyone passes ordering up, otherwise False.
+        """
+        # Ask players if they want to order up top card
+        for player in self.table:
+            orderUp = player.orderUp()
+            if orderUp:
+                self.maker = player
+                self.trump = self.topCard.suit
+                self.msgPlayers({'type': 'ordered_up', 'player': player},
+                                exclude=player)
+                return False
+            else:
+                self.msgPlayers({'type': 'denied_up', 'player': player},
+                                exclude=player)
+        return True
+
+    def trumpPhase(self):
+        """Asks all players if they want to order trump.
+
+        Returns:
+            True if everyone passes ordering trump, otherwise False
+        """
+        # Ask players if they want to order trump
+        for player in self.table:
+            orderTrump = player.orderTrump()
+            if orderTrump:
+                call = player.callTrump(self.topCard.suit)
+
+                # Require valid trump that isn't top card suit
+                while not self.validTrump(call):
+                    player.passMsg({'type':'invalid_suit'})
+                    call = player.callTrump(self.topCard.suit)
+
+                self.maker = player
+                self.trump = call
+                self.msgPlayers({'type': 'ordered_trump', 'player': player},
+                                exclude=player)
+                return False
+            else:
+                self.msgPlayers({'type': 'denied_trump', 'player': player},
+                                exclude=player)
+
+        return True
 
     def playTricks(self):
-        """Plays the 5 tricks."""
+        """Plays 5 tricks."""
         # Initialize trick information
         goingAlone = self.maker.goAlone()
         cardsPlayed = {} # Maps player to cards played
         tricksTaken = {} # Maps players to tricks taken
         if goingAlone:
-            # Skip team-mate of player going alone
-            for player in self.players:
+            # Skip teammate of player going alone
+            for player in self.play_order:
                 if self.maker.getTeammate() is not player:
                     cardsPlayed[player] = []
                     tricksTaken[player] = 0
         else:
-            cardsPlayed = {player: [] for player in self.players}
-            tricksTaken = {player: 0 for player in self.players}
+            cardsPlayed = {player: [] for player in self.play_order}
+            tricksTaken = {player: 0 for player in self.play_order}
 
-        taker = self.players[1] # Init taker to player left of dealer
+        taker = self.table[0] # Init taker to player left of dealer
         leaderList = [] # List of players that lead for all 5 tricks
-        self.msgPlayers({'type': 'new_leader', 'leader': player})
+        #self.msgPlayers({'type': 'new_leader', 'leader': taker})
 
         # Play tricks
         for j in range(5):
-            leaderList.append(taker) # Taker of previous round leads
+            # Taker of previous round leads
+            leaderList.append(taker)
+            self.updatePlayOrder(taker)
+
+            self.msgPlayers({'type': 'trick_start'})
 
             # Play a trick
-            for i in range(4):
-                idx = (self.players.index(taker) + i) % 4
-                player = self.players[idx]
+            for player in self.play_order:
                 if goingAlone and self.maker.getTeammate() is player:
                     # Skip teammate of player going alone
                     continue
@@ -93,10 +168,22 @@ class StandardGame:
         renegers = self.checkForReneges(leaderList, cardsPlayed, goingAlone)
         if renegers:
             self.penalize(renegers)
-
-        # Otherwise score round
         else:
+            # Otherwise score round
             self.scoreRound(tricksTaken, goingAlone)
+
+    def validTrump(self, suit):
+        """Checks if a trump call is valid.
+
+        Args:
+            The suit that a player has called.
+
+        Returns:
+            True if the trump is valid, otherwise False.
+        """
+        if not suit in ['C', 'S', 'H', 'D']:
+            return False
+        return suit != self.topCard.suit
 
     def scoreRound(self, tricksTaken, goingAlone):
         """Messages players winner and points won."""
@@ -124,20 +211,6 @@ class StandardGame:
                          'points': points,
                          'team_tricks': teamTricks[takingTeam]
                         })
-
-    def msgPlayers(self, msg exclude=None):
-        """Messages all players with a type of message and it's content.
-
-        See Player.passMsg() for valid values for msg.
-
-        Args:
-            msg: A string identifying type of message.
-            content: Content of message to be sent.
-            exclude: Players that should NOT recieve the message.
-        """
-        for player in self.players:
-            if player is not exclude:
-                player.passMsg(msg)
 
     def penalize(self, renegers):
         """Penalizes the renegers by giving 2 points to the opposing team.
@@ -168,28 +241,21 @@ class StandardGame:
             leadSuit = cardsPlayed[leader][j].getSuit(self.trump)
 
             # Add player to renengers if invalid card played
-            for player in self.players:
+            for player in self.table:
                 if goingAlone and self.maker.getTeammate() is player:
+                    # If player is going alone skip their teammate
                     continue
                 cards = cardsPlayed[player][j:]
                 playable = [card for card in cards if card.getSuit(
-                    self.trump) == leadSuit]
+                            self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
-                    valid = False
-                else:
-                    valid = True
-                if not valid:
+                    #TODO Fix this logic, maybe penalties should be messaged in batches? This way if a player reneges twice, the player classes will handle the messages better and not say that a player was penalized points for each renege, when they were actually only penalized for one
                     self.msgPlayers({'type': 'penalty',
                                      'player': player,
                                      'card': cards[0]})
-                    renegers.append(player) if player not in renegers else renegers
-        return renegers
+                    renegers.append(player) if player not in renegers else None
 
-    def resetTrick(self):
-        """Resets the information used in each trick."""
-        self.topCard = None
-        self.trump = None
-        self.maker = None
+        return renegers
 
     def seatPlayers(self):
         """Seats the players randomly around table (preserving teams).
@@ -212,96 +278,53 @@ class StandardGame:
         self.players.append(teams[0][1])
         self.players.append(teams[1][1])
 
-    def dealPhase(self):
-        """Deals cards and determines trump.
+        # Table order is initially just the players in order
+        #   where the 0th index is for the dealer
+        self.table = self.players.copy()
 
-        Returns:
-            True if there was a misdeal, False otherwise.
-        """
-        # Distribute Cards
-        self.deck.shuffle()
-        hands = self.deck.deal()
-        for i in range(4):
-            self.players[i].hand = hands[i]
-        self.kitty = hands[4]
-        self.topCard = self.kitty[0]
+        # The player left of the dealer (at 3rd index) should start the trick
+        #   (be at the 0th index)
+        self.play_order = []
+        self.play_order = self.players.copy()
+        new_leader = self.play_order.pop(0)
+        self.play_order.append(new_leader)
 
-        # Order Up and Trump phases
-        allPassed = self.orderPhase()
-        if allPassed:
-            allPassed = self.trumpPhase()
+    def updatePlayOrder(self, taker):
+        """Updates the play order so the taker of the previous trick goes first."""
+        while self.play_order[0] is not taker:
+            new_leader = self.play_order.pop(0)
+            self.play_order.append(new_leader)
 
-        return not allPassed
-
-    def orderPhase(self):
-        """Asks all players if they want to order up the top card.
-
-        Returns:
-            True if everyone passes ordering up, otherwise False.
-        """
-        # Ask players if they want to order up top card
-        for player in self.players:
-            orderUp = player.orderUp()
-            if orderUp:
-                self.maker = player
-                self.trump = self.topCard.suit
-                return False
-            else:
-                self.msgPlayers({'type': 'denied_up', 'player': player},
-                                exclude=player)
-        return True
-
-    def trumpPhase(self):
-        """Asks all players if they want to order trump.
-
-        Returns:
-            True if everyone passes ordering trump, otherwise False
-        """
-        # Ask players if they want to order trump
-        for player in self.players:
-            orderTrump = player.orderTrump()
-            if orderTrump:
-                call = player.callTrump()
-
-                # Require valid trump that isn't top card suit
-                while not self.validTrump(call):
-                    player.passMsg({'type':'invalid_suit'})
-                    call = player.callTrump()
-
-                self.maker = player
-                self.trump = call
-                return False
-            else:
-                self.msgPlayers({'type': 'denied_trump', 'player': player},
-                                exclude=player)
-
-        return True
-
-    def validTrump(self, suit):
-        """Checks if a trump call is valid.
-
-        Args:
-            The suit that a player has called.
-
-        Returns:
-            True if the trump is valid, otherwise False.
-        """
-        if not suit in ['C', 'S', 'H', 'D']:
-            return False
-        return suit != self.topCard.suit
-
-    def newDealer(self):
+    def updateTableOrder(self):
         """Selects the new dealer.
 
         Rotates the player order so the player to the left of the dealer is the new dealer.
         """
-        newDealer = self.players.pop(0)
-        self.players.append(newDealer)
+        new_dealer = self.table.pop(0)
+        self.table.append(new_dealer)
 
     def getWinner(self):
         """Fetches the winner.
 
         Returns:
             Player that won, or if there is no winner, None.
+        TODO
         """
         return None
+
+    def msgPlayers(self, msg, exclude=None):
+        """Messages all players with a type of message and it's content.
+
+        See Player.passMsg() for valid values for msg.
+
+        Args:
+            msg: A string identifying type of message.
+            content: Content of message to be sent.
+            exclude: Players that should NOT recieve the message.
+
+        #TODO:
+            Modify so that it waits for tcp message to be sent to all players before continuing
+        """
+        for player in self.table:
+            if player is not exclude:
+                player.passMsg(msg)
