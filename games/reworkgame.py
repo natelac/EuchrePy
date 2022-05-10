@@ -1,5 +1,5 @@
 import numpy as np
-from deck import Deck
+from cards.deck import Deck
 
 game_state = {
     'deck': Deck()

@@ -1,5 +1,5 @@
 import numpy as np
-from deck import Deck
+from cards.deck import Deck
 # from card import Card
 # from team import Team
 # from player import Player

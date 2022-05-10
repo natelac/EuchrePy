@@ -1,7 +1,7 @@
-from consoleplayer import HumanPlayer
-from basicai import BasicAIPlayer
-from team import Team
-from standardgame import StandardGame
+from players.consoleplayer import HumanPlayer
+from players.basicai import BasicAIPlayer
+from players.team import Team
+from games.standardgame import StandardGame
 
 p1 = HumanPlayer('User')
 ai = []
