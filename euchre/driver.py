@@ -1,7 +1,7 @@
-from players.consoleplayer import HumanPlayer
-from players.basicai import BasicAIPlayer
-from players.team import Team
-from games.standardgame import StandardGame
+from euchre.players.consoleplayer import HumanPlayer
+from euchre.players.basicai import BasicAIPlayer
+from euchre.players.team import Team
+from euchre.games.standardgame import StandardGame
 
 p1 = HumanPlayer('User')
 ai = []

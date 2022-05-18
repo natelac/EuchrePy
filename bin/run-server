@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# runserver
+#
+# Euchre server daemon
+
+set -Eeuo pipefail
+
+usage() {
+  echo "Usage: TODO"
+}
+
+if [ $# -ne 1 ]; then
+  usage
+  exit 1
+fi
+
+start-server() {
+  echo "starting euchre server..."
+  euchre-server --host localhost --port 6000 --hb-port 5999 &
+  sleep 2
+}
+
+stop-server() {
+  # Detect GNU vs BSD netcat. We need netcat to close the connection after
+  # sending a message, which requires different options.
+  echo "stopping euchre server..."
+  set +o pipefail  # Avoid erroneous failures due to grep returning non-zero
+  if nc -h 2>&1 | grep -q "\-c"; then
+    NC="nc -c"
+  elif nc -h 2>&1 | grep -q "\-N"; then
+    NC="nc -N"
+  elif nc -h 2>&1 | grep -q "\-C"; then
+    NC="nc -C"
+  else
+    echo "Error detecting netcat version."
+    exit 1
+  fi
+  set -o pipefail
+
+  echo '{"message_type": "shutdown"}' | $NC localhost 6000 || true
+  sleep 2
+  if pgrep -f euchre-server &> /dev/null; then
+    echo "killing euchre server..."
+    pkill -f euchre-server || true
+  fi
+}
+
+case $1 in
+  "start")
+    if pgrep -f "euchre-server" &> /dev/null; then
+      echo "Error: euchre-server is already running"
+      exit 1
+    else
+      start-server
+      exit 0
+    fi
+    ;;
+  "stop")
+    stop-server
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac

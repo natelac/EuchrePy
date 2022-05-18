@@ -1,4 +1,4 @@
-from players.player import Player
+from euchre.players.player import Player
 import abc
 import socket
 import json

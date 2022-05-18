@@ -12,23 +12,34 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 *NSFP was [already implemented](https://github.com/elipugh/euchre) in Euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. The MCTS and NFSP papers do not explicitly discuss feature selection. I think I could get better performance by creating better features. There was [another paper](https://sites.ualberta.ca/~amw8/hearts.pdf) that talked about what features to select for a game of hearts, which might be a good reference.*
 
+## Install
+- Run 'sudo pip install -e .'
+
 ## TODO:
+### Now
+- Create a
 - Have functions to call, rather than dictionaries passed to Players
   - For example: msgPoints, rather than passing a dictionary to passMsg
 
+### Short Term
 - On player disconnect, save game
-- Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
-- Simple intelligent plays for BasicAI rather than just random valid plays.
+
+### Bugs
 - Fix bug where if you renege, AI0 reneges with
   ERROR:
   You reneged by playing 9H and the opposing team was awarded 2 points
   AI0 reneged by playing AI0 and your team was awarded 2 points
+- Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
 
 ### Short Term
 - Euchre() class as a driver instead
 - Check for whether a player played cards only from their hand.
+- Simple intelligent plays for BasicAI rather than just random valid plays.
 
-### Long Term
+## Ideas
+- Work on user experience, IE "import EuchrePy as euch"
+  - "euch.playGame()"
+    - Defaults to a console game against AI
 - Add game save states in the event of crashes
 - Add WebPlayer that is a separate thread that sends messages to a client
 - Game Class that can be extended to create variations of euchre
@@ -36,3 +47,4 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 - MLPlayer that makes decisions from a trained ML/ interfaces with one
 to train it? Along with a driver class that will train the network by
 running through the game?
+- Switch to poetry from setup tools

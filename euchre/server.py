@@ -6,16 +6,16 @@ import socket
 import click
 import time
 #from players.online.webplayer import WebPlayer
-from players.online.webplayer import WebPlayer
-from utils import message_to_dictionary
+from euchre.players.online.webplayer import WebPlayer
+from euchre.utils import message_to_dictionary
 
 
 class GameServer:
     def __init__(self, host, port, hb_port):
         self.socket_info = {
             'host': host,
-            'port': port,
-            'hb_port': hb_port
+            'port': int(port),
+            'hb_port': int(hb_port)
         }
         # Could this just be the gamestate, and is passed to all player classes?
         self.signals = {'shutdown': False,
@@ -131,7 +131,8 @@ class GameServer:
                 print("Player", web_player, "registered")
 
             options = {
-                        'register': handleRegister
+                        'register': handleRegister,
+                        # 'shutdown': handleShutdown
                       }
 
             # Execute handle message based on type
