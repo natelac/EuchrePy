@@ -206,9 +206,9 @@ class StandardGame:
         # Finalize results
         takingTeam.points += points
         self.msgPlayers({
-                         'type': 'roundResults',
+                         'type': 'round_results',
                          'taking_team': takingTeam,
-                         'points': points,
+                         'points_scored': points,
                          'team_tricks': teamTricks[takingTeam]
                         })
 

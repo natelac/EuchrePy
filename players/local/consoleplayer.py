@@ -2,7 +2,7 @@ from players.player import Player
 import abc
 
 
-class HumanPlayer(Player, abc.ABC):
+class ConsolePlayer(Player, abc.ABC):
     """A Player class that prints to and takes input from the console."""
 
     def __init__(self, name='Human'):
@@ -55,11 +55,29 @@ class HumanPlayer(Player, abc.ABC):
             print(f"{team1._p1}, {team1._p2} have {team1.points} points\t {team2._p1}, {team2._p2} have {team2.points} points")
             print('-'*50)
 
+        def dealer():
+            print(f"The dealer is {msg['player']}")
+
+        def topCard():
+            print(f"The top card is {msg['top_card'].prettyString()}")
+
         def roundResults():
             winners = msg['taking_team'].getPlayers()
             print("{} and {} win the round with {} points and {} trick taken"
                   .format(winners[0], winners[1],
-                          msg['points'], msg['team_tricks']))
+                          msg['points_scored'], msg['team_tricks']))
+
+        def orderedUp():
+            print(f"{msg['player']} ordered up {msg['top_card']}")
+
+        def deniedUp():
+            print(f"{msg['player']} denied ordering up")
+
+        def orderedTrump():
+            print(f"{msg['player']} chose {msg['trump_suit']} as the trump suit")
+
+        def deniedTrump():
+            print(f"{msg['player']} denied ordering trump")
 
         def gameResults():
             print("TODO")
@@ -76,18 +94,6 @@ class HumanPlayer(Player, abc.ABC):
         def taker():
             print(f"{msg['taker']} takes the hand")
 
-        def deniedUp():
-            print(f"{msg['player']} denied ordering up")
-
-        def deniedTrump():
-            print(f"{msg['player']} denied ordering trump")
-
-        def orderedUp():
-            print(f"{msg['player']} ordered up {msg['top_card']}")
-
-        def orderedTrump():
-            print(f"{msg['player']} chose {msg['trump_suit']} as the trump suit")
-
         def penalty():
             #TODO: Check if other player is teammate
             if msg['player'] is self:
@@ -101,15 +107,9 @@ class HumanPlayer(Player, abc.ABC):
             print(
                 "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
 
-        def topCard():
-            print(f"The top card is {msg['top_card'].prettyString()}")
-
         def trickStart():
             #TODO:
             print()
-
-        def dealer():
-            print(f"The dealer is {msg['player']}")
 
         options = {'points': points,
                    'misdeal': misdeal,
@@ -120,7 +120,7 @@ class HumanPlayer(Player, abc.ABC):
                    'denied_trump': deniedTrump,
                    'penalty': penalty,
                    'invalid_suit': invalidSuit,
-                   'roundResults': roundResults,
+                   'round_results': roundResults,
                    'gameResults': gameResults,
                    'top_card': topCard,
                    'ordered_up': orderedUp,

@@ -1,0 +1,1 @@
+from .standardgame import StandardGame

@@ -13,7 +13,10 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 *NSFP was [already implemented](https://github.com/elipugh/euchre) in Euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. The MCTS and NFSP papers do not explicitly discuss feature selection. I think I could get better performance by creating better features. There was [another paper](https://sites.ualberta.ca/~amw8/hearts.pdf) that talked about what features to select for a game of hearts, which might be a good reference.*
 
 ## TODO:
-- Simplify table ordering logic so dealer is last (3rd) position and a simple for loop will go between all players
+- Have functions to call, rather than dictionaries passed to Players
+  - For example: msgPoints, rather than passing a dictionary to passMsg
+
+- On player disconnect, save game
 - Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
 - Simple intelligent plays for BasicAI rather than just random valid plays.
 - Fix bug where if you renege, AI0 reneges with

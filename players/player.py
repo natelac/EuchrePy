@@ -1,6 +1,5 @@
 import abc
 
-
 class Player(abc.ABC):
     """Base Player class
 
@@ -80,35 +79,66 @@ class Player(abc.ABC):
 
     @abc.abstractmethod
     def passMsg(self, msg):
-        """Recieves messages that pass game information to the player.
+        """Recieves game information and processes it for the player.
 
-        #TODO: This is all invalid with dictionary changes
-        Valid values for msg:
-            "points":
-                content: (team1 points, team2 points)
-            "misdeal"
-                content: None
-            "leader":
-                content: Player
-            "played":
-                content: (player, card)
-            "taker":
-                content: Player
-            "deniedUp":
-                content: Player
-            "allPassed":
-                content: isTrump
-            "deniedTrump":
-                content: Player
-            "penalty"
-                content: (Player, points)
-            "invalidSuit"
-                content: None
-            "roundResults:"
-                content: (winningTeam, pointsWon)
-            "gameResults:"
-                content: (winningTeam, losingTeam)
-            "top_card_selected":
-                content: top_card
+        Possible messages and their purposes:
+            {'type': 'points',
+             'teams': (Team, Team)}
+            Updated points after round, points can be accessed in the Team
+            object through team.points.
+
+            {'type': 'dealer',
+             'player': Player}
+            What player is the new dealer.
+
+            {'type': 'misdeal'}
+            Last round was a misdeal and a new round will start.
+
+            {'type': 'top_card',
+             'top_card': Card}
+            Top card turned up during the dealing phase.
+
+            {'type': 'ordered_up',
+             'player': Player}
+            Player that ordered the top card up.
+
+            {'type': 'denied_up',
+             'player': Player}
+            Player that denied ordering the top card up.
+
+            {'type': 'invalid_suit'}
+            This player tried to call an invalid suit for trump.
+
+            {'type': 'ordered_trump',
+             'player': Player}
+            Player that ordered trump.
+
+            {'type': 'denied_trump',
+             'player': Player}
+            Player that denied trump.
+
+            {'type': 'trick_start'}
+            New trick is starting.
+
+            {'type': 'card_played',
+             'player': Player,
+             'card': Card}
+            Card played by a player during a trick.
+
+            {'type': 'new_taker',
+             'taker': Player}
+            Taker of the previous trick.
+
+            {'type': 'round_results',
+             'taking_team': Team,
+             'points_scored': points,
+             'team_tricks': tricks}
+            Results of a round including points scored and number of tricks
+            taken by the team that won the round.
+
+            {'type': 'penalty',
+             'player': Player,
+             'card': Card}
+            Player that reneged and what card they played to renege
         """
         pass
