@@ -6,7 +6,7 @@ import socket
 import click
 import time
 #from players.online.webplayer import WebPlayer
-from euchre.players.online.webplayer import WebPlayer
+from euchre.players import ConsoleWebPlayer
 from euchre.utils import message_to_dictionary
 
 
@@ -69,7 +69,7 @@ class GameServer:
     def checkHeartbeat(self, signals):
         """Check worker hearbeat messages"""
         while not signals["shutdown"]:
-            for player in self.online_players:
+            for player in self.online_players.values():
                 if time.perf_counter() - player.last_heartbeat >= 10:
                     print(player, "missed a heartbeat")
             time.sleep(2)
@@ -107,11 +107,12 @@ class GameServer:
 
             def handleRegister():
                 """Handle register."""
-                if len(self.players) >= 4:
+                print("Registering player...")
+                if len(self.online_players) + len(self.local_players)  >= 4:
                     print("Error: Too many players registered")
                     return
 
-                web_player = WebPlayer(message_dict['player_host'],
+                web_player = ConsoleWebPlayer(message_dict['player_host'],
                                         message_dict['player_port'])
                 self.online_players[web_player.address] = web_player
 
@@ -138,6 +139,7 @@ class GameServer:
             # Execute handle message based on type
             if message_dict == -1:
                 continue
+            print("Message recieved")
             options[message_dict['message_type']]()
 
     def setSocket(self, sock):

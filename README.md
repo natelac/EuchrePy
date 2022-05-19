@@ -17,11 +17,15 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 ## TODO:
 ### Now
+- Come up with better terminology rather than "update" for webplayer
 - Get webconsole.py to register with server and print connection complete
 - Get a loop in webconsole.py for waiting for commands from server and prompting the user
 - Implement consolewebplayer.py so server can send commands to webconsole.py
 - Have functions to call, rather than dictionaries passed to Players
   - For example: msgPoints, rather than passing a dictionary to passMsg
+
+- Networking questions:
+  - What if player doesn't respond to request? When to resend/how to resend?
 
 ### Short Term
 - On player disconnect, save game

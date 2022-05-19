@@ -1,7 +1,7 @@
 """
 Euchre python modules.
 
-Nathaniel Lacelle <natelac@umich.edu>
+Nathaniel F. Lacelle <natelac@umich.edu>
 """
 
 from setuptools import setup, find_packages

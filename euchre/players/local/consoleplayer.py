@@ -1,12 +1,12 @@
 from euchre.players.player import Player
 import abc
 
-
 class ConsolePlayer(Player, abc.ABC):
     """A Player class that prints to and takes input from the console."""
 
     def __init__(self, name='Human'):
         Player.__init__(self, name)
+        self.top_card = None
 
     def updateHand(self, cards):
         self.hand = cards
@@ -59,6 +59,7 @@ class ConsolePlayer(Player, abc.ABC):
             print(f"The dealer is {msg['player']}")
 
         def topCard():
+            self.top_card = msg['top_card']
             print(f"The top card is {msg['top_card'].prettyString()}")
 
         def roundResults():
@@ -111,9 +112,13 @@ class ConsolePlayer(Player, abc.ABC):
             #TODO:
             print()
 
+        def newTrump():
+            pass
+
         options = {'points': points,
                    'misdeal': misdeal,
                    'new_leader': leader,
+                   'new_trump': newTrump,
                    'card_played': played,
                    'new_taker': taker,
                    'denied_up': deniedUp,
@@ -125,9 +130,10 @@ class ConsolePlayer(Player, abc.ABC):
                    'top_card': topCard,
                    'ordered_up': orderedUp,
                    'ordered_trump': orderedTrump,
+
                    'trick_start': trickStart,
                    'dealer': dealer}
-        options[msg['type']]()
+        options[msg['info_type']]()
 
     def printCards(self):
         """Prints 'nice' view of player's hand to console."""

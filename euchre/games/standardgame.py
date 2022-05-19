@@ -34,15 +34,15 @@ class StandardGame:
             raise AssertionError(f"Euchre requires 4 players to play")
         # Game Loop
         while not self.getWinner():
-            self.msgPlayers({'type': 'points',
+            self.msgPlayers({'info_type': 'points',
                              'teams': (self.team1, self.team2)})
-            self.msgPlayers({'type': 'dealer',
+            self.msgPlayers({'info_type': 'dealer',
                              'player': self.table[3]})
             makerSelected = self.dealPhase()
             if makerSelected:
                 self.playTricks()
             else:
-                self.msgPlayers({'type':'misdeal'})
+                self.msgPlayers({'info_type':'misdeal'})
             self.updateTableOrder()
 
     def dealPhase(self):
@@ -58,7 +58,7 @@ class StandardGame:
         self.topCard = self.kitty[0]
         for i in range(4):
             self.play_order[i].updateHand(hands[i])
-        self.msgPlayers({'type': 'top_card', 'top_card': self.topCard})
+        self.msgPlayers({'info_type': 'top_card', 'top_card': self.topCard})
 
         # Order up and order trump phases
         allPassed = self.orderPhase()
@@ -79,11 +79,13 @@ class StandardGame:
             if orderUp:
                 self.maker = player
                 self.trump = self.topCard.suit
-                self.msgPlayers({'type': 'ordered_up', 'player': player},
+                self.msgPlayers({'info_type': 'ordered_up', 'player': player},
                                 exclude=player)
+                self.msgPlayers({'info_type': 'new_trump',
+                                 'trump': self.trump})
                 return False
             else:
-                self.msgPlayers({'type': 'denied_up', 'player': player},
+                self.msgPlayers({'info_type': 'denied_up', 'player': player},
                                 exclude=player)
         return True
 
@@ -101,16 +103,17 @@ class StandardGame:
 
                 # Require valid trump that isn't top card suit
                 while not self.validTrump(call):
-                    player.passMsg({'type':'invalid_suit'})
+                    player.passMsg({'info_type': 'invalid_suit'})
                     call = player.callTrump(self.topCard.suit)
 
                 self.maker = player
                 self.trump = call
-                self.msgPlayers({'type': 'ordered_trump', 'player': player},
+                self.msgPlayers({'info_type': 'ordered_trump', 'player': player},
                                 exclude=player)
+                self.msgPlayers({'info_type': 'new_trump', 'trump': self.trump})
                 return False
             else:
-                self.msgPlayers({'type': 'denied_trump', 'player': player},
+                self.msgPlayers({'info_type': 'denied_trump', 'player': player},
                                 exclude=player)
 
         return True
@@ -133,7 +136,7 @@ class StandardGame:
 
         taker = self.table[0] # Init taker to player left of dealer
         leaderList = [] # List of players that lead for all 5 tricks
-        #self.msgPlayers({'type': 'new_leader', 'leader': taker})
+        #self.msgPlayers({'info_type': 'new_leader', 'leader': taker})
 
         # Play tricks
         for j in range(5):
@@ -141,7 +144,7 @@ class StandardGame:
             leaderList.append(taker)
             self.updatePlayOrder(taker)
 
-            self.msgPlayers({'type': 'trick_start'})
+            self.msgPlayers({'info_type': 'trick_start'})
 
             # Play a trick
             for player in self.play_order:
@@ -150,7 +153,7 @@ class StandardGame:
                     continue
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
-                self.msgPlayers({'type': 'card_played',
+                self.msgPlayers({'info_type': 'card_played',
                                  'player': player,
                                  'card': card},
                                 exclude=player)
@@ -161,7 +164,7 @@ class StandardGame:
             taker = max(trick,
                         key=lambda player: trick[player].value(
                             ledSuit, self.trump))
-            self.msgPlayers({'type': 'new_taker', 'taker': taker})
+            self.msgPlayers({'info_type': 'new_taker', 'taker': taker})
             tricksTaken[taker] += 1
 
         # Reneging
@@ -206,7 +209,7 @@ class StandardGame:
         # Finalize results
         takingTeam.points += points
         self.msgPlayers({
-                         'type': 'round_results',
+                         'info_type': 'round_results',
                          'taking_team': takingTeam,
                          'points_scored': points,
                          'team_tricks': teamTricks[takingTeam]
@@ -250,7 +253,7 @@ class StandardGame:
                             self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
                     #TODO Fix this logic, maybe penalties should be messaged in batches? This way if a player reneges twice, the player classes will handle the messages better and not say that a player was penalized points for each renege, when they were actually only penalized for one
-                    self.msgPlayers({'type': 'penalty',
+                    self.msgPlayers({'info_type': 'penalty',
                                      'player': player,
                                      'card': cards[0]})
                     renegers.append(player) if player not in renegers else None
