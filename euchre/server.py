@@ -7,7 +7,10 @@ import click
 import time
 #from players.online.webplayer import WebPlayer
 from euchre.players import ConsoleWebPlayer
+from euchre.players import BasicAIPlayer
 from euchre.utils import message_to_dictionary
+from euchre.players import Team
+from euchre.games import StandardGame
 
 
 class GameServer:
@@ -156,10 +159,9 @@ class GameServer:
 
     def playGame(self):
         #TODO
-        p1 = HumanPlayer('User')
         while len(self.online_players) == 0:
-            time(1)
-        p1 = self.online_players.items()[0]
+            time.sleep(1)
+        p1 = list(self.online_players.values())[0]
         ai = []
         for i in range(3):
             ai.append(BasicAIPlayer('AI' + str(i)))
@@ -173,7 +175,8 @@ class GameServer:
 @click.option("--port", "port", default=6000)
 @click.option("--hb-port", "hb_port", default=5999)
 def main(host, port, hb_port):
-    GameServer(host, port, hb_port)
+    server = GameServer(host, port, hb_port)
+    server.playGame()
 
 if __name__ == '__main__':
     main()

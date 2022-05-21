@@ -1,8 +1,7 @@
 import numpy as np
-from cards.deck import Deck
-# from card import Card
-# from team import Team
-# from player import Player
+from euchre.cards import Card
+from euchre.cards import Deck
+from euchre.players import Player
 # from consolehuman import HumanPlayer
 # from basicai import BasicAIPlayer
 
@@ -22,6 +21,33 @@ class StandardGame:
         self.table = [] # Ordered players where index 3 is dealer
         self.play_order = [] # Ordered plaeyrs where index 0 is leader
         self.seatPlayers()
+
+        # Cards are represented by their shorthand string, i.e., 'AH' or '1C'
+        # self.game_info = {
+        #     'players': [
+        #         {'player_id': player_id,
+        #          'hand': [card,]},
+        #     ],
+        #     'teams': [
+        #         {'players': [player_id,],
+        #          'points': points}
+        #     ]
+        #     'table': [player_id,], # Order based on dealer (idx 3 is dealer)
+        #     'play_order': [player_id,], # Order based on trick leader (idx 0 is leader)
+        #     'phase': phase,  # fx: dealing start, dealing first, ..., dealing done...
+        #     'kitty': [card,],
+        #     'top_card': top_card,
+        #     'dealer': player_id,
+        #     'maker': player_id,
+        #     'leader': player_id,
+        #     'ordered_up': player_id,
+        #     'called_trump': player_id,
+        #     'trump_suit': trump_suit,
+        #     'trick_takers': [player_id] #
+        #     'down_cards': {
+        #             player_id: [card, ],
+        #         }
+        #     }
 
         # Trick Info
         self.topCard = None
@@ -44,6 +70,9 @@ class StandardGame:
             else:
                 self.msgPlayers({'info_type':'misdeal'})
             self.updateTableOrder()
+
+    def updateHands(self, hands):
+        pass
 
     def dealPhase(self):
         """Deals cards and determines trump.

@@ -7,7 +7,7 @@
 set -Eeuo pipefail
 
 usage() {
-  echo "Usage: TODO"
+  echo "Usage: $0 (start|stop|status|restart)"
 }
 
 if [ $# -ne 1 ]; then
@@ -58,6 +58,22 @@ case $1 in
     ;;
   "stop")
     stop-server
+    ;;
+  "status")
+    mrun=0
+    if pgrep -f euchre-server &> /dev/null; then
+      echo "server running"
+      mrun=1
+    else
+      echo "server not running"
+    fi
+    if [[ $mrun == 1 ]]; then
+      exit 1
+    fi
+    ;;
+  "restart")
+    stop-server
+    start-server
     ;;
   *)
     usage

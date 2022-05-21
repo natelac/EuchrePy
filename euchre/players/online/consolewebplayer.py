@@ -49,8 +49,8 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
 
     def passMsg(self, msg):
         new_msg = msg.copy()
-        new_message['message_type'] = 'info'
-        self.sendMessage(msg)
+        new_msg['message_type'] = 'info'
+        self.sendMessage(new_msg)
 
     def printCards(self):
         """Prints 'nice' view of player's hand to console."""

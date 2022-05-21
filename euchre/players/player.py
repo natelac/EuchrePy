@@ -13,6 +13,9 @@ class Player(abc.ABC):
         self.name = name
         self.team = None
         self.hand = None
+        self.game_info = {'trump_suit': None,
+                          'leader': None,
+                          'down_cards': None}
         self._playedCards = []
 
     def __str__(self):

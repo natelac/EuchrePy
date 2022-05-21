@@ -1,1 +1,1 @@
-# from .standardgame import StandardGame
+from .standardgame import StandardGame
