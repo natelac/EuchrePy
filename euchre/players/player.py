@@ -80,68 +80,140 @@ class Player(abc.ABC):
         """
         pass
 
+    # Information updates that don't require a return value
+    # -----------------------------------------------------
+
     @abc.abstractmethod
-    def passMsg(self, msg):
-        """Recieves game information and processes it for the player.
-
-        Possible messages and their purposes:
-            {'type': 'points',
-             'teams': (Team, Team)}
-            Updated points after round, points can be accessed in the Team
-            object through team.points.
-
-            {'type': 'dealer',
-             'player': Player}
-            What player is the new dealer.
-
-            {'type': 'misdeal'}
-            Last round was a misdeal and a new round will start.
-
-            {'type': 'top_card',
-             'top_card': Card}
-            Top card turned up during the dealing phase.
-
-            {'type': 'ordered_up',
-             'player': Player}
-            Player that ordered the top card up.
-
-            {'type': 'denied_up',
-             'player': Player}
-            Player that denied ordering the top card up.
-
-            {'type': 'invalid_suit'}
-            This player tried to call an invalid suit for trump.
-
-            {'type': 'ordered_trump',
-             'player': Player}
-            Player that ordered trump.
-
-            {'type': 'denied_trump',
-             'player': Player}
-            Player that denied trump.
-
-            {'type': 'trick_start'}
-            New trick is starting.
-
-            {'type': 'card_played',
-             'player': Player,
-             'card': Card}
-            Card played by a player during a trick.
-
-            {'type': 'new_taker',
-             'taker': Player}
-            Taker of the previous trick.
-
-            {'type': 'round_results',
-             'taking_team': Team,
-             'points_scored': points,
-             'team_tricks': tricks}
-            Results of a round including points scored and number of tricks
-            taken by the team that won the round.
-
-            {'type': 'penalty',
-             'player': Player,
-             'card': Card}
-            Player that reneged and what card they played to renege
-        """
+    def pointsMsg(self, team1, team2):
         pass
+
+    @abc.abstractmethod
+    def dealerMsg(self, dealer):
+        pass
+
+    @abc.abstractmethod
+    def topCardMsg(self, top_card):
+        pass
+
+    @abc.abstractmethod
+    def roundResultsMsg(self, taking_team, points_scored,
+                        team_tricks)
+        pass
+
+    @abc.abstractmethod
+    def orderedUpMsg(self, player, top_card):
+        pass
+
+    @abc.abstractmethod
+    def deniedUpMsg(self, player):
+        pass
+
+    @abc.abstractmethod
+    def orderedTrumpMsg(self, player, trump_suit):
+        pass
+
+    @abc.abstractmethod
+    def deniedTrumpMsg(self, player):
+        pass
+
+    @abc.abstractmethod
+    def gameResultsMsg(self):
+        pass
+
+    @abc.abstractmethod
+    def misdealMsg(self):
+        pass
+
+    @abc.abstractmethod
+    def leaderMsg(self, leader):
+        pass
+
+    @abc.abstractmethod
+    def playedMsg(self, player, card):
+        pass
+
+    @abc.abstractmethod
+    def takerMsg(self, taker):
+        pass
+
+    @abc.abstractmethod
+    def penaltyMsg(self, player, card):
+        pass
+
+    @abc.abstractmethod
+    def invalidSuitMsg(self):
+        pass
+
+    @abc.abstractmethod
+    def trickStartMsg(self):
+        pass
+
+    @abc.abstractmethod
+    def newTrumpMsg(self):
+        pass
+
+#    @abc.abstractmethod
+#    def passMsg(self, msg):
+#        """Recieves game information and processes it for the player.
+#
+#        Possible messages and their purposes:
+#            {'type': 'points',
+#             'teams': (Team, Team)}
+#            Updated points after round, points can be accessed in the Team
+#            object through team.points.
+#
+#            {'type': 'dealer',
+#             'player': Player}
+#            What player is the new dealer.
+#
+#            {'type': 'misdeal'}
+#            Last round was a misdeal and a new round will start.
+#
+#            {'type': 'top_card',
+#             'top_card': Card}
+#            Top card turned up during the dealing phase.
+#
+#            {'type': 'ordered_up',
+#             'player': Player}
+#            Player that ordered the top card up.
+#
+#            {'type': 'denied_up',
+#             'player': Player}
+#            Player that denied ordering the top card up.
+#
+#            {'type': 'invalid_suit'}
+#            This player tried to call an invalid suit for trump.
+#
+#            {'type': 'ordered_trump',
+#             'player': Player}
+#            Player that ordered trump.
+#
+#            {'type': 'denied_trump',
+#             'player': Player}
+#            Player that denied trump.
+#
+#            {'type': 'trick_start'}
+#            New trick is starting.
+#
+#            {'type': 'card_played',
+#             'player': Player,
+#             'card': Card}
+#            Card played by a player during a trick.
+#
+#            {'type': 'new_taker',
+#             'taker': Player}
+#            Taker of the previous trick.
+#
+#            {'type': 'round_results',
+#             'taking_team': Team,
+#             'points_scored': points,
+#             'team_tricks': tricks}
+#            Results of a round including points scored and number of tricks
+#            taken by the team that won the round.
+#
+#            {'type': 'penalty',
+#             'player': Player,
+#             'card': Card}
+#            Player that reneged and what card they played to renege
+#        """
+#        pass

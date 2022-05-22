@@ -108,11 +108,9 @@ class StandardGame:
             orderUp = player.orderUp()
             if orderUp:
                 self.maker = player
-                self.trump = self.topCard.suit
                 p.orderedUpMsg(self.maker, player) for p in self.players
+                self.trump = self.topCard.suit
                 p.newTrumpMsg(self.trump) for p in self.players
-                self.msgPlayers({'info_type': 'new_trump',
-                    'trump': self.trump})
                 return False
             else:
                 p.deniedUpMsg(player) for p in self.players
@@ -127,24 +125,25 @@ class StandardGame:
         # Ask players if they want to order trump
         for player in self.table:
             orderTrump = player.orderTrump()
+
+            # Player orders trump
             if orderTrump:
                 call = player.callTrump(self.topCard.suit)
 
                 # Require valid trump that isn't top card suit
                 while not self.validTrump(call):
-                    player.passMsg({'info_type': 'invalid_suit'})
+                    player.invalidSuitMsg()
                     call = player.callTrump(self.topCard.suit)
 
                 self.maker = player
+                p.orderedTrumpMsg(player) for p in self.players
                 self.trump = call
-                self.msgPlayers({'info_type': 'ordered_trump', 'player': player},
-                        exclude=player)
-                self.msgPlayers({'info_type': 'new_trump', 'trump': self.trump})
+                p.newTrumpMsg(self.trump) for p in self.players
                 return False
-            else:
-                self.msgPlayers({'info_type': 'denied_trump', 'player': player},
-                        exclude=player)
 
+            # Player denies trump
+            else:
+                p.deniedTrumpMsg(player) for p in self.players
                 return True
 
     def playTricks(self):
@@ -165,7 +164,7 @@ class StandardGame:
 
         taker = self.table[0] # Init taker to player left of dealer
         leaderList = [] # List of players that lead for all 5 tricks
-        #self.msgPlayers({'info_type': 'new_leader', 'leader': taker})
+        p.leaderMsg(taker) for p in self.players
 
         # Play tricks
         for j in range(5):
@@ -173,7 +172,7 @@ class StandardGame:
             leaderList.append(taker)
             self.updatePlayOrder(taker)
 
-            self.msgPlayers({'info_type': 'trick_start'})
+            p.trickStartMsg() for p in self.players
 
             # Play a trick
             for player in self.play_order:
@@ -182,18 +181,15 @@ class StandardGame:
                     continue
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
-                self.msgPlayers({'info_type': 'card_played',
-                    'player': player,
-                    'card': card},
-                    exclude=player)
+                p.playedMsg(player, card) for p in self.players 
 
                 # Decide Taker
             trick = {player: cards[j] for player, cards in cardsPlayed.items()}
             ledSuit = trick[taker].suit
             taker = max(trick,
-                    key=lambda player: trick[player].value(
-                        ledSuit, self.trump))
-                    self.msgPlayers({'info_type': 'new_taker', 'taker': taker})
+                        key=lambda player: trick[player].value(
+                            ledSuit, self.trump))
+            p.takerMsg(taker) for p in self.players
             tricksTaken[taker] += 1
 
         # Reneging
@@ -237,19 +233,14 @@ class StandardGame:
 
         # Finalize results
         takingTeam.points += points
-        self.msgPlayers({
-            'info_type': 'round_results',
-            'taking_team': takingTeam,
-            'points_scored': points,
-            'team_tricks': teamTricks[takingTeam]
-            })
+        p.roundResultsMsg(taking_team, points, teamTricks[takingTeam]) for p in self.players
 
         def penalize(self, renegers):
             """Penalizes the renegers by giving 2 points to the opposing team.
 
-        Args:
-            renegers: A list of players to be penalized
-        """
+            Args:
+                renegers: A list of players to be penalized
+            """
         for player in renegers:
             team = self.oppoTeam[player.team]
             team.points += 2
@@ -274,17 +265,18 @@ class StandardGame:
 
             # Add player to renengers if invalid card played
             for player in self.table:
+                # Skip teammate if going alone
                 if goingAlone and self.maker.getTeammate() is player:
-                    # If player is going alone skip their teammate
                     continue
                 cards = cardsPlayed[player][j:]
                 playable = [card for card in cards if card.getSuit(
                     self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
-                    #TODO Fix this logic, maybe penalties should be messaged in batches? This way if a player reneges twice, the player classes will handle the messages better and not say that a player was penalized points for each renege, when they were actually only penalized for one
-                    self.msgPlayers({'info_type': 'penalty',
-                        'player': player,
-                        'card': cards[0]})
+                    #TODO Fix this logic, maybe penalties should be messaged in batches? 
+                    # This way if a player reneges twice, the player classes will handle 
+                    # the messages better and not say that a player was penalized points 
+                    # for each renege, when they were actually only penalized for one
+                    p.penaltyMsg(player, cards[0]) for p in self.players
                     renegers.append(player) if player not in renegers else None
 
         return renegers
