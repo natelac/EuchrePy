@@ -37,7 +37,7 @@ class WebPlayer(Player, abc.ABC):
             sock.sendall(message.encode('utf-8'))
 
     def request(self, request_type):
-        """Sends a request to the client, and awaits a relevant response"""
+        """Send a request to the client, and awaits a relevant response"""
         self.updates = {'new_update': False}
         self.sendMessage({'message_type': 'request',
                           'request_type': request_type})

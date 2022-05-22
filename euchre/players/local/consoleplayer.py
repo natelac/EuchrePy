@@ -101,7 +101,7 @@ class ConsolePlayer(Player, abc.ABC):
                 f"You reneged by playing {card} and the opposing team was awarded 2 points")
         else:
             print(
-                f"{player} reneged by playing {player} and your team was awarded 2 points")
+                f"{player} reneged by playing {card} and your team was awarded 2 points")
 
     def invalidSuitMsg(self): 
         print(

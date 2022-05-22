@@ -10,8 +10,9 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
 
     def updateHand(self, cards):
         self.hand = cards
+
         msg = {'message_type': 'update_hand',
-               'new_hand': cards}
+               'new_hand': [str(card) for card in cards]}
         self.sendMessage(msg)
 
     def orderUp(self):
@@ -47,15 +48,147 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
 
         return card
 
-    def passMsg(self, msg):
-        new_msg = msg.copy()
-        new_msg['message_type'] = 'info'
-        self.sendMessage(new_msg)
+    def pointsMsg(self, team1, team2):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'points',
+                'team1': {
+                    'players': (str(team1._p1), str(team1._p2)),
+                    'points': team1.points
+                    },
+                'team2': {
+                    'players': (str(team2._p1), str(team2._p2)),
+                    'points': team2.points
+                    }
+                }
+        self.sendMessage(msg)
+                
+    def dealerMsg(self, dealer):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'dealer',
+                'dealer': str(dealer)
+                }
+        self.sendMessage(msg)
 
-    def printCards(self):
-        """Prints 'nice' view of player's hand to console."""
-        print('Cards: ', end="")
-        cards = []
-        for card in self.hand:
-            cards.append(card.prettyString())
-        print(*cards, sep=", ")
+    def topCardMsg(self, top_card):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'top_card',
+                'top_card': str(top_card)
+                }
+        self.sendMessage(msg)
+
+    def roundResultsMsg(self, taking_team, points_scored,
+                        team_tricks):
+        winners = taking_team.getPlayers()
+        msg = {
+                'message_type': 'info',
+                'info_type': 'round_results',
+                'winners': (str(winners[0]), str(winners[1])),
+                'points_scored': points_Scored,
+                'tricks_taken': team_tricks
+                }
+        self.sendMessage(msg)
+
+    def orderedUpMsg(self, player, top_card):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'ordered_up',
+                'orderer': str(player),
+                'top_card': str(top_card)
+                }
+        self.sendMessage(msg)
+
+    def deniedUpMsg(self, player):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'denied_up',
+                'denier': str(player)
+                }
+        self.sendMessage(msg)
+
+    def orderedTrumpMsg(self, player, trump_suit):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'ordered_trump',
+                'orderer': str(player),
+                'trump_suit': trump_suit
+                }
+        self.sendMessage(msg)
+
+    def deniedTrumpMsg(self, player):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'denied_trump',
+                'denier': str(player)
+                }
+        self.sendMessage(msg)
+
+    def gameResultsMsg(self):
+        msg = {
+                'message_type': 'todo'
+                }
+        self.sendMessage(msg)
+
+    def misdealMsg(self):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'misdeal'
+                }
+        self.sendMessage(msg)
+
+    def leaderMsg(self, leader):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'leader',
+                'leader': str(leader)
+                }
+        self.sendMessage(msg)
+
+    def playedMsg(self, player, card):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'played_card',
+                'player': str(player),
+                'card': str(card)
+                }
+        self.sendMessage(msg)
+
+    def takerMsg(self, taker):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'taker',
+                'taker': taker
+                }
+        self.sendMessage(msg)
+
+    def penaltyMsg(self, player, card):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'renege',
+                'player': str(player),
+                'card': str(card)
+                }
+        self.sendMessage(msg)
+
+    def invalidSuitMsg(self):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'invalid_suit'
+                }
+        self.sendMessage(msg)
+
+    def trickStartMsg(self):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'trick_start'
+                }
+        self.sendMessage(msg)
+
+    def newTrumpMsg(self):
+        msg = {
+                'message_type': 'info',
+                'info_type': 'new_trump'
+                }
+        self.sendMessage(msg)

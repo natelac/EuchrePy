@@ -8,8 +8,11 @@ class Player(abc.ABC):
         team: Team that the player is on
         hand: List of cards in the players hand
     """
+    next_id = 0
 
     def __init__(self, name=''):
+        self.id = next_id
+        next_id += 1
         self.name = name
         self.team = None
         self.hand = None
