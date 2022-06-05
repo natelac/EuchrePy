@@ -65,7 +65,6 @@ class WebConsole:
             message_dict = message_to_dictionary(sock)
 
             def orderUp():
-                #TODO: Have this send a message back with a response
                 printCards(self.game_info['hand'])
                 ans = input('Order up? y/n\n')
                 self.sendMessage({
@@ -133,7 +132,9 @@ class WebConsole:
             def pointsMsg():
                 team1 = message_dict['team1']
                 team2 = message_dict['team2']
-                print(f"{team1['players'][0]}, {team1['players'][1]} have {team1['points']}\t {team2['players'][0]}, {team2['players'][1]} have {team2['points']}")
+                print(f"{team1['players'][0]}, {team1['players'][1]} have"
+                    f"{team1['points']}\t {team2['players'][0]},"
+                    f"{team2['players'][1]} have {team2['points']}")
 
             def dealerMsg():
                 dealer = message_dict['dealer']
@@ -194,6 +195,9 @@ class WebConsole:
                 self.game_info['trump'] = message_dict['trump']
                 #print(f"The trump is {self.game_info['trump']}")
 
+            def takerMsg():
+                print(f"{message_dict['taker']} takes the trick")
+
             if message_dict == -1:
                 continue
 
@@ -213,6 +217,7 @@ class WebConsole:
                 'invalid_suit': invalidSuitMsg,
                 'trick_start': trickStartMsg,
                 'new_trump':  newTrumpMsg,
+                'taker': takerMsg
             }
 
             request_options = {

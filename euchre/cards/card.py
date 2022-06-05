@@ -35,7 +35,7 @@ class Card:
         }
 
     @property
-    def rank(self):
+    def rank(self) -> str:
         "Shorthand rank of card"
         if self._rank == '10':
             return '10'
@@ -43,12 +43,12 @@ class Card:
             return self._rank[0]
 
     @property
-    def suit(self):
+    def suit(self) -> str:
         "Shorthand suit of card"
         return self._suit[0]
 
     @classmethod
-    def str2card(cls, shorthand):
+    def str2card(cls, shorthand: str):
         """Convert shorthand string to card object"""
         rank = shorthand[0]
         suit = shorthand[1]
@@ -59,7 +59,7 @@ class Card:
         return Card(rank, suit)
 
 
-    def getSuit(self, trumpSuit):
+    def getSuit(self, trumpSuit: str) -> str:
         """Returns suit of card in context of trump suit"""
         if self.isLeftBower(trumpSuit):
             return self._offSuit[self.suit]
@@ -70,7 +70,7 @@ class Card:
         NOTE: '10 of Clubs' would be 1C"""
         return self._rank[0] + self._suit[0]
 
-    def value(self, ledSuit, trumpSuit):
+    def value(self, ledSuit: str, trumpSuit: str) -> int:
         """Returns value of card in the context of a tricksTaken"""
         val = self._values[self.rank]
         if self.isRightBower(trumpSuit):
@@ -84,14 +84,14 @@ class Card:
         else:
             return 0
 
-    def isLeftBower(self, trumpSuit):
+    def isLeftBower(self, trumpSuit: str) -> bool:
         """Returns whether the card is left bower given the trump suit."""
         if self.rank == 'J' and self.suit == self._offSuit[trumpSuit]:
             return True
         else:
             return False
 
-    def isRightBower(self, trumpSuit):
+    def isRightBower(self, trumpSuit: str):
         """Returns whether the card is right bower given the trump suit."""
         if self.rank == 'J' and self.suit == trumpSuit:
             return True
@@ -105,7 +105,7 @@ class Card:
         i.e. 'AC' for 'Ace of Clubs'"""
         return self._rank + ' of ' + self._suit
 
-    def prettyString(self):
+    def prettyString(self) -> str:
         """Returns a pretty version of the card,
         i.e. '[ AC ]' for 'Ace of Clubs'
         """

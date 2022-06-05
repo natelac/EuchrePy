@@ -1,4 +1,5 @@
 from euchre.players.player import Player
+from euchre.cards.card import Card
 import abc
 import socket
 import json
@@ -83,16 +84,16 @@ class WebPlayer(Player, abc.ABC):
     def playCard(self, leader, cardsPlayed, trump):
         # Get card to play from user
         ans = self.request('play_card')
-        while ans not in cards:
-            #TODO: Update player that they played a card not in their hand
-            ans = self.request('play_card')
+        # while ans not in cards:
+            # TODO: Update player that they played a card not in their hand
+            # ans = self.request('play_card')
 
         # Remove card from hand, add to playedCards
-        cardIndex = cards.index(ans)
-        card = self.hand.pop(cardIndex)
-        self._playedCards.append(card)
+        # cardIndex = cards.index(ans)
+        # card = self.hand.pop(cardIndex)
+        # self._playedCards.append(card)
 
-        return card
+        return Card.str2card(ans)
 
     def updateHand(self, cards):
         self.hand = cards
@@ -212,7 +213,7 @@ class WebPlayer(Player, abc.ABC):
         msg = {
                 'message_type': 'info',
                 'info_type': 'taker',
-                'taker': taker
+                'taker': str(taker)
                 }
         self.sendMessage(msg)
 

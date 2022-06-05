@@ -108,7 +108,7 @@ class StandardGame:
             orderUp = player.orderUp()
             if orderUp:
                 self.maker = player
-                for p in self.players: p.orderedUpMsg(self.maker, player)
+                for p in self.players: p.orderedUpMsg(self.maker, self.topCard)
                 self.trump = self.topCard.suit
                 for p in self.players: p.newTrumpMsg(self.trump)
                 return False
