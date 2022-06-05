@@ -36,5 +36,54 @@ class BasicAIPlayer(Player, abc.ABC):
 
         return card
 
-    def passMsg(self, msg):
+    def pointsMsg(self, team1, team2):
+        pass
+
+    def dealerMsg(self, dealer):
+        pass
+
+    def topCardMsg(self, top_card):
+        pass
+
+    def roundResultsMsg(self, taking_team, points_scored,
+                        team_tricks):
+        pass
+
+    def orderedUpMsg(self, player, top_card):
+        pass
+
+    def deniedUpMsg(self, player):
+        pass
+
+    def orderedTrumpMsg(self, player, trump_suit):
+        pass
+
+    def deniedTrumpMsg(self, player):
+        pass
+
+    def gameResultsMsg(self):
+        pass
+
+    def misdealMsg(self):
+        pass
+
+    def leaderMsg(self, leader):
+        pass
+
+    def playedMsg(self, player, card):
+        pass
+
+    def takerMsg(self, taker):
+        pass
+
+    def penaltyMsg(self, player, card):
+        pass
+
+    def invalidSuitMsg(self):
+        pass
+
+    def trickStartMsg(self):
+        pass
+
+    def newTrumpMsg(self, trump):
         pass

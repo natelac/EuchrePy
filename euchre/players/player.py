@@ -1,4 +1,7 @@
 import abc
+import itertools
+
+from euchre.utils import printCards as utilPrintCards
 
 class Player(abc.ABC):
     """Base Player class
@@ -8,11 +11,10 @@ class Player(abc.ABC):
         team: Team that the player is on
         hand: List of cards in the players hand
     """
-    next_id = 0
+    id_iter = itertools.count()
 
     def __init__(self, name=''):
-        self.id = next_id
-        next_id += 1
+        self.id = next(Player.id_iter)
         self.name = name
         self.team = None
         self.hand = None
@@ -31,6 +33,10 @@ class Player(abc.ABC):
         Returns:
             Player that is on the same team as this Player."""
         return self.team.getTeammate(self)
+
+    def printCards(self):
+        """Prints 'nice' view of player's hand to console."""
+        utilPrintCards(self.hand)
 
     @abc.abstractmethod
     def updateHand(self, cards):
@@ -100,7 +106,7 @@ class Player(abc.ABC):
 
     @abc.abstractmethod
     def roundResultsMsg(self, taking_team, points_scored,
-                        team_tricks)
+                        team_tricks):
         pass
 
     @abc.abstractmethod

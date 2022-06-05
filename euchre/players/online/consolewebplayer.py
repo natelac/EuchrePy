@@ -8,13 +8,6 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
         WebPlayer.__init__(self, updates, host='localhost',
                            port=6001, name='WebPlayer')
 
-    def updateHand(self, cards):
-        self.hand = cards
-
-        msg = {'message_type': 'update_hand',
-               'new_hand': [str(card) for card in cards]}
-        self.sendMessage(msg)
-
     def orderUp(self):
         ans = self.request('order_up')
         return ans == 'y'
@@ -48,6 +41,13 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
 
         return card
 
+    def updateHand(self, cards):
+        self.hand = cards
+        msg = {'message_type': 'info',
+               'info_type': 'update_hand',
+               'new_hand': [str(card) for card in cards]}
+        self.sendMessage(msg)
+
     def pointsMsg(self, team1, team2):
         msg = {
                 'message_type': 'info',
@@ -62,7 +62,7 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
                     }
                 }
         self.sendMessage(msg)
-                
+
     def dealerMsg(self, dealer):
         msg = {
                 'message_type': 'info',
@@ -149,7 +149,7 @@ class ConsoleWebPlayer(WebPlayer, abc.ABC):
     def playedMsg(self, player, card):
         msg = {
                 'message_type': 'info',
-                'info_type': 'played_card',
+                'info_type': 'card_played',
                 'player': str(player),
                 'card': str(card)
                 }

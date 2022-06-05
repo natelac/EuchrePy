@@ -17,24 +17,21 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 ## TODO:
 ### Now
-- Come up with better terminology rather than "update" for webplayer
-- Get webconsole.py to register with server and print connection complete
-- Get a loop in webconsole.py for waiting for commands from server and prompting the user
-- Implement consolewebplayer.py so server can send commands to webconsole.py
-- Have functions to call, rather than dictionaries passed to Players
-  - For example: msgPoints, rather than passing a dictionary to passMsg
-
-- Networking questions:
-  - What if player doesn't respond to request? When to resend/how to resend?
+- Have new_trump message being sent, hnd having trump displayed for webconsole in spots it was commented out
+- Finish webconsole
+- Implement picking card to swap
 
 ### Short Term
+- Create a public game info dict structure that stores the local information for webconsole, and which can be used in React
+  - This might make more sense in context of a 'javscriptplayer' class
+- Have information about who is currently ordering up be sent to all payers
+- Setup threading when sending informational messages
+  - Make sure that players recieve information in order
+- Networking questions:
+  - What if player doesn't respond to request? When to resend/how to resend?
+    - Currently it goes endlessly, but for sending regular messages it might throw an error
 - On player disconnect, save game
-
 ### Bugs
-- Fix bug where if you renege, AI0 reneges with
-  ERROR:
-  You reneged by playing 9H and the opposing team was awarded 2 points
-  AI0 reneged by playing AI0 and your team was awarded 2 points
 - Fix bug where if going alone, your partner will start the trick (which shouldn't be able to happen) and the continue doesn't work?
 
 ### Short Term

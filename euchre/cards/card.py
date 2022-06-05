@@ -47,6 +47,18 @@ class Card:
         "Shorthand suit of card"
         return self._suit[0]
 
+    @classmethod
+    def str2card(cls, shorthand):
+        """Convert shorthand string to card object"""
+        rank = shorthand[0]
+        suit = shorthand[1]
+
+        if rank == '1':
+            rank = '10'
+
+        return Card(rank, suit)
+
+
     def getSuit(self, trumpSuit):
         """Returns suit of card in context of trump suit"""
         if self.isLeftBower(trumpSuit):
@@ -73,14 +85,14 @@ class Card:
             return 0
 
     def isLeftBower(self, trumpSuit):
-        "Returns whether the card is left bower given the trump suit."
+        """Returns whether the card is left bower given the trump suit."""
         if self.rank == 'J' and self.suit == self._offSuit[trumpSuit]:
             return True
         else:
             return False
 
     def isRightBower(self, trumpSuit):
-        "Returns whether the card is right bower given the trump suit."
+        """Returns whether the card is right bower given the trump suit."""
         if self.rank == 'J' and self.suit == trumpSuit:
             return True
         else:
@@ -98,6 +110,8 @@ class Card:
         i.e. '[ AC ]' for 'Ace of Clubs'
         """
         if self.suit in ['D', 'H']:
+            # return "\u001b[31m[ " + self.rank[0] + ' ' + self._symbols[self.suit[0]] + " ]\033[0m"
             return "\u001b[31m[ " + self.rank[0] + self.suit[0] + " ]\033[0m"
         else:
+            # return "[ " + self.rank[0] + ' ' + self._symbols[self.suit[0]] + " ]"
             return "[ " + self.__str__() + " ]"

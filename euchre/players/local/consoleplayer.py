@@ -103,7 +103,7 @@ class ConsolePlayer(Player, abc.ABC):
             print(
                 f"{player} reneged by playing {card} and your team was awarded 2 points")
 
-    def invalidSuitMsg(self): 
+    def invalidSuitMsg(self):
         print(
                 "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
 
@@ -112,11 +112,3 @@ class ConsolePlayer(Player, abc.ABC):
 
     def newTrumpMsg(self):
         pass
-
-    def printCards(self):
-        """Prints 'nice' view of player's hand to console."""
-        print('Cards: ', end="")
-        cards = []
-        for card in self.hand:
-            cards.append(card.prettyString())
-        print(*cards, sep=", ")

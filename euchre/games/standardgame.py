@@ -62,13 +62,13 @@ class StandardGame:
             raise AssertionError(f"Euchre requires 4 players to play")
         # Game Loop
         while not self.getWinner():
-            p.pointsMsg(self.team1, self.team2) for p in self.players
-            p.dealerMsg(self.table[3]) for p in self.players
+            for p in self.players: p.pointsMsg(self.team1, self.team2)
+            for p in self.players: p.dealerMsg(self.table[3])
             makerSelected = self.dealPhase()
             if makerSelected:
                 self.playTricks()
             else:
-                p.misdealMsg() for p in self.players
+                for p in self.players: p.misdealMsg()
             self.updateTableOrder()
 
     def updateHands(self, hands):
@@ -88,7 +88,7 @@ class StandardGame:
         self.kitty.pop(0)
         for i in range(4):
             self.play_order[i].updateHand(hands[i])
-        p.topCardMsg(self.topCard) for p in self.players
+        for p in self.players: p.topCardMsg(self.topCard)
 
         # Order up and order trump phases
         allPassed = self.orderPhase()
@@ -108,13 +108,13 @@ class StandardGame:
             orderUp = player.orderUp()
             if orderUp:
                 self.maker = player
-                p.orderedUpMsg(self.maker, player) for p in self.players
+                for p in self.players: p.orderedUpMsg(self.maker, player)
                 self.trump = self.topCard.suit
-                p.newTrumpMsg(self.trump) for p in self.players
+                for p in self.players: p.newTrumpMsg(self.trump)
                 return False
             else:
-                p.deniedUpMsg(player) for p in self.players
-                return True
+                for p in self.players: p.deniedUpMsg(player)
+        return True
 
     def trumpPhase(self):
         """Asks all players if they want to order trump.
@@ -136,15 +136,15 @@ class StandardGame:
                     call = player.callTrump(self.topCard.suit)
 
                 self.maker = player
-                p.orderedTrumpMsg(player) for p in self.players
+                for p in self.players: p.orderedTrumpMsg(player)
                 self.trump = call
-                p.newTrumpMsg(self.trump) for p in self.players
+                for p in self.players: p.newTrumpMsg(self.trump)
                 return False
 
             # Player denies trump
             else:
-                p.deniedTrumpMsg(player) for p in self.players
-                return True
+                for p in self.players: p.deniedTrumpMsg(player)
+        return True
 
     def playTricks(self):
         """Plays 5 tricks."""
@@ -164,7 +164,7 @@ class StandardGame:
 
         taker = self.table[0] # Init taker to player left of dealer
         leaderList = [] # List of players that lead for all 5 tricks
-        p.leaderMsg(taker) for p in self.players
+        for p in self.players: p.leaderMsg(taker)
 
         # Play tricks
         for j in range(5):
@@ -172,7 +172,7 @@ class StandardGame:
             leaderList.append(taker)
             self.updatePlayOrder(taker)
 
-            p.trickStartMsg() for p in self.players
+            for p in self.players: p.trickStartMsg()
 
             # Play a trick
             for player in self.play_order:
@@ -181,7 +181,7 @@ class StandardGame:
                     continue
                 card = player.playCard(taker, cardsPlayed, self.trump)
                 cardsPlayed[player].append(card)
-                p.playedMsg(player, card) for p in self.players 
+                for p in self.players: p.playedMsg(player, card)
 
                 # Decide Taker
             trick = {player: cards[j] for player, cards in cardsPlayed.items()}
@@ -189,7 +189,7 @@ class StandardGame:
             taker = max(trick,
                         key=lambda player: trick[player].value(
                             ledSuit, self.trump))
-            p.takerMsg(taker) for p in self.players
+            for p in self.players: p.takerMsg(taker)
             tricksTaken[taker] += 1
 
         # Reneging
@@ -233,7 +233,8 @@ class StandardGame:
 
         # Finalize results
         takingTeam.points += points
-        p.roundResultsMsg(taking_team, points, teamTricks[takingTeam]) for p in self.players
+        for p in self.players:
+            p.roundResultsMsg(taking_team, points, teamTricks[takingTeam])
 
         def penalize(self, renegers):
             """Penalizes the renegers by giving 2 points to the opposing team.
@@ -272,11 +273,11 @@ class StandardGame:
                 playable = [card for card in cards if card.getSuit(
                     self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
-                    #TODO Fix this logic, maybe penalties should be messaged in batches? 
-                    # This way if a player reneges twice, the player classes will handle 
-                    # the messages better and not say that a player was penalized points 
+                    #TODO Fix this logic, maybe penalties should be messaged in batches?
+                    # This way if a player reneges twice, the player classes will handle
+                    # the messages better and not say that a player was penalized points
                     # for each renege, when they were actually only penalized for one
-                    p.penaltyMsg(player, cards[0]) for p in self.players
+                    for p in self.players: p.penaltyMsg(player, cards[0])
                     renegers.append(player) if player not in renegers else None
 
         return renegers

@@ -6,7 +6,7 @@ import socket
 import click
 import time
 #from players.online.webplayer import WebPlayer
-from euchre.players import ConsoleWebPlayer
+from euchre.players import WebPlayer
 from euchre.players import BasicAIPlayer
 from euchre.utils import message_to_dictionary
 from euchre.players import Team
@@ -74,7 +74,8 @@ class GameServer:
         while not signals["shutdown"]:
             for player in self.online_players.values():
                 if time.perf_counter() - player.last_heartbeat >= 10:
-                    print(player, "missed a heartbeat")
+                    pass
+                    #print(player, "missed a heartbeat")
             time.sleep(2)
 
     def listenHeartbeat(self, signals):
@@ -115,7 +116,7 @@ class GameServer:
                     print("Error: Too many players registered")
                     return
 
-                web_player = ConsoleWebPlayer(message_dict['player_host'],
+                web_player = WebPlayer(message_dict['player_host'],
                                         message_dict['player_port'])
                 self.online_players[web_player.address] = web_player
 
@@ -134,15 +135,22 @@ class GameServer:
                 #       call a function for playing the game
                 print("Player", web_player, "registered")
 
+            def webPlayerMsg():
+                player_host = message_dict['player_host']
+                player_port = message_dict['player_port']
+                address = WebPlayer.getAddress(player_host, player_port)
+                self.online_players[address].recvMessage(message_dict)
+
             options = {
                         'register': handleRegister,
+                        'response': webPlayerMsg
                         # 'shutdown': handleShutdown
                       }
 
             # Execute handle message based on type
             if message_dict == -1:
                 continue
-            print("Message recieved")
+            print("Message recieved:", message_dict)
             options[message_dict['message_type']]()
 
     def setSocket(self, sock):

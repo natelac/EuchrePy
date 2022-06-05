@@ -33,3 +33,11 @@ def message_to_dictionary(sock):
         return -1
 
     return message_dict
+
+def printCards(cards):
+    """Prints 'nice' view of player's hand to console."""
+    print('Cards: ', end="")
+    pretty_cards = []
+    for card in cards:
+        pretty_cards.append(card.prettyString())
+    print(*pretty_cards, sep=", ")
