@@ -140,7 +140,7 @@ class WebPlayer(Player, abc.ABC):
                 'message_type': 'info',
                 'info_type': 'round_results',
                 'winners': (str(winners[0]), str(winners[1])),
-                'points_scored': points_Scored,
+                'points_scored': points_scored,
                 'tricks_taken': team_tricks
                 }
         self.sendMessage(msg)

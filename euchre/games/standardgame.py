@@ -234,7 +234,7 @@ class StandardGame:
         # Finalize results
         takingTeam.points += points
         for p in self.players:
-            p.roundResultsMsg(taking_team, points, teamTricks[takingTeam])
+            p.roundResultsMsg(takingTeam, points, teamTricks[takingTeam])
 
         def penalize(self, renegers):
             """Penalizes the renegers by giving 2 points to the opposing team.
@@ -242,9 +242,9 @@ class StandardGame:
             Args:
                 renegers: A list of players to be penalized
             """
-        for player in renegers:
-            team = self.oppoTeam[player.team]
-            team.points += 2
+            for player in renegers:
+                team = self.oppoTeam[player.team]
+                team.points += 2
 
     def checkForReneges(self, leaderList, cardsPlayed, goingAlone):
         """Figures out who reneged.

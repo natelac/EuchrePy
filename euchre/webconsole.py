@@ -132,8 +132,8 @@ class WebConsole:
             def pointsMsg():
                 team1 = message_dict['team1']
                 team2 = message_dict['team2']
-                print(f"{team1['players'][0]}, {team1['players'][1]} have"
-                    f"{team1['points']}\t {team2['players'][0]},"
+                print(f"{team1['players'][0]}, {team1['players'][1]} have "
+                    f"{team1['points']}\t{team2['players'][0]},"
                     f"{team2['players'][1]} have {team2['points']}")
 
             def dealerMsg():
@@ -198,6 +198,14 @@ class WebConsole:
             def takerMsg():
                 print(f"{message_dict['taker']} takes the trick")
 
+            def roundResults():
+                winners = message_dict['winners']
+                points_scored = message_dict['points_scored']
+                team_tricks = message_dict['tricks_taken']
+                print("{} and {} win the round with {} points and {} trick taken"
+                      .format(winners[0], winners[1],
+                              points_scored, team_tricks))
+
             if message_dict == -1:
                 continue
 
@@ -217,7 +225,8 @@ class WebConsole:
                 'invalid_suit': invalidSuitMsg,
                 'trick_start': trickStartMsg,
                 'new_trump':  newTrumpMsg,
-                'taker': takerMsg
+                'taker': takerMsg,
+                'round_results': roundResults,
             }
 
             request_options = {
