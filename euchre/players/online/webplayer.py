@@ -6,7 +6,7 @@ import json
 import time
 
 class WebPlayer(Player, abc.ABC):
-    """A Player class for TCP connected players"""
+    """A Player class for TCP connected players."""
 
     def __init__(self, host='localhost', port=6001, name='WebPlayer'):
         Player.__init__(self, name)
@@ -21,7 +21,7 @@ class WebPlayer(Player, abc.ABC):
         #TODO
         # - Add enum, or bool, or string or something for current player state,
         #   i.e., disconnected, timing out, timed out, etc.,
-        #   At the very least, for i f they have timed out
+        #   At the very least, for if they have timed out
 
     @property
     def address(self):
@@ -35,7 +35,7 @@ class WebPlayer(Player, abc.ABC):
         return str(host) + ":" + str(port)
 
     def recvMessage(self, message):
-        """Recieves a message from a client"""
+        """Recieves a message from a client."""
         self.updates['new_update'] = True
         self.updates['response_type'] = message['response_type']
         self.updates['response'] = message['response']
@@ -48,7 +48,7 @@ class WebPlayer(Player, abc.ABC):
             sock.sendall(message.encode('utf-8'))
 
     def request(self, request_type):
-        """Send a request to the client, and awaits a relevant response"""
+        """Send a request to the client, and awaits a relevant response."""
         #self.updates = {'new_update': False}
         self.sendMessage({'message_type': 'request',
                           'request_type': request_type})

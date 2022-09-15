@@ -49,7 +49,6 @@ class ConsolePlayer(Player, abc.ABC):
         return card
 
     def pointsMsg(self, team1, team2):
-        team1, team2 = msg['teams']
         print()
         print(f"{team1._p1}, {team1._p2} have {team1.points} points\t {team2._p1}, {team2._p2} have {team2.points} points")
         print('-'*50)
@@ -110,5 +109,5 @@ class ConsolePlayer(Player, abc.ABC):
     def trickStartMsg(self):
         print()
 
-    def newTrumpMsg(self):
+    def newTrumpMsg(self, trump_suit):
         pass

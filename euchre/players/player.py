@@ -4,7 +4,7 @@ import itertools
 from euchre.utils import printCards as utilPrintCards
 
 class Player(abc.ABC):
-    """Base Player class
+    """Base Player class used in a Euchre game.
 
     Attributes:
         name: Name of the player
@@ -94,71 +94,142 @@ class Player(abc.ABC):
 
     @abc.abstractmethod
     def pointsMsg(self, team1, team2):
+        """Passes Teams which contains the players on the team and the points
+        the players have.
+
+        For human players, displays player names and team points.
+        """
         pass
 
     @abc.abstractmethod
     def dealerMsg(self, dealer):
+        """Passes the Player that is the dealer.
+
+        For human players, displays dealers name.
+        """
         pass
 
     @abc.abstractmethod
     def topCardMsg(self, top_card):
+        """Passes the Card turned up in the kitty.
+
+        For human players, displays the top card.
+        """
         pass
 
     @abc.abstractmethod
     def roundResultsMsg(self, taking_team, points_scored,
                         team_tricks):
+        """Passes results of a round (5 trick stint).
+
+        For human players, displays takers, points won, and # of tricks taken.
+        """
         pass
 
     @abc.abstractmethod
     def orderedUpMsg(self, player, top_card):
+        """Passes Player that ordered up and the Card from the top of the kitty.
+
+        For human players, displays orderers name and card ordered up
+        """
         pass
 
     @abc.abstractmethod
     def deniedUpMsg(self, player):
+        """Passes Player that denied ordering up.
+
+        For human players, displays deniers name.
+        """
         pass
 
     @abc.abstractmethod
     def orderedTrumpMsg(self, player, trump_suit):
+        """Passes Player that ordered a trump suit.
+
+        For human players, displays the orderers name and
+        suit they ordered.
+        """
         pass
 
     @abc.abstractmethod
     def deniedTrumpMsg(self, player):
+        """Passes Player that denied ordering a trump suit.
+
+        For human players, displays deniers name.
+        """
         pass
 
     @abc.abstractmethod
     def gameResultsMsg(self):
+        """TODO"""
         pass
 
     @abc.abstractmethod
     def misdealMsg(self):
+        """Called when a misdeal occurs and that a new dealer is selected.
+
+        For human players, displays that a misdeal occurred.
+        """
         pass
 
     @abc.abstractmethod
     def leaderMsg(self, leader):
+        """Passes Player that leads the trick.
+
+        For human players, displays dealers name.
+        """
         pass
 
     @abc.abstractmethod
     def playedMsg(self, player, card):
+        """Passes Player and the card that they played.
+
+
+        For human players, displays the name of the player and card played.
+        """
         pass
 
     @abc.abstractmethod
     def takerMsg(self, taker):
+        """Passes Player that took the trick.
+
+        For human players, displays takers name.
+        """
         pass
 
     @abc.abstractmethod
     def penaltyMsg(self, player, card):
+        """Passes Player that reneged.
+
+        For human players, displays reneger, card reneged, and points awarded.
+        """
         pass
 
     @abc.abstractmethod
     def invalidSuitMsg(self):
+        """Called when this Player misdeals.
+
+
+        For human players, informs player to call a valid suit.
+        """
         pass
 
     @abc.abstractmethod
     def trickStartMsg(self):
+        """Called when a new trick starts.
+
+
+        For human players, displays that a new trick has started / is used for
+        console spacing.
+        """
         pass
 
     @abc.abstractmethod
-    def newTrumpMsg(self):
+    def newTrumpMsg(self, trump_suit):
+        """Called when there is a new trump.
+
+        For human players, displays new trump.
+        """
         pass
 
 #    @abc.abstractmethod

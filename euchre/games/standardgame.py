@@ -108,9 +108,11 @@ class StandardGame:
             orderUp = player.orderUp()
             if orderUp:
                 self.maker = player
-                for p in self.players: p.orderedUpMsg(self.maker, self.topCard)
                 self.trump = self.topCard.suit
-                for p in self.players: p.newTrumpMsg(self.trump)
+                for p in self.players:
+                    p.orderedUpMsg(self.maker, self.topCard)
+                for p in self.players:
+                    p.newTrumpMsg(self.trump)
                 return False
             else:
                 for p in self.players: p.deniedUpMsg(player)
@@ -136,9 +138,11 @@ class StandardGame:
                     call = player.callTrump(self.topCard.suit)
 
                 self.maker = player
-                for p in self.players: p.orderedTrumpMsg(player)
                 self.trump = call
-                for p in self.players: p.newTrumpMsg(self.trump)
+                for p in self.players:
+                    p.orderedTrumpMsg(self.maker, self.topCard)
+                for p in self.players:
+                    p.newTrumpMsg(self.trump)
                 return False
 
             # Player denies trump
