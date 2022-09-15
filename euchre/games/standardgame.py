@@ -16,7 +16,7 @@ class StandardGame:
         self.deck = Deck()
         self.team1 = team1
         self.team2 = team2
-        self.oppoTeam = {team1: team2, team2: team1}
+        self.oppo_team = {team1: team2, team2: team1}
         self.players = [] # List of players, initially equivelant to self.table
         self.table = [] # Ordered players where index 3 is dealer
         self.play_order = [] # Ordered plaeyrs where index 0 is leader
@@ -52,7 +52,7 @@ class StandardGame:
         #     }
 
         # Trick Info
-        self.topCard = None
+        self.top_card = None
         self.trump = None
         self.maker = None
 
@@ -84,11 +84,11 @@ class StandardGame:
         self.deck.shuffle()
         hands = self.deck.deal()
         self.kitty = hands[4]
-        self.topCard = self.kitty[0]
+        self.top_card = self.kitty[0]
         self.kitty.pop(0)
         for i in range(4):
             self.play_order[i].updateHand(hands[i])
-        for p in self.players: p.topCardMsg(self.topCard)
+        for p in self.players: p.top_cardMsg(self.top_card)
 
         # Order up and order trump phases
         allPassed = self.orderPhase()
@@ -108,9 +108,10 @@ class StandardGame:
             orderUp = player.orderUp()
             if orderUp:
                 self.maker = player
-                self.trump = self.topCard.suit
+                self.trump = self.top_card.suit
                 for p in self.players:
-                    p.orderedUpMsg(self.maker, self.topCard)
+                    p.orderedUpMsg(self.maker, self.top_card)
+                self.table[3].orderUp(self.top_card)
                 for p in self.players:
                     p.newTrumpMsg(self.trump)
                 return False
@@ -122,7 +123,7 @@ class StandardGame:
         """Asks all players if they want to order trump.
 
         Returns:
-            True if everyone passes ordering trump, otherwise False
+            True if everyone passes ordering trump, otherwise False.
         """
         # Ask players if they want to order trump
         for player in self.table:
@@ -130,17 +131,17 @@ class StandardGame:
 
             # Player orders trump
             if orderTrump:
-                call = player.callTrump(self.topCard.suit)
+                call = player.callTrump(self.top_card.suit)
 
                 # Require valid trump that isn't top card suit
                 while not self.validTrump(call):
                     player.invalidSuitMsg()
-                    call = player.callTrump(self.topCard.suit)
+                    call = player.callTrump(self.top_card.suit)
 
                 self.maker = player
                 self.trump = call
                 for p in self.players:
-                    p.orderedTrumpMsg(self.maker, self.topCard)
+                    p.orderedTrumpMsg(self.maker, self.top_card)
                 for p in self.players:
                     p.newTrumpMsg(self.trump)
                 return False
@@ -215,7 +216,7 @@ class StandardGame:
         """
         if not suit in ['C', 'S', 'H', 'D']:
             return False
-        return suit != self.topCard.suit
+        return suit != self.top_card.suit
 
     def scoreRound(self, tricksTaken, goingAlone):
         """Messages players winner and points won."""
@@ -247,7 +248,7 @@ class StandardGame:
                 renegers: A list of players to be penalized
             """
             for player in renegers:
-                team = self.oppoTeam[player.team]
+                team = self.oppo_team[player.team]
                 team.points += 2
 
     def checkForReneges(self, leaderList, cardsPlayed, goingAlone):

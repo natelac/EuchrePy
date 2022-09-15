@@ -128,9 +128,18 @@ class Player(abc.ABC):
 
     @abc.abstractmethod
     def orderedUpMsg(self, player, top_card):
-        """Passes Player that ordered up and the Card from the top of the kitty.
+        """Passes Player that ordered up and the top Card.
 
         For human players, displays orderers name and card ordered up
+        """
+        pass
+
+    @abc.abstractmethod
+    def orderedUp(self, top_card):
+        """Called when this Player is orderd up, passes the top Card.
+
+        Returns:
+            Card to throw in kitty.
         """
         pass
 
@@ -184,7 +193,6 @@ class Player(abc.ABC):
     def playedMsg(self, player, card):
         """Passes Player and the card that they played.
 
-
         For human players, displays the name of the player and card played.
         """
         pass
@@ -209,7 +217,6 @@ class Player(abc.ABC):
     def invalidSuitMsg(self):
         """Called when this Player misdeals.
 
-
         For human players, informs player to call a valid suit.
         """
         pass
@@ -217,7 +224,6 @@ class Player(abc.ABC):
     @abc.abstractmethod
     def trickStartMsg(self):
         """Called when a new trick starts.
-
 
         For human players, displays that a new trick has started / is used for
         console spacing.
