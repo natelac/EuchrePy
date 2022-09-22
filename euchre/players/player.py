@@ -6,6 +6,8 @@ from euchre.utils import printCards as utilPrintCards
 class Player(abc.ABC):
     """Base Player class used in a Euchre game.
 
+    Player objects are directly called by the game.
+
     Attributes:
         name: Name of the player
         team: Team that the player is on
@@ -38,12 +40,8 @@ class Player(abc.ABC):
         """Prints 'nice' view of player's hand to console."""
         utilPrintCards(self.hand)
 
-    @abc.abstractmethod
-    def updateHand(self, cards):
-        """Updates cards in players hand
-        """
-        pass
-
+    # Decision methods that require a return value
+    # ----------------------------------------------
     @abc.abstractmethod
     def orderUp(self):
         """Determines whether player will order up.
@@ -89,8 +87,22 @@ class Player(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def discardCard(self, top_card):
+        """Called when this Player is orderd up, passes the top Card.
+
+        Returns:
+            Card to throw in kitty.
+        """
+        pass
+
     # Information updates that don't require a return value
     # -----------------------------------------------------
+    @abc.abstractmethod
+    def updateHand(self, cards):
+        """Updates cards in players hand
+        """
+        pass
 
     @abc.abstractmethod
     def pointsMsg(self, team1, team2):
@@ -127,19 +139,10 @@ class Player(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def orderedUpMsg(self, player, top_card):
+    def orderUpMsg(self, player, top_card):
         """Passes Player that ordered up and the top Card.
 
         For human players, displays orderers name and card ordered up
-        """
-        pass
-
-    @abc.abstractmethod
-    def orderedUp(self, top_card):
-        """Called when this Player is orderd up, passes the top Card.
-
-        Returns:
-            Card to throw in kitty.
         """
         pass
 

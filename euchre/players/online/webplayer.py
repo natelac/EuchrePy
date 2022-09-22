@@ -34,8 +34,11 @@ class WebPlayer(Player, abc.ABC):
         # Worker.get_address(host, port)
         return str(host) + ":" + str(port)
 
+    # Networking methods
+    # ------------------
+
     def recvMessage(self, message):
-        """Recieves a message from a client."""
+        """Recieves a TCP message from a client."""
         self.updates['new_update'] = True
         self.updates['response_type'] = message['response_type']
         self.updates['response'] = message['response']
@@ -48,7 +51,7 @@ class WebPlayer(Player, abc.ABC):
             sock.sendall(message.encode('utf-8'))
 
     def request(self, request_type):
-        """Send a request to the client, and awaits a relevant response."""
+        """Send a TCP request to the client, and awaits a relevant response."""
         #self.updates = {'new_update': False}
         self.sendMessage({'message_type': 'request',
                           'request_type': request_type})
@@ -62,6 +65,8 @@ class WebPlayer(Player, abc.ABC):
         self.updates['new_update'] = False
         return self.updates['response']
 
+    # Decision methods that require a return value
+    # --------------------------------------------
     def orderUp(self):
         ans = self.request('order_up')
         return ans == 'y'
@@ -95,6 +100,18 @@ class WebPlayer(Player, abc.ABC):
 
         return Card.str2card(ans)
 
+    @abc.abstractmethod
+    def discardCard(self, top_card):
+        """Called when this Player is orderd up, passes the top Card.
+
+        Returns:
+            Card to throw in kitty.
+        """
+        # TODO
+        pass
+
+    # Information updates that don't require a return value
+    # -----------------------------------------------------
     def updateHand(self, cards):
         self.hand = cards
         msg = {'message_type': 'info',

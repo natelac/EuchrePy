@@ -8,9 +8,8 @@ class ConsolePlayer(Player, abc.ABC):
         Player.__init__(self, name)
         self.top_card = None
 
-    def updateHand(self, cards):
-        self.hand = cards
-
+    # Decision methods that require a return value
+    # ----------------------------------------------
     def orderUp(self):
         self.printCards()
         ans = input('Order up? y/n\n')
@@ -21,7 +20,7 @@ class ConsolePlayer(Player, abc.ABC):
         return ans == 'y'
 
     def callTrump(self, topSuit):
-        ans = input('Enter suit to pick\n')
+        ans = input('Enter suit to pick:\n')
         while ans not in ['C', 'S', 'H', 'D'] and ans != topSuit:
             ans = input('Not a valid suit.\n')
         return ans
@@ -32,21 +31,43 @@ class ConsolePlayer(Player, abc.ABC):
 
     def playCard(self, leader, cardsPlayed, trump):
         # Print trump and cards
-        print("Trump Suit:", trump)
+        #print("Trump Suit:", trump)
         cards = [str(card) for card in self.hand]
         self.printCards()
 
         # Get card to play from user
-        ans = input('Enter card to play\n')
+        ans = input('Enter card to play:\n')
         while ans not in cards:
             ans = input('Not a card in your hand.\n')
 
         # Remove card from hand, add to playedCards
-        cardIndex = cards.index(ans)
-        card = self.hand.pop(cardIndex)
+        card_index = cards.index(ans)
+        card = self.hand.pop(card_index)
         self._playedCards.append(card)
 
         return card
+
+    def discardCard(self, top_card):
+        # Add top card to the hand
+        self.hand.append(top_card)
+        self.printCards()
+
+        # Get card to discard from user
+        cards = [str(card) for card in self.hand]
+        ans = input('Enter card to discard:\n')
+        while ans not in cards:
+            ans = input('Not a card in your hand.\n')
+
+        # Remove and return discard card
+        card_index = cards.index(ans)
+        discard_card = self.hand.pop(card_index)
+
+        return discard_card
+
+    # Information updates that don't require a return value
+    # -----------------------------------------------------
+    def updateHand(self, cards):
+        self.hand = cards
 
     def pointsMsg(self, team1, team2):
         print()
@@ -62,12 +83,12 @@ class ConsolePlayer(Player, abc.ABC):
 
     def roundResultsMsg(self, taking_team, points_scored,
                         team_tricks):
-        winners = msg['taking_team'].getPlayers()
+        winners = taking_team.getPlayers()
         print("{} and {} win the round with {} points and {} trick taken"
               .format(winners[0], winners[1],
                       points_scored, team_tricks))
 
-    def orderedUpMsg(self, player, top_card):
+    def orderUpMsg(self, player, top_card):
         print(f"{player} ordered up {top_card}")
 
     def deniedUpMsg(self, player):

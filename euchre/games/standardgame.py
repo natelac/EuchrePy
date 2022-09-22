@@ -8,6 +8,7 @@ from euchre.players import Player
 
 class StandardGame:
     """Standard game of euchre
+
     Source: https://en.wikipedia.org/wiki/Euchre
     """
 
@@ -64,56 +65,53 @@ class StandardGame:
         while not self.getWinner():
             for p in self.players: p.pointsMsg(self.team1, self.team2)
             for p in self.players: p.dealerMsg(self.table[3])
-            makerSelected = self.dealPhase()
-            if makerSelected:
+            maker_selected = self.dealPhase()
+            if maker_selected:
                 self.playTricks()
             else:
                 for p in self.players: p.misdealMsg()
             self.updateTableOrder()
 
-    def updateHands(self, hands):
-        pass
-
     def dealPhase(self):
         """Deals cards and determines trump.
 
         Returns:
-            True if there was a misdeal, False otherwise.
+            (bool): True if there was a misdeal, False otherwise.
         """
         # Distribute Cards
         self.deck.shuffle()
         hands = self.deck.deal()
         self.kitty = hands[4]
-        self.top_card = self.kitty[0]
-        self.kitty.pop(0)
+        self.top_card = self.kitty.pop(0)
         for i in range(4):
             self.play_order[i].updateHand(hands[i])
-        for p in self.players: p.top_cardMsg(self.top_card)
+        for p in self.players: p.topCardMsg(self.top_card)
 
         # Order up and order trump phases
-        allPassed = self.orderPhase()
-        if allPassed:
-            allPassed = self.trumpPhase()
+        all_passed = self.orderPhase()
+        if all_passed:
+            all_passed = self.trumpPhase()
 
-        return not allPassed
+        return not all_passed
 
     def orderPhase(self):
         """Asks all players if they want to order up the top card.
 
         Returns:
-            True if everyone passes ordering up, otherwise False.
+            (bool): True if everyone passes ordering up, otherwise False.
         """
         # Ask players if they want to order up top card
         for player in self.table:
-            orderUp = player.orderUp()
-            if orderUp:
+            order_up = player.orderUp()
+            if order_up:
                 self.maker = player
                 self.trump = self.top_card.suit
                 for p in self.players:
-                    p.orderedUpMsg(self.maker, self.top_card)
-                self.table[3].orderUp(self.top_card)
+                    p.orderUpMsg(self.maker, self.top_card)
                 for p in self.players:
                     p.newTrumpMsg(self.trump)
+                discard_card = self.table[3].discardCard(self.top_card)
+                self.kitty.append(discard_card)
                 return False
             else:
                 for p in self.players: p.deniedUpMsg(player)
@@ -123,14 +121,14 @@ class StandardGame:
         """Asks all players if they want to order trump.
 
         Returns:
-            True if everyone passes ordering trump, otherwise False.
+            (bool): True if everyone passes ordering trump, otherwise False.
         """
         # Ask players if they want to order trump
         for player in self.table:
-            orderTrump = player.orderTrump()
+            order_trump = player.orderTrump()
 
             # Player orders trump
-            if orderTrump:
+            if order_trump:
                 call = player.callTrump(self.top_card.suit)
 
                 # Require valid trump that isn't top card suit
@@ -154,109 +152,119 @@ class StandardGame:
     def playTricks(self):
         """Plays 5 tricks."""
         # Initialize trick information
-        goingAlone = self.maker.goAlone()
-        cardsPlayed = {} # Maps player to cards played
-        tricksTaken = {} # Maps players to tricks taken
-        if goingAlone:
-            # Skip teammate of player going alone
+        going_alone = self.maker.goAlone()
+        cards_played = {} # Maps player to cards played
+        tricks_taken = {} # Maps players to tricks taken
+
+        # Skip teammate of player going alone
+        if going_alone:
             for player in self.play_order:
                 if self.maker.getTeammate() is not player:
-                    cardsPlayed[player] = []
-                    tricksTaken[player] = 0
+                    cards_played[player] = []
+                    tricks_taken[player] = 0
         else:
-            cardsPlayed = {player: [] for player in self.play_order}
-            tricksTaken = {player: 0 for player in self.play_order}
+            cards_played = {player: [] for player in self.play_order}
+            tricks_taken = {player: 0 for player in self.play_order}
 
-        taker = self.table[0] # Init taker to player left of dealer
-        leaderList = [] # List of players that lead for all 5 tricks
+        # Init taker to player left of dealer
+        taker = self.table[0]
+
+        # Init list of leaders for each trick
+        leader_list = []
         for p in self.players: p.leaderMsg(taker)
 
         # Play tricks
         for j in range(5):
+
             # Taker of previous round leads
-            leaderList.append(taker)
+            leader_list.append(taker)
             self.updatePlayOrder(taker)
 
             for p in self.players: p.trickStartMsg()
 
             # Play a trick
             for player in self.play_order:
-                if goingAlone and self.maker.getTeammate() is player:
+                if going_alone and self.maker.getTeammate() is player:
                     # Skip teammate of player going alone
                     continue
-                card = player.playCard(taker, cardsPlayed, self.trump)
-                cardsPlayed[player].append(card)
+                card = player.playCard(taker, cards_played, self.trump)
+                cards_played[player].append(card)
                 for p in self.players: p.playedMsg(player, card)
 
-                # Decide Taker
-            trick = {player: cards[j] for player, cards in cardsPlayed.items()}
-            ledSuit = trick[taker].suit
+            # Decide Taker
+            trick = {player: cards[j] for player, cards in cards_played.items()}
+            led_suit = trick[taker].suit
             taker = max(trick,
                         key=lambda player: trick[player].value(
-                            ledSuit, self.trump))
+                            led_suit, self.trump))
             for p in self.players: p.takerMsg(taker)
-            tricksTaken[taker] += 1
+            tricks_taken[taker] += 1
 
-        # Reneging
-        renegers = self.checkForReneges(leaderList, cardsPlayed, goingAlone)
+        # Penalize any players that reneged, otherwise score round normally
+        renegers = self.checkForReneges(leader_list, cards_played, going_alone)
         if renegers:
             self.penalize(renegers)
         else:
-            # Otherwise score round
-            self.scoreRound(tricksTaken, goingAlone)
+            self.scoreRound(tricks_taken, going_alone)
 
     def validTrump(self, suit):
         """Checks if a trump call is valid.
 
         Args:
-            The suit that a player has called.
+            suit (char): The suit that a player has called.
 
         Returns:
-            True if the trump is valid, otherwise False.
+            (bool): True if the trump is valid, otherwise False.
         """
         if not suit in ['C', 'S', 'H', 'D']:
             return False
         return suit != self.top_card.suit
 
-    def scoreRound(self, tricksTaken, goingAlone):
-        """Messages players winner and points won."""
+    def scoreRound(self, tricks_taken, going_alone):
+        """Messages players winner and points won.
+
+        Args:
+            tricks_taken (dict): Tricks taken by team
+
+            going_alone (bool): Whether the maker went alone
+        """
         # Count tricks taken per team
-        teamTricks = {self.team1: 0, self.team2: 0}
-        for player, taken in tricksTaken.items():
-            teamTricks[player.team] += taken
-        takingTeam = max(teamTricks, key=teamTricks.get)
+        team_tricks = {self.team1: 0, self.team2: 0}
+        for player, taken in tricks_taken.items():
+            team_tricks[player.team] += taken
+        teaking_team = max(team_tricks, key=team_tricks.get)
 
         # Figure out points
         points = 1
-        if self.maker in takingTeam.getPlayers():
-            if goingAlone and teamTricks[takingTeam] == 5:
+        if self.maker in teaking_team.getPlayers():
+            if going_alone and team_tricks[teaking_team] == 5:
                 points = 4
-            elif teamTricks[takingTeam] == 5:
+            elif team_tricks[teaking_team] == 5:
                 points = 2
         else:
             points = 2
 
         # Finalize results
-        takingTeam.points += points
+        teaking_team.points += points
         for p in self.players:
-            p.roundResultsMsg(takingTeam, points, teamTricks[takingTeam])
+            p.roundResultsMsg(teaking_team, points, team_tricks[teaking_team])
 
-        def penalize(self, renegers):
-            """Penalizes the renegers by giving 2 points to the opposing team.
+    def penalize(self, renegers):
+        """Penalizes the renegers by giving 2 points to the opposing team.
 
-            Args:
-                renegers: A list of players to be penalized
-            """
-            for player in renegers:
-                team = self.oppo_team[player.team]
-                team.points += 2
+        Args:
+            renegers (list): Players to be penalized
+        """
+        for player in renegers:
+            team = self.oppo_team[player.team]
+            team.points += 2
 
-    def checkForReneges(self, leaderList, cardsPlayed, goingAlone):
+    def checkForReneges(self, leader_list, cards_played, going_alone):
         """Figures out who reneged.
 
         Args:
-            leaderList: A list of players ordered by when they lead the trick.
-            cardsPlayed: A dict mapping players to a list of cards played.
+            leader_list: A list of players ordered by when they lead the trick.
+            cards_played: A dict mapping players to a list of cards played.
                 The list of cards is ordered by trick.
 
         Returns:
@@ -266,15 +274,15 @@ class StandardGame:
 
         # Check each trick
         for j in range(5):
-            leader = leaderList[j]
-            leadSuit = cardsPlayed[leader][j].getSuit(self.trump)
+            leader = leader_list[j]
+            leadSuit = cards_played[leader][j].getSuit(self.trump)
 
             # Add player to renengers if invalid card played
             for player in self.table:
                 # Skip teammate if going alone
-                if goingAlone and self.maker.getTeammate() is player:
+                if going_alone and self.maker.getTeammate() is player:
                     continue
-                cards = cardsPlayed[player][j:]
+                cards = cards_played[player][j:]
                 playable = [card for card in cards if card.getSuit(
                     self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):

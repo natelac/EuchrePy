@@ -2,10 +2,29 @@ from euchre.players.player import Player
 import abc
 
 
-class BasicAIPlayer(Player, abc.ABC):
-    """A Player class that returns valid responses."""
+class SmartAIPlayer(Player, abc.ABC):
+    """A Player class that returns smart responses.
+
+    Here are some things that make this smarter than the basic AI:
+    - Orders up jack if it's the dealer
+    - Orders up if it has at least 3 trump cards
+        and the top card goes to its team
+    - Orders trump if it has 3 or more cards of the same suit
+    - Plays highest card if it wins the trick
+    - Plays lowest card if highest card can't win
+    - Plays random trump if can't follow lead
+
+    """
     def __init__(self, name='AI'):
         Player.__init__(self, name)
+
+    def getLowestCard(self, led_card, trump_suit):
+        # Return lowest value card
+        pass
+
+    def getHighestCard(self, led_card, trump_suit):
+        # Return high value card
+        pass
 
     # Abstract functions to implement
     # -------------------------------
@@ -17,9 +36,13 @@ class BasicAIPlayer(Player, abc.ABC):
         return False
 
     def discardCard(self, top_card):
-        # Put an arbitrary card in kitty
-        discard_card = self.hand.pop()
+        # Put lowest valued card in the kitty
         self.hand.append(top_card)
+        values = {}
+        for card in self.hand:
+            values[card] = card.value(card.suit, top_card.suit)
+        discard_card = max(values, key=values.get)
+        self.hand.remove(discard_card)
         return discard_card
 
     def orderTrump(self):
@@ -58,7 +81,7 @@ class BasicAIPlayer(Player, abc.ABC):
                         team_tricks):
         pass
 
-    def orderUpMsg(self, player, top_card):
+    def orderedUpMsg(self, player, top_card):
         pass
 
     def deniedUpMsg(self, player):
