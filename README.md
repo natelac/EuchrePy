@@ -17,3 +17,4 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 # TODO:
 - Complete game state object that can be exported play by play
+- Discarding for web player
