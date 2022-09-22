@@ -47,7 +47,7 @@ class Player(abc.ABC):
         """Determines whether player will order up.
 
         Returns:
-            True if player is ordering up, otherwise False.
+            (Bool): True if player is ordering up, otherwise False.
         """
         pass
 
@@ -56,7 +56,7 @@ class Player(abc.ABC):
         """Determines whether player will order trump.
 
         Returns:
-            True if player is ordering trump, otherwise False.
+            (Bool): True if player is ordering trump, otherwise False.
         """
         pass
 
@@ -65,7 +65,7 @@ class Player(abc.ABC):
         """Gets players call for trump.
 
         Returns:
-            Suit that player will call for trump.
+            (Char): Suit that player will call for trump.
         """
         pass
 
@@ -74,7 +74,7 @@ class Player(abc.ABC):
         """Gets players card to be played during a trick.
 
         Returns:
-            A card that player selects.
+            (Card): A card that player selects.
         """
         pass
 
@@ -83,7 +83,7 @@ class Player(abc.ABC):
         """Gets whether player is going alone.
 
         Returns:
-            True if player is going alone, otherwise False.
+            (Bool): True if player is going alone, otherwise False.
         """
         pass
 
@@ -92,7 +92,7 @@ class Player(abc.ABC):
         """Called when this Player is orderd up, passes the top Card.
 
         Returns:
-            Card to throw in kitty.
+            (Card): Card to throw in kitty.
         """
         pass
 
@@ -101,6 +101,9 @@ class Player(abc.ABC):
     @abc.abstractmethod
     def updateHand(self, cards):
         """Updates cards in players hand
+
+        Args:
+            (List): Cards dealt to player
         """
         pass
 
@@ -110,6 +113,10 @@ class Player(abc.ABC):
         the players have.
 
         For human players, displays player names and team points.
+
+        Args:
+            team1 (Team)
+            team2 (Team)
         """
         pass
 
@@ -118,6 +125,9 @@ class Player(abc.ABC):
         """Passes the Player that is the dealer.
 
         For human players, displays dealers name.
+
+        Args:
+            dealer (Player): The dealer
         """
         pass
 
@@ -126,6 +136,9 @@ class Player(abc.ABC):
         """Passes the Card turned up in the kitty.
 
         For human players, displays the top card.
+
+        Args:
+            top_card (Card): The top card
         """
         pass
 
@@ -135,6 +148,11 @@ class Player(abc.ABC):
         """Passes results of a round (5 trick stint).
 
         For human players, displays takers, points won, and # of tricks taken.
+
+        Args:
+            taking_team (Team): Team that won the round
+            points_scored (int): Points scored by the team that won the round
+            team_tricks (int): Number of tricks taken by winning team
         """
         pass
 
@@ -143,6 +161,10 @@ class Player(abc.ABC):
         """Passes Player that ordered up and the top Card.
 
         For human players, displays orderers name and card ordered up
+
+        Args:
+            player (Player): Player that ordered up
+            top_card (Card): Card ordered up
         """
         pass
 
@@ -151,6 +173,9 @@ class Player(abc.ABC):
         """Passes Player that denied ordering up.
 
         For human players, displays deniers name.
+
+        Args:
+            player (Player): Player that denied ordering up
         """
         pass
 
@@ -160,6 +185,10 @@ class Player(abc.ABC):
 
         For human players, displays the orderers name and
         suit they ordered.
+
+        Args:
+            player (Player): Player that called a trump suit
+            trump_suit (Player): Suit called for trump
         """
         pass
 
@@ -168,6 +197,9 @@ class Player(abc.ABC):
         """Passes Player that denied ordering a trump suit.
 
         For human players, displays deniers name.
+
+        Args:
+            player (Player): Player that denied calling trump
         """
         pass
 
@@ -189,6 +221,9 @@ class Player(abc.ABC):
         """Passes Player that leads the trick.
 
         For human players, displays dealers name.
+
+        Args:
+            leader (Player): Player that leads the next trick
         """
         pass
 
@@ -197,6 +232,10 @@ class Player(abc.ABC):
         """Passes Player and the card that they played.
 
         For human players, displays the name of the player and card played.
+
+        Args:
+            player (Player): Player that played a card
+            card (Card): Card played by the player
         """
         pass
 
@@ -205,6 +244,9 @@ class Player(abc.ABC):
         """Passes Player that took the trick.
 
         For human players, displays takers name.
+
+        Args:
+            taker (Player): Player that took the trick
         """
         pass
 
@@ -213,6 +255,10 @@ class Player(abc.ABC):
         """Passes Player that reneged.
 
         For human players, displays reneger, card reneged, and points awarded.
+
+        Args:
+            player (Player): Player that reneged
+            card (Card): Card that caused the player to renege
         """
         pass
 
@@ -238,71 +284,8 @@ class Player(abc.ABC):
         """Called when there is a new trump.
 
         For human players, displays new trump.
+
+        Args:
+            trump_suit (Char): Suit of the new trump
         """
         pass
-
-#    @abc.abstractmethod
-#    def passMsg(self, msg):
-#        """Recieves game information and processes it for the player.
-#
-#        Possible messages and their purposes:
-#            {'type': 'points',
-#             'teams': (Team, Team)}
-#            Updated points after round, points can be accessed in the Team
-#            object through team.points.
-#
-#            {'type': 'dealer',
-#             'player': Player}
-#            What player is the new dealer.
-#
-#            {'type': 'misdeal'}
-#            Last round was a misdeal and a new round will start.
-#
-#            {'type': 'top_card',
-#             'top_card': Card}
-#            Top card turned up during the dealing phase.
-#
-#            {'type': 'ordered_up',
-#             'player': Player}
-#            Player that ordered the top card up.
-#
-#            {'type': 'denied_up',
-#             'player': Player}
-#            Player that denied ordering the top card up.
-#
-#            {'type': 'invalid_suit'}
-#            This player tried to call an invalid suit for trump.
-#
-#            {'type': 'ordered_trump',
-#             'player': Player}
-#            Player that ordered trump.
-#
-#            {'type': 'denied_trump',
-#             'player': Player}
-#            Player that denied trump.
-#
-#            {'type': 'trick_start'}
-#            New trick is starting.
-#
-#            {'type': 'card_played',
-#             'player': Player,
-#             'card': Card}
-#            Card played by a player during a trick.
-#
-#            {'type': 'new_taker',
-#             'taker': Player}
-#            Taker of the previous trick.
-#
-#            {'type': 'round_results',
-#             'taking_team': Team,
-#             'points_scored': points,
-#             'team_tricks': tricks}
-#            Results of a round including points scored and number of tricks
-#            taken by the team that won the round.
-#
-#            {'type': 'penalty',
-#             'player': Player,
-#             'card': Card}
-#            Player that reneged and what card they played to renege
-#        """
-#        pass

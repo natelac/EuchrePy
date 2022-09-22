@@ -7,12 +7,8 @@ class BasicAIPlayer(Player, abc.ABC):
     def __init__(self, name='AI'):
         Player.__init__(self, name)
 
-    # Abstract functions to implement
-    # -------------------------------
-
-    def updateHand(self, cards):
-        self.hand = cards
-
+    # Decision methods that require a return value
+    # ----------------------------------------------
     def orderUp(self):
         return False
 
@@ -44,6 +40,11 @@ class BasicAIPlayer(Player, abc.ABC):
             self.hand.remove(card)
 
         return card
+
+    # Information updates that don't require a return value
+    # -----------------------------------------------------
+    def updateHand(self, cards):
+        self.hand = cards
 
     def pointsMsg(self, team1, team2):
         pass

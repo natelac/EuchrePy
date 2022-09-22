@@ -23,35 +23,6 @@ class StandardGame:
         self.play_order = [] # Ordered plaeyrs where index 0 is leader
         self.seatPlayers()
 
-        # Cards are represented by their shorthand string, i.e., 'AH' or '1C'
-        # self.game_info = {
-        #     'players': [
-        #         {'player_id': player_id,
-        #          'hand': [card,]},
-        #     ],
-        #     'teams': [
-        #         {
-        #         'players': [player_id,],
-        #          'points': points
-        #          }
-        #     ]
-        #     'table': [player_id,], # Order based on dealer (idx 3 is dealer)
-        #     'play_order': [player_id,], # Order based on trick leader (idx 0 is leader)
-        #     'phase': phase,  # fx: dealing start, dealing first, ..., dealing done...
-        #     'kitty': [card,],
-        #     'top_card': top_card,
-        #     'dealer': player_id,
-        #     'maker': player_id,
-        #     'leader': player_id,
-        #     'ordered_up': player_id,
-        #     'called_trump': player_id,
-        #     'trump_suit': trump_suit,
-        #     'trick_takers': [player_id] #
-        #     'down_cards': {
-        #             player_id: [card, ],
-        #         }
-        #     }
-
         # Trick Info
         self.top_card = None
         self.trump = None
@@ -76,7 +47,7 @@ class StandardGame:
         """Deals cards and determines trump.
 
         Returns:
-            (bool): True if there was a misdeal, False otherwise.
+            (Bool): True if there was a misdeal, False otherwise.
         """
         # Distribute Cards
         self.deck.shuffle()
@@ -98,7 +69,7 @@ class StandardGame:
         """Asks all players if they want to order up the top card.
 
         Returns:
-            (bool): True if everyone passes ordering up, otherwise False.
+            (Bool): True if everyone passes ordering up, otherwise False.
         """
         # Ask players if they want to order up top card
         for player in self.table:
@@ -121,7 +92,7 @@ class StandardGame:
         """Asks all players if they want to order trump.
 
         Returns:
-            (bool): True if everyone passes ordering trump, otherwise False.
+            (Bool): True if everyone passes ordering trump, otherwise False.
         """
         # Ask players if they want to order trump
         for player in self.table:
@@ -211,10 +182,10 @@ class StandardGame:
         """Checks if a trump call is valid.
 
         Args:
-            suit (char): The suit that a player has called.
+            suit (Char): The suit that a player has called.
 
         Returns:
-            (bool): True if the trump is valid, otherwise False.
+            (Bool): True if the trump is valid, otherwise False.
         """
         if not suit in ['C', 'S', 'H', 'D']:
             return False
@@ -224,9 +195,8 @@ class StandardGame:
         """Messages players winner and points won.
 
         Args:
-            tricks_taken (dict): Tricks taken by team
-
-            going_alone (bool): Whether the maker went alone
+            tricks_taken (Dict): Tricks taken by team
+            going_alone (Bool): Whether the maker went alone
         """
         # Count tricks taken per team
         team_tricks = {self.team1: 0, self.team2: 0}
@@ -253,7 +223,7 @@ class StandardGame:
         """Penalizes the renegers by giving 2 points to the opposing team.
 
         Args:
-            renegers (list): Players to be penalized
+            renegers (List): Players to be penalized
         """
         for player in renegers:
             team = self.oppo_team[player.team]
@@ -263,12 +233,13 @@ class StandardGame:
         """Figures out who reneged.
 
         Args:
-            leader_list: A list of players ordered by when they lead the trick.
-            cards_played: A dict mapping players to a list of cards played.
-                The list of cards is ordered by trick.
+            leader_list (List): Players ordered by when they lead the trick
+            cards_played (Dict): Maps players to a list of cards played
+                The list of cards is ordered by trick
+            going_alone (Bol): Whether the maker went alone
 
         Returns:
-            A list of players that reneged and need to be penalized.
+            renegers (List) Players that reneged and need to be penalized.
         """
         renegers = []
 
@@ -328,7 +299,11 @@ class StandardGame:
         self.play_order.append(new_leader)
 
     def updatePlayOrder(self, taker):
-        """Updates the play order so the taker of the previous trick goes first."""
+        """Updates the play order so the taker of the previous trick goes first.
+
+        Args:
+            taker (Player): Player that won the previous trick
+        """
         while self.play_order[0] is not taker:
             new_leader = self.play_order.pop(0)
             self.play_order.append(new_leader)
@@ -336,7 +311,8 @@ class StandardGame:
     def updateTableOrder(self):
         """Selects the new dealer.
 
-        Rotates the player order so the player to the left of the dealer is the new dealer.
+        Rotates the player order so the player to the left of the dealer
+        is the new dealer.
         """
         new_dealer = self.table.pop(0)
         self.table.append(new_dealer)
@@ -345,24 +321,7 @@ class StandardGame:
         """Fetches the winner.
 
         Returns:
-            Player that won, or if there is no winner, None.
+            winner (Player): Player that won, or if there is no winner, None
         TODO
         """
         return None
-
-    def msgPlayers(self, msg, exclude=None):
-        """Messages all players with a type of message and it's content.
-
-        See Player.passMsg() for valid values for msg.
-
-        Args:
-            msg: A string identifying type of message.
-            content: Content of message to be sent.
-            exclude: Players that should NOT recieve the message.
-
-        #TODO:
-            Modify so that it waits for tcp message to be sent to all players before continuing
-        """
-        for player in self.table:
-            if player is not exclude:
-                player.passMsg(msg)
