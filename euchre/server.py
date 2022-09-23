@@ -166,7 +166,6 @@ class GameServer:
         return self.players[address]
 
     def playGame(self):
-        #TODO
         while len(self.online_players) == 0:
             time.sleep(1)
         p1 = list(self.online_players.values())[0]

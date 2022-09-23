@@ -5,6 +5,7 @@ import abc
 class SmartAIPlayer(Player, abc.ABC):
     """A Player class that returns smart responses.
 
+    TODO:
     Here are some things that make this smarter than the basic AI:
     - Orders up jack if it's the dealer
     - Orders up if it has at least 3 trump cards
@@ -13,8 +14,8 @@ class SmartAIPlayer(Player, abc.ABC):
     - Plays highest card if it wins the trick
     - Plays lowest card if highest card can't win
     - Plays random trump if can't follow lead
-
     """
+
     def __init__(self, name='AI'):
         Player.__init__(self, name)
 
@@ -61,7 +62,7 @@ class SmartAIPlayer(Player, abc.ABC):
         else:
             # Play an arbitrary valid card
             leadSuit = cards_played[leader][-1].suit
-            playable = [card for card in self.hand if card.getSuit(
+            playable = [card for card in self.hand if card.suit(
                         trump) == leadSuit]
             card = playable[0] if playable else self.hand[0]
             self.hand.remove(card)

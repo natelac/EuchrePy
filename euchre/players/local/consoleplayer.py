@@ -1,8 +1,10 @@
 from euchre.players.player import Player
 import abc
 
+
 class ConsolePlayer(Player, abc.ABC):
-    """A Player class that prints to and takes input from the console."""
+    """A Player class that prints to and takes input from the console.
+    """
 
     def __init__(self, name='Human'):
         Player.__init__(self, name)
@@ -30,7 +32,7 @@ class ConsolePlayer(Player, abc.ABC):
         return ans == 'y'
 
     def playCard(self, leader, cardsPlayed, trump):
-        # Print trump and cards
+        # Print cards (and trump?)
         #print("Trump Suit:", trump)
         cards = [str(card) for card in self.hand]
         self.printCards()
@@ -43,7 +45,6 @@ class ConsolePlayer(Player, abc.ABC):
         # Remove card from hand, add to playedCards
         card_index = cards.index(ans)
         card = self.hand.pop(card_index)
-        self._playedCards.append(card)
 
         return card
 

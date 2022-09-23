@@ -5,13 +5,11 @@ from .card import Card
 class Deck:
     """Deck consisting of 24 cards for the game of Euchre.
 
-    ...
-
     Attributes:
-        ranks: List containing all possible ranks (str) for the game of Euchre.
-        suits: List containing all possible suits (str) for the game of Euchre.
-        cards: List containing every unique card that can be made from ranks and suits.
-        size: Number of cards in the deck.
+        ranks (list): All possible ranks (str) for the game of Euchre
+        suits (list): All possible suits (str) for the game of Euchre
+        cards (list): Every unique card that can be made from ranks and suits
+        size (int): Number of cards in the deck
     """
 
     ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
@@ -27,12 +25,13 @@ class Deck:
                 self.cards.append(Card(rank, suit))
 
     def deal(self):
-        """Returns four hands and a kitty selected in order from the deck and an up card.
+        """Deals four hands and a kitty selected in order from the deck
+        and an up card.
 
         Remember to shuffle before you deal if you want to randomize the cards.
 
         Returns:
-            Tuple where first element is a list of list of cards,
+            hands (tuple): First element is a list of list of cards
                 and second element is the up card
         """
         hands = [[], [], [], [], []]
@@ -41,7 +40,8 @@ class Deck:
         return hands
 
     def shuffle(self):
-        """Randomizes the order of the cards in the deck."""
+        """Randomizes the order of the cards in the deck.
+        """
         random.shuffle(self.cards)
 
     def print(self):
@@ -52,6 +52,7 @@ class Deck:
             print(card)
 
     def printFull(self):
-        """Prints the cards in the deck using long form, i.e. 'Ace of Clubs'"""
+        """Prints the cards in the deck using long form, i.e. 'Ace of Clubs'
+        """
         for card in self.cards:
             print(card.toString())

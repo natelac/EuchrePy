@@ -3,41 +3,46 @@ import itertools
 
 from euchre.utils import printCards as utilPrintCards
 
+
 class Player(abc.ABC):
     """Base Player class used in a Euchre game.
 
     Player objects are directly called by the game.
 
     Attributes:
-        name: Name of the player
-        team: Team that the player is on
-        hand: List of cards in the players hand
+        name (str): Name of the player
+        team (Team): Team that the player is on
+        hand (list): Cards in the players hand
     """
+
     id_iter = itertools.count()
 
-    def __init__(self, name=''):
-        self.id = next(Player.id_iter)
-        self.name = name
+    def __init__(self, name=None):
+        self._id = next(Player.id_iter)
+
+        self.name = str(self._id) if name is None else name
         self.team = None
         self.hand = None
-        self.game_info = {'trump_suit': None,
-                          'leader': None,
-                          'down_cards': None}
-        self._playedCards = []
 
     def __str__(self):
-        """Gets name of player"""
+        """Gets name of player
+
+        Returns:
+            name (str): Players name
+        """
         return self.name
 
     def getTeammate(self):
         """Gets teammate
 
         Returns:
-            Player that is on the same team as this Player."""
+            (Player): Player that is on the same team as this Player.
+        """
         return self.team.getTeammate(self)
 
     def printCards(self):
-        """Prints 'nice' view of player's hand to console."""
+        """Prints 'nice' view of player's hand to console.
+        """
         utilPrintCards(self.hand)
 
     # Decision methods that require a return value
@@ -47,7 +52,7 @@ class Player(abc.ABC):
         """Determines whether player will order up.
 
         Returns:
-            (Bool): True if player is ordering up, otherwise False.
+            (bool): True if player is ordering up, otherwise False.
         """
         pass
 
@@ -56,7 +61,7 @@ class Player(abc.ABC):
         """Determines whether player will order trump.
 
         Returns:
-            (Bool): True if player is ordering trump, otherwise False.
+            (bool): True if player is ordering trump, otherwise False.
         """
         pass
 
@@ -65,7 +70,7 @@ class Player(abc.ABC):
         """Gets players call for trump.
 
         Returns:
-            (Char): Suit that player will call for trump.
+            (str): Suit that player will call for trump.
         """
         pass
 
@@ -83,7 +88,7 @@ class Player(abc.ABC):
         """Gets whether player is going alone.
 
         Returns:
-            (Bool): True if player is going alone, otherwise False.
+            (bool): True if player is going alone, otherwise False.
         """
         pass
 
@@ -103,7 +108,7 @@ class Player(abc.ABC):
         """Updates cards in players hand
 
         Args:
-            (List): Cards dealt to player
+            (list): Cards dealt to player
         """
         pass
 
@@ -286,6 +291,6 @@ class Player(abc.ABC):
         For human players, displays new trump.
 
         Args:
-            trump_suit (Char): Suit of the new trump
+            trump_suit (str): Suit of the new trump
         """
         pass

@@ -4,16 +4,22 @@ import random
 class Card:
     """Card object used to construct a deck.
 
+    Contains the shorthand names for the rank and suit of a Card.
+
     Attributes:
-        rank: The shorthand rank of the card, i.e. 'Ace' is 'A'.
-        suit: The shorthand suit of the card, i.e. 'Clubs' is 'C'.
+        rank (str): The shorthand rank of the card, i.e. 'Ace' is 'A'.
+        suit (str): The shorthand suit of the card, i.e. 'Clubs' is 'C'.
     """
 
-    def __init__(self, rank: str, suit: str):
-        """Inits Card"""
+    def __init__(self, rank, suit):
+        """
+        Args:
+            rank (str): Shorthand rank of the card
+            suit (str): Shorthand suit of the card
+        """
         self._rank: str = rank
         self._suit: str = suit
-        self._offSuit: dict = {
+        self._off_suit: dict = {
             'C': 'S',
             'S': 'C',
             'H': 'D',
@@ -35,21 +41,75 @@ class Card:
         }
 
     @property
-    def rank(self) -> str:
-        "Shorthand rank of card"
+    def rank(self):
+        """Shorthand rank of card.
+
+        Returns:
+            rank (str): Shorthand rank of the card
+        """
         if self._rank == '10':
             return '10'
         else:
             return self._rank[0]
 
     @property
-    def suit(self) -> str:
-        "Shorthand suit of card"
+    def suit(self):
+        """Shorthand suit of the Card.
+
+        Returns:
+            suit (str): Shorthand suit of the Card
+        """
         return self._suit[0]
 
+    def suit(self, trump_suit):
+        """Shorthand suit of the Card given trump.
+
+        Checks if the card is left bower.
+
+        Returns:
+            suit (str): Shorthand suit of the Card given trump
+        """
+        if self.isLeftBower(trump_suit):
+            return self._off_suit[self.suit]
+        return self.suit
+
+    @property
+    def name(self):
+        """Name of the card.
+
+        For example, returns 'Ace of Clubs' for the Ace of Clubs.
+
+        Returns:
+            (str): Full name of the Card
+        """
+        return self._rank + ' of ' + self._suit
+
+    def prettyString(self):
+        """A pretty version of the card.
+
+        For example, returns '[ AC ]' for 'Ace of Clubs'.
+
+        Returns:
+            (str): Pretty version of the card
+        """
+        if self.suit in ['D', 'H']:
+            # return "\u001b[31m[ " + self.rank[0] + ' ' + self._symbols[self.suit[0]] + " ]\033[0m"
+            return "\u001b[31m[ " + self.rank[0] + self.suit[0] + " ]\033[0m"
+        else:
+            # return "[ " + self.rank[0] + ' ' + self._symbols[self.suit[0]] + " ]"
+            return "[ " + self.__str__() + " ]"
+
     @classmethod
-    def str2card(cls, shorthand: str):
-        """Convert shorthand string to card object"""
+    def str2card(cls, shorthand):
+        """Convert shorthand string to card object.
+
+        Args:
+            shorthand (str): Shorthand name of the card where the first
+                character is the rank and the second is the suit
+
+        Returns:
+            (Card): A card object corresponding to the shorthand
+        """
         rank = shorthand[0]
         suit = shorthand[1]
 
@@ -58,60 +118,61 @@ class Card:
 
         return Card(rank, suit)
 
+    def __str__(self):
+        """Shorthand name of card.
+        'AC' for 'Ace of Clubs'.
 
-    def getSuit(self, trumpSuit: str) -> str:
-        """Returns suit of card in context of trump suit"""
-        if self.isLeftBower(trumpSuit):
-            return self._offSuit[self.suit]
-        return self.suit
-
-    def __str__(self) -> str:
-        """Returns shortened name of card, i.e. 'AC' for 'Ace of Clubs'.
-        NOTE: '10 of Clubs' would be 1C"""
+        Returns:
+            (str): Shorthand name of card
+        """
         return self._rank[0] + self._suit[0]
 
-    def value(self, ledSuit: str, trumpSuit: str) -> int:
-        """Returns value of card in the context of a tricksTaken"""
+    def value(self, led_suit, trump_suit):
+        """Value of card in context of the led suit and the trump suit.
+
+        Args:
+            led_suit (str): Suit of card led
+            trump_suit (str): Trump suit
+
+        Returns:
+            (int): Value of card relative to other cards
+        """
         val = self._values[self.rank]
-        if self.isRightBower(trumpSuit):
+        if self.isRightBower(trump_suit):
             return 52
-        elif self.isLeftBower(trumpSuit):
+        elif self.isLeftBower(trump_suit):
             return 51
-        elif self.suit == trumpSuit:
+        elif self.suit == trump_suit:
             return val + 6
-        elif self.suit == ledSuit:
+        elif self.suit == led_suit:
             return val
         else:
             return 0
 
-    def isLeftBower(self, trumpSuit: str) -> bool:
-        """Returns whether the card is left bower given the trump suit."""
-        if self.rank == 'J' and self.suit == self._offSuit[trumpSuit]:
-            return True
-        else:
-            return False
+    def isLeftBower(self, trump_suit):
+        """Whether the card is left bower given the trump suit.
 
-    def isRightBower(self, trumpSuit: str):
-        """Returns whether the card is right bower given the trump suit."""
-        if self.rank == 'J' and self.suit == trumpSuit:
-            return True
-        else:
-            return False
+        Args:
+            trump_suit (str): Trump suit
 
-    def toString(self) -> str:
-        """Returns the full name of a card, for example 'Ace of Clubs'.
-
-        Implicitly cast the card object to string if you want shorthand,
-        i.e. 'AC' for 'Ace of Clubs'"""
-        return self._rank + ' of ' + self._suit
-
-    def prettyString(self) -> str:
-        """Returns a pretty version of the card,
-        i.e. '[ AC ]' for 'Ace of Clubs'
+        Returns:
+            (bool): True if left bower, otherwise False
         """
-        if self.suit in ['D', 'H']:
-            # return "\u001b[31m[ " + self.rank[0] + ' ' + self._symbols[self.suit[0]] + " ]\033[0m"
-            return "\u001b[31m[ " + self.rank[0] + self.suit[0] + " ]\033[0m"
+        if self.rank == 'J' and self.suit == self._off_suit[trump_suit]:
+            return True
         else:
-            # return "[ " + self.rank[0] + ' ' + self._symbols[self.suit[0]] + " ]"
-            return "[ " + self.__str__() + " ]"
+            return False
+
+    def isRightBower(self, trump_suit):
+        """Whether the card is right bower given the trump suit.
+
+        Args:
+            trump_suit (str): Trump suit
+
+        Returns:
+            (bool): True if right bower, otherwise False
+        """
+        if self.rank == 'J' and self.suit == trump_suit:
+            return True
+        else:
+            return False

@@ -6,7 +6,8 @@ import json
 import time
 
 class WebPlayer(Player, abc.ABC):
-    """A Player class for TCP connected players."""
+    """A Player class for TCP connected players.
+    """
 
     def __init__(self, host='localhost', port=6001, name='WebPlayer'):
         Player.__init__(self, name)
@@ -25,12 +26,21 @@ class WebPlayer(Player, abc.ABC):
 
     @property
     def address(self):
-        """Access as player.address."""
+        """The host:port address of the player
+
+        Returns:
+            (str): String address of the player
+        """
         return str(self.host) + ":" + str(self.port)
 
     @classmethod
     def getAddress(cls, host, port):
-        """Convert host:port pair to string."""
+        """Convert host:port pair to string.
+
+        Args:
+            host (str / int): Host
+            port (str / int): Host port
+        """
         # Worker.get_address(host, port)
         return str(host) + ":" + str(port)
 
@@ -38,20 +48,26 @@ class WebPlayer(Player, abc.ABC):
     # ------------------
 
     def recvMessage(self, message):
-        """Recieves a TCP message from a client."""
+        """Recieves a TCP message from a client.
+
+        Args:
+            message (dict): A dictionary that always contains the
+        """
         self.updates['new_update'] = True
         self.updates['response_type'] = message['response_type']
         self.updates['response'] = message['response']
 
     def sendMessage(self, message):
-        """Send a TCP message to the player."""
+        """Send a TCP message to the player.
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((self.host, self.port))
             message = json.dumps(message)
             sock.sendall(message.encode('utf-8'))
 
     def request(self, request_type):
-        """Send a TCP request to the client, and awaits a relevant response."""
+        """Send a TCP request to the client, and awaits a relevant response.
+        """
         #self.updates = {'new_update': False}
         self.sendMessage({'message_type': 'request',
                           'request_type': request_type})
@@ -104,8 +120,11 @@ class WebPlayer(Player, abc.ABC):
     def discardCard(self, top_card):
         """Called when this Player is orderd up, passes the top Card.
 
+        Args:
+            top_card (Card): Card turned up on kitty
+
         Returns:
-            Card to throw in kitty.
+            (Card): Card to throw in kitty
         """
         # TODO
         pass

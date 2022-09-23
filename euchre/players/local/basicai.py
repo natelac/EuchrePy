@@ -3,7 +3,9 @@ import abc
 
 
 class BasicAIPlayer(Player, abc.ABC):
-    """A Player class that returns valid responses."""
+    """A Player class that returns valid responses.
+    """
+
     def __init__(self, name='AI'):
         Player.__init__(self, name)
 
@@ -34,7 +36,7 @@ class BasicAIPlayer(Player, abc.ABC):
         else:
             # Play an arbitrary valid card
             leadSuit = cards_played[leader][-1].suit
-            playable = [card for card in self.hand if card.getSuit(
+            playable = [card for card in self.hand if card.suit(
                         trump) == leadSuit]
             card = playable[0] if playable else self.hand[0]
             self.hand.remove(card)

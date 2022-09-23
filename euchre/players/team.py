@@ -15,7 +15,7 @@ class Team:
         """Gets all players on the team.
 
         Returns:
-            List of players on team.
+            (list): Players on team.
         """
         return [self._p1, self._p2]
 
@@ -23,7 +23,7 @@ class Team:
         """Gets the teammates of the passed player.
 
         Returns:
-            Teammate of passed player, or None if they have no teammate.
+            (Player): Teammate of passed player
         """
         if player is self._p1:
             return self._p2
@@ -31,8 +31,3 @@ class Team:
             return self._p1
         else:
             return None
-
-    def msgPlayers(self, msg):
-        """Passes messages onto players on this team."""
-        self._p1.passMsg(msg)
-        self._p2.passMsg(msg)

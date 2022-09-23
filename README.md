@@ -15,6 +15,21 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 # Install
 - Run 'sudo pip install -e .'
 
-# TODO:
-- Complete game state object that can be exported play by play
+# TODO
+
+## Complete euchre game
+
 - Discarding for web player
+- Fix logic for penalties
+- Add farmers hand
+- Complete game state object that can be exported for play by play
+
+## Long-term goals
+
+- Improved basicAI (smartAI)
+
+## Other projects
+
+- AI project
+  - Move all AI stuff to a separate project
+  - Explore coding different strategies and having them compete against each other

@@ -2,8 +2,6 @@ import numpy as np
 from euchre.cards import Card
 from euchre.cards import Deck
 from euchre.players import Player
-# from consolehuman import HumanPlayer
-# from basicai import BasicAIPlayer
 
 
 class StandardGame:
@@ -18,36 +16,55 @@ class StandardGame:
         self.team1 = team1
         self.team2 = team2
         self.oppo_team = {team1: team2, team2: team1}
-        self.players = [] # List of players, initially equivelant to self.table
-        self.table = [] # Ordered players where index 3 is dealer
-        self.play_order = [] # Ordered plaeyrs where index 0 is leader
-        self.seatPlayers()
+
+        # List of players, initially equivelant to self.table
+        self.players = []
+
+         # Ordered players where index 3 is dealer
+        self.table = []
+
+        # Ordered players where index 0 is leader
+        self.play_order = []
 
         # Trick Info
         self.top_card = None
         self.trump = None
         self.maker = None
 
+        # Randomly seat players around the table
+        self.seatPlayers()
+
     def play(self):
-        """Plays a game of euchre until a team reaches 10 points."""
+        """Plays a game of euchre until a team reaches 10 points.
+        """
         if len(self.players) != 4:
             raise AssertionError(f"Euchre requires 4 players to play")
-        # Game Loop
+
+        # Game loop
         while not self.getWinner():
+
+            # Inform players of current game state
             for p in self.players: p.pointsMsg(self.team1, self.team2)
             for p in self.players: p.dealerMsg(self.table[3])
+
+            # Enter dealing phase
             maker_selected = self.dealPhase()
+
             if maker_selected:
+                # Enter playing stage
                 self.playTricks()
             else:
+                # Inform players about misdeal
                 for p in self.players: p.misdealMsg()
+
+            # Update dealer
             self.updateTableOrder()
 
     def dealPhase(self):
         """Deals cards and determines trump.
 
         Returns:
-            (Bool): True if there was a misdeal, False otherwise.
+            (bool): True if there was a misdeal, False otherwise.
         """
         # Distribute Cards
         self.deck.shuffle()
@@ -58,9 +75,12 @@ class StandardGame:
             self.play_order[i].updateHand(hands[i])
         for p in self.players: p.topCardMsg(self.top_card)
 
-        # Order up and order trump phases
+        # Ask players to order up
         all_passed = self.orderPhase()
+
+        # Everyone passed ordering up
         if all_passed:
+            # Ask players to order trump
             all_passed = self.trumpPhase()
 
         return not all_passed
@@ -69,36 +89,42 @@ class StandardGame:
         """Asks all players if they want to order up the top card.
 
         Returns:
-            (Bool): True if everyone passes ordering up, otherwise False.
+            (bool): True if everyone passes ordering up, otherwise False.
         """
-        # Ask players if they want to order up top card
         for player in self.table:
+            # Ask players if they want to order up top card
             order_up = player.orderUp()
+
+            # Someone ordered up
             if order_up:
+                # Update game state and inform players
                 self.maker = player
                 self.trump = self.top_card.suit
                 for p in self.players:
                     p.orderUpMsg(self.maker, self.top_card)
                 for p in self.players:
                     p.newTrumpMsg(self.trump)
+
+                # Have dealer discard a card
                 discard_card = self.table[3].discardCard(self.top_card)
                 self.kitty.append(discard_card)
                 return False
-            else:
-                for p in self.players: p.deniedUpMsg(player)
+
+            # Inform players that player denied up
+            for p in self.players: p.deniedUpMsg(player)
         return True
 
     def trumpPhase(self):
         """Asks all players if they want to order trump.
 
         Returns:
-            (Bool): True if everyone passes ordering trump, otherwise False.
+            (bool): True if everyone passes ordering trump, otherwise False.
         """
-        # Ask players if they want to order trump
+        # Ask players if they want to call trump
         for player in self.table:
             order_trump = player.orderTrump()
 
-            # Player orders trump
+            # Player calls trump
             if order_trump:
                 call = player.callTrump(self.top_card.suit)
 
@@ -107,6 +133,7 @@ class StandardGame:
                     player.invalidSuitMsg()
                     call = player.callTrump(self.top_card.suit)
 
+                # Update game state and inform players
                 self.maker = player
                 self.trump = call
                 for p in self.players:
@@ -121,7 +148,8 @@ class StandardGame:
         return True
 
     def playTricks(self):
-        """Plays 5 tricks."""
+        """Plays 5 tricks.
+        """
         # Initialize trick information
         going_alone = self.maker.goAlone()
         cards_played = {} # Maps player to cards played
@@ -151,6 +179,7 @@ class StandardGame:
             leader_list.append(taker)
             self.updatePlayOrder(taker)
 
+            # Inform players of trick start
             for p in self.players: p.trickStartMsg()
 
             # Play a trick
@@ -182,10 +211,10 @@ class StandardGame:
         """Checks if a trump call is valid.
 
         Args:
-            suit (Char): The suit that a player has called.
+            suit (str): The suit that a player has called.
 
         Returns:
-            (Bool): True if the trump is valid, otherwise False.
+            (bool): True if the trump is valid, otherwise False.
         """
         if not suit in ['C', 'S', 'H', 'D']:
             return False
@@ -195,8 +224,8 @@ class StandardGame:
         """Messages players winner and points won.
 
         Args:
-            tricks_taken (Dict): Tricks taken by team
-            going_alone (Bool): Whether the maker went alone
+            tricks_taken (dict): Tricks taken by team
+            going_alone (bool): Whether the maker went alone
         """
         # Count tricks taken per team
         team_tricks = {self.team1: 0, self.team2: 0}
@@ -225,6 +254,10 @@ class StandardGame:
         Args:
             renegers (List): Players to be penalized
         """
+        # TODO:
+        #   - A team should be penalized only once
+        #   - If both teams renege then it should be treated like a misdeal
+        #   - A renege while going alone is 4 points
         for player in renegers:
             team = self.oppo_team[player.team]
             team.points += 2
@@ -233,20 +266,20 @@ class StandardGame:
         """Figures out who reneged.
 
         Args:
-            leader_list (List): Players ordered by when they lead the trick
-            cards_played (Dict): Maps players to a list of cards played
+            leader_list (list): Players ordered by when they lead the trick
+            cards_played (dict): Maps players to a list of cards played.
                 The list of cards is ordered by trick
-            going_alone (Bol): Whether the maker went alone
+            going_alone (bool): Whether the maker went alone
 
         Returns:
-            renegers (List) Players that reneged and need to be penalized.
+            renegers (list): Players that reneged and need to be penalized.
         """
         renegers = []
 
         # Check each trick
         for j in range(5):
             leader = leader_list[j]
-            leadSuit = cards_played[leader][j].getSuit(self.trump)
+            leadSuit = cards_played[leader][j].suit(self.trump)
 
             # Add player to renengers if invalid card played
             for player in self.table:
@@ -254,13 +287,11 @@ class StandardGame:
                 if going_alone and self.maker.getTeammate() is player:
                     continue
                 cards = cards_played[player][j:]
-                playable = [card for card in cards if card.getSuit(
+                playable = [card for card in cards if card.suit(
                     self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
-                    #TODO Fix this logic, maybe penalties should be messaged in batches?
-                    # This way if a player reneges twice, the player classes will handle
-                    # the messages better and not say that a player was penalized points
-                    # for each renege, when they were actually only penalized for one
+
+                    # Inform players that they reneged
                     for p in self.players: p.penaltyMsg(player, cards[0])
                     renegers.append(player) if player not in renegers else None
 
@@ -321,7 +352,7 @@ class StandardGame:
         """Fetches the winner.
 
         Returns:
-            winner (Player): Player that won, or if there is no winner, None
+            winner (Player): Player that won, otherwise None
         TODO
         """
         return None
