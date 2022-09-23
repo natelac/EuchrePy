@@ -19,6 +19,7 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 ## Complete euchre game
 
+- Displaying game results
 - Discarding for web player
 - Polish code for web classes
 - Complete game state object that can be exported for play by play

@@ -253,10 +253,14 @@ class StandardGame:
             p.roundResultsMsg(teaking_team, points, team_tricks[teaking_team])
 
     def penalize(self, renegers, going_alone):
-        """Penalizes the renegers by giving 2 points to the opposing team.
+        """Penalizes the renegers.
+
+        Penalizes the team only once even if player(s) renege multiple times.
+        Penalizes twice as much when a player is going alone.
+        Doesn't penalize anyone if both teams renege.
 
         Args:
-            renegers (List): Players to be penalized
+            renegers (list): Players to be penalized
         """
         # Use sets to figure out teams to give points to,
         # if both teams renege no one gets points
