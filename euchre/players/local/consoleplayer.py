@@ -1,5 +1,7 @@
-from euchre.players.player import Player
 import abc
+
+from euchre.players.player import Player
+
 
 
 class ConsolePlayer(Player, abc.ABC):
@@ -11,7 +13,7 @@ class ConsolePlayer(Player, abc.ABC):
         self.top_card = None
 
     # Decision methods that require a return value
-    # ----------------------------------------------
+    # -------------------------------------------------------------------------
     def orderUp(self):
         self.printCards()
         ans = input('Order up? y/n\n')
@@ -66,7 +68,7 @@ class ConsolePlayer(Player, abc.ABC):
         return discard_card
 
     # Information updates that don't require a return value
-    # -----------------------------------------------------
+    # -------------------------------------------------------------------------
     def updateHand(self, cards):
         self.hand = cards
 
@@ -119,10 +121,10 @@ class ConsolePlayer(Player, abc.ABC):
     def penaltyMsg(self, player, card):
         if player is self:
             print(
-                f"You reneged by playing {card} and the opposing team was awarded 2 points")
+                f"You reneged by playing {card}")
         else:
             print(
-                f"{player} reneged by playing {card} and your team was awarded 2 points")
+                f"{player} reneged by playing {card}")
 
     def invalidSuitMsg(self):
         print(

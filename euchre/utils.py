@@ -1,14 +1,22 @@
 """Utils file.
 
-This file is to house code common between the Server and the Players
-
+Houses code common between the Server and the Players
 """
 import json
 import socket
 
 
 def message_to_dictionary(sock):
-    """Turn message received by sock to dictionary."""
+    """Turn message received by sock to dictionary.
+
+    Args:
+        sock (socket.socket): Socket to listen to
+
+    Returns:
+        message_dict (int / dict): -1 if no socket, else the message as
+            a python dictionary
+    """
+    # Listen for message
     try:
         clientsocket, _ = sock.accept()
     except socket.timeout:
@@ -35,7 +43,8 @@ def message_to_dictionary(sock):
     return message_dict
 
 def printCards(cards):
-    """Prints 'nice' view of player's hand to console."""
+    """Prints a 'nice' view of player's hand to console.
+    """
     print('Cards: ', end="")
     pretty_cards = []
     for card in cards:

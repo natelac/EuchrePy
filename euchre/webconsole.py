@@ -4,7 +4,7 @@ import threading
 import time
 import click
 
-from euchre.utils import message_to_dictionary
+from euchre.utils import messageToDictionary
 from euchre.utils import printCards
 from euchre.cards import Card
 
@@ -62,7 +62,7 @@ class WebConsole:
     def listenLoop(self, sock, signals):
         """Listen and handle messages over a TCP connection"""
         while not self.signals["shutdown"]:
-            message_dict = message_to_dictionary(sock)
+            message_dict = messageToDictionary(sock)
 
             def orderUp():
                 printCards(self.game_info['hand'])

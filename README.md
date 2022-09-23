@@ -20,16 +20,18 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 ## Complete euchre game
 
 - Discarding for web player
-- Fix logic for penalties
-- Add farmers hand
+- Polish code for web classes
 - Complete game state object that can be exported for play by play
+- Run PEP8 on all of the code
 
 ## Long-term goals
 
 - Improved basicAI (smartAI)
+- Add farmers hand
 
 ## Other projects
 
 - AI project
   - Move all AI stuff to a separate project
   - Explore coding different strategies and having them compete against each other
+  - Train AI using self play

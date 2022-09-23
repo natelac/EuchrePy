@@ -17,15 +17,15 @@ class Card:
             rank (str): Shorthand rank of the card
             suit (str): Shorthand suit of the card
         """
-        self._rank: str = rank
-        self._suit: str = suit
-        self._off_suit: dict = {
+        self._rank = rank
+        self._suit = suit
+        self._off_suit = {
             'C': 'S',
             'S': 'C',
             'H': 'D',
             'D': 'H'
         }
-        self._values: dict = {
+        self._values = {
             'A': 6,
             'K': 5,
             'Q': 4,
@@ -33,7 +33,7 @@ class Card:
             '10': 2,
             '9': 1
         }
-        self._symbols: dict = {
+        self._symbols = {
             'C': '♣',
             'S': '♠',
             'H': '♥',
@@ -61,7 +61,7 @@ class Card:
         """
         return self._suit[0]
 
-    def suit(self, trump_suit):
+    def getSuit(self, trump_suit):
         """Shorthand suit of the Card given trump.
 
         Checks if the card is left bower.

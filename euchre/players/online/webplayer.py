@@ -1,12 +1,15 @@
-from euchre.players.player import Player
-from euchre.cards.card import Card
 import abc
 import socket
 import json
 import time
 
+from euchre.players.player import Player
+from euchre.cards.card import Card
+
 class WebPlayer(Player, abc.ABC):
     """A Player class for TCP connected players.
+
+    Allows the server to communicate with players over the web.
     """
 
     def __init__(self, host='localhost', port=6001, name='WebPlayer'):
@@ -45,7 +48,7 @@ class WebPlayer(Player, abc.ABC):
         return str(host) + ":" + str(port)
 
     # Networking methods
-    # ------------------
+    # -------------------------------------------------------------------------
 
     def recvMessage(self, message):
         """Recieves a TCP message from a client.
@@ -82,7 +85,7 @@ class WebPlayer(Player, abc.ABC):
         return self.updates['response']
 
     # Decision methods that require a return value
-    # --------------------------------------------
+    # -------------------------------------------------------------------------
     def orderUp(self):
         ans = self.request('order_up')
         return ans == 'y'
@@ -130,7 +133,7 @@ class WebPlayer(Player, abc.ABC):
         pass
 
     # Information updates that don't require a return value
-    # -----------------------------------------------------
+    # -------------------------------------------------------------------------
     def updateHand(self, cards):
         self.hand = cards
         msg = {'message_type': 'info',

@@ -1,5 +1,7 @@
-from euchre.players.player import Player
 import abc
+
+from euchre.players.player import Player
+
 
 
 class BasicAIPlayer(Player, abc.ABC):
@@ -10,7 +12,7 @@ class BasicAIPlayer(Player, abc.ABC):
         Player.__init__(self, name)
 
     # Decision methods that require a return value
-    # ----------------------------------------------
+    # -------------------------------------------------------------------------
     def orderUp(self):
         return False
 
@@ -36,15 +38,14 @@ class BasicAIPlayer(Player, abc.ABC):
         else:
             # Play an arbitrary valid card
             leadSuit = cards_played[leader][-1].suit
-            playable = [card for card in self.hand if card.suit(
-                        trump) == leadSuit]
+            playable = [card for card in self.hand if card.getSuit(trump) == leadSuit]
             card = playable[0] if playable else self.hand[0]
             self.hand.remove(card)
 
         return card
 
     # Information updates that don't require a return value
-    # -----------------------------------------------------
+    # -------------------------------------------------------------------------
     def updateHand(self, cards):
         self.hand = cards
 

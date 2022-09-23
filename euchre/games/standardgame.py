@@ -1,4 +1,5 @@
 import numpy as np
+
 from euchre.cards import Card
 from euchre.cards import Deck
 from euchre.players import Player
@@ -137,7 +138,7 @@ class StandardGame:
                 self.maker = player
                 self.trump = call
                 for p in self.players:
-                    p.orderedTrumpMsg(self.maker, self.top_card)
+                    p.orderedTrumpMsg(self.maker, self.trump)
                 for p in self.players:
                     p.newTrumpMsg(self.trump)
                 return False
@@ -203,12 +204,15 @@ class StandardGame:
         # Penalize any players that reneged, otherwise score round normally
         renegers = self.checkForReneges(leader_list, cards_played, going_alone)
         if renegers:
-            self.penalize(renegers)
+            self.penalize(renegers, going_alone)
         else:
             self.scoreRound(tricks_taken, going_alone)
 
     def validTrump(self, suit):
         """Checks if a trump call is valid.
+
+        A trump call is valid if it is a valid suit and isn't the same suit
+        as the top card.
 
         Args:
             suit (str): The suit that a player has called.
@@ -248,19 +252,21 @@ class StandardGame:
         for p in self.players:
             p.roundResultsMsg(teaking_team, points, team_tricks[teaking_team])
 
-    def penalize(self, renegers):
+    def penalize(self, renegers, going_alone):
         """Penalizes the renegers by giving 2 points to the opposing team.
 
         Args:
             renegers (List): Players to be penalized
         """
-        # TODO:
-        #   - A team should be penalized only once
-        #   - If both teams renege then it should be treated like a misdeal
-        #   - A renege while going alone is 4 points
-        for player in renegers:
-            team = self.oppo_team[player.team]
-            team.points += 2
+        # Use sets to figure out teams to give points to,
+        # if both teams renege no one gets points
+        reneging_teams = {player.team for player in renegers}
+        teams = {self.team1, self.team2}
+        for team in teams - reneging_teams:
+            if going_alone:
+                team.points += 4
+            else:
+                team.points += 2
 
     def checkForReneges(self, leader_list, cards_played, going_alone):
         """Figures out who reneged.
@@ -279,7 +285,7 @@ class StandardGame:
         # Check each trick
         for j in range(5):
             leader = leader_list[j]
-            leadSuit = cards_played[leader][j].suit(self.trump)
+            leadSuit = cards_played[leader][j].getSuit(self.trump)
 
             # Add player to renengers if invalid card played
             for player in self.table:
@@ -287,7 +293,7 @@ class StandardGame:
                 if going_alone and self.maker.getTeammate() is player:
                     continue
                 cards = cards_played[player][j:]
-                playable = [card for card in cards if card.suit(
+                playable = [card for card in cards if card.getSuit(
                     self.trump) == leadSuit]
                 if (len(playable) != 0) and (cards[0] not in playable):
 

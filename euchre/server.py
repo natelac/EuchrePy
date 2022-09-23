@@ -1,14 +1,15 @@
-"""Server class for managing Euchre games"""
+"""Server class for managing Euchre games.
+"""
 import json
 import subprocess
 import threading
 import socket
 import click
 import time
-#from players.online.webplayer import WebPlayer
+
 from euchre.players import WebPlayer
 from euchre.players import BasicAIPlayer
-from euchre.utils import message_to_dictionary
+from euchre.utils import messageToDictionary
 from euchre.players import Team
 from euchre.games import StandardGame
 
@@ -33,6 +34,11 @@ class GameServer:
         self.startThreads()
 
     def startThreads(self):
+        """Create threads for TCP and UDP connections.
+
+        Creates a listening thread for TCP connections, a heartbeat thread for
+        communicating server state
+        """
         # Make heartbeat thread for UDP connections
         hb_thread = threading.Thread(
                 target=self.listenHeartbeat,
@@ -79,7 +85,7 @@ class GameServer:
             time.sleep(2)
 
     def listenHeartbeat(self, signals):
-        """Listen for UDP hearbeat messages from players."""
+        """Listen for UDP heartbeat messages from players."""
         # Connect to socket
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -107,7 +113,7 @@ class GameServer:
         """Loop for listen."""
         print("Server listening for registers...")
         while not signals['shutdown']:
-            message_dict = message_to_dictionary(sock)
+            message_dict = messageToDictionary(sock)
 
             def handleRegister():
                 """Handle register."""

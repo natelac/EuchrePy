@@ -46,7 +46,7 @@ class Player(abc.ABC):
         utilPrintCards(self.hand)
 
     # Decision methods that require a return value
-    # ----------------------------------------------
+    # -------------------------------------------------------------------------
     @abc.abstractmethod
     def orderUp(self):
         """Determines whether player will order up.
@@ -102,7 +102,7 @@ class Player(abc.ABC):
         pass
 
     # Information updates that don't require a return value
-    # -----------------------------------------------------
+    # -------------------------------------------------------------------------
     @abc.abstractmethod
     def updateHand(self, cards):
         """Updates cards in players hand
