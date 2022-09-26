@@ -14,8 +14,7 @@ class StandardGame:
     def __init__(self, team1, team2):
         # Game info
         self.deck = Deck()
-        self.team1 = team1
-        self.team2 = team2
+        self.teams = team1, team2
         self.oppo_team = {team1: team2, team2: team1}
 
         # List of players, initially equivelant to self.table
@@ -45,7 +44,7 @@ class StandardGame:
         while not self.getWinner():
 
             # Inform players of current game state
-            for p in self.players: p.pointsMsg(self.team1, self.team2)
+            for p in self.players: p.pointsMsg(*self.teams)
             for p in self.players: p.dealerMsg(self.table[3])
 
             # Enter dealing phase
@@ -60,6 +59,10 @@ class StandardGame:
 
             # Update dealer
             self.updateTableOrder()
+
+        winning_team = self.getWinner()
+        if winning_team:
+            for p in self.players: p.gameResultsMsg(winning_team)
 
     def dealPhase(self):
         """Deals cards and determines trump.
@@ -232,7 +235,7 @@ class StandardGame:
             going_alone (bool): Whether the maker went alone
         """
         # Count tricks taken per team
-        team_tricks = {self.team1: 0, self.team2: 0}
+        team_tricks = {team: 0 for team in self.teams}
         for player, taken in tricks_taken.items():
             team_tricks[player.team] += taken
         teaking_team = max(team_tricks, key=team_tricks.get)
@@ -263,9 +266,9 @@ class StandardGame:
             renegers (list): Players to be penalized
         """
         # Use sets to figure out teams to give points to,
-        # if both teams renege no one gets points
+        #   if both teams renege no one gets points
         reneging_teams = {player.team for player in renegers}
-        teams = {self.team1, self.team2}
+        teams = {team for team in self.teams}
         for team in teams - reneging_teams:
             if going_alone:
                 team.points += 4
@@ -286,16 +289,19 @@ class StandardGame:
         """
         renegers = []
 
-        # Check each trick
+        # Check each trick for reneges
         for j in range(5):
             leader = leader_list[j]
             leadSuit = cards_played[leader][j].getSuit(self.trump)
 
             # Add player to renengers if invalid card played
             for player in self.table:
+
                 # Skip teammate if going alone
                 if going_alone and self.maker.getTeammate() is player:
                     continue
+
+                # Check for reneges
                 cards = cards_played[player][j:]
                 playable = [card for card in cards if card.getSuit(
                     self.trump) == leadSuit]
@@ -311,8 +317,8 @@ class StandardGame:
         """Seats the players randomly around table (preserving teams).
         """
         self.players = []
-        t1 = self.team1.getPlayers()
-        t2 = self.team2.getPlayers()
+        t1 = self.teams[0].getPlayers()
+        t2 = self.teams[1].getPlayers()
 
         # Shuffle within each team
         np.random.shuffle(t1)
@@ -322,7 +328,7 @@ class StandardGame:
         teams = [t1, t2]
         np.random.shuffle(teams)
 
-        # Team mates must be across from each other
+        # Teammates must be across from each other
         self.players.append(teams[0][0])
         self.players.append(teams[1][0])
         self.players.append(teams[0][1])
@@ -359,10 +365,14 @@ class StandardGame:
         self.table.append(new_dealer)
 
     def getWinner(self):
-        """Fetches the winner.
+        """Fetches the winning team.
+
+        The team to reach 10 points first wins.
 
         Returns:
-            winner (Player): Player that won, otherwise None
-        TODO
+            (Team): Team that won, otherwise None
         """
+        for team in self.teams:
+            if team.points == 10:
+                return team
         return None

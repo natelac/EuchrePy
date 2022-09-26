@@ -74,7 +74,7 @@ class BasicAIPlayer(Player, abc.ABC):
     def deniedTrumpMsg(self, player):
         pass
 
-    def gameResultsMsg(self):
+    def gameResultsMsg(self, winning_team):
         pass
 
     def misdealMsg(self):

@@ -209,8 +209,13 @@ class Player(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def gameResultsMsg(self):
-        """TODO"""
+    def gameResultsMsg(self, winning_team):
+        """Passes winning team and marks the end of the game.
+
+        For human players, displays the players that won the game.
+
+        Args:
+            winning_team (Team): Team that got to 10 points first and won"""
         pass
 
     @abc.abstractmethod

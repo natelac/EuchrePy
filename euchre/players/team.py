@@ -11,6 +11,15 @@ class Team:
         self._p1.team = self
         self._p2.team = self
 
+    @property
+    def players(self):
+        """All players on the team.
+
+        Returns:
+            (list): Players on the team
+        """
+        return [self._p1, self._p2]
+
     def getPlayers(self):
         """Gets all players on the team.
 

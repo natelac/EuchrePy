@@ -206,6 +206,10 @@ class WebConsole:
                       .format(winners[0], winners[1],
                               points_scored, team_tricks))
 
+            def gameResultsMsg():
+                winners = message_dict['winners']
+                print(f"{winners[0]} and {winners[1]} win the game!"))
+
             if message_dict == -1:
                 continue
 
@@ -227,6 +231,7 @@ class WebConsole:
                 'new_trump':  newTrumpMsg,
                 'taker': takerMsg,
                 'round_results': roundResults,
+                'game_results': gameResultsMsg,
             }
 
             request_options = {

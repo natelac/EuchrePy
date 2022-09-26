@@ -174,7 +174,7 @@ class WebPlayer(Player, abc.ABC):
 
     def roundResultsMsg(self, taking_team, points_scored,
                         team_tricks):
-        winners = taking_team.getPlayers()
+        winners = taking_team.players
         msg = {
                 'message_type': 'info',
                 'info_type': 'round_results',
@@ -218,9 +218,12 @@ class WebPlayer(Player, abc.ABC):
                 }
         self.sendMessage(msg)
 
-    def gameResultsMsg(self):
+    def gameResultsMsg(self, winning_team):
+        winners = winning_team.players
         msg = {
-                'message_type': 'todo'
+                'message_type': 'info',
+                'info_type': 'game_results',
+                'winners': (str(winners[0]), str(winners[1]))
                 }
         self.sendMessage(msg)
 

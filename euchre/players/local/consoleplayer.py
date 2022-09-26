@@ -87,7 +87,7 @@ class ConsolePlayer(Player, abc.ABC):
     def roundResultsMsg(self, taking_team, points_scored,
                         team_tricks):
         winners = taking_team.getPlayers()
-        print("{} and {} win the round with {} points and {} trick taken"
+        print("{} and {} win the round with {} point(s) and {} tricks taken"
               .format(winners[0], winners[1],
                       points_scored, team_tricks))
 
@@ -103,8 +103,9 @@ class ConsolePlayer(Player, abc.ABC):
     def deniedTrumpMsg(self, player):
         print(f"{player} denied ordering trump")
 
-    def gameResultsMsg(self):
-        print("TODO")
+    def gameResultsMsg(self, winning_team):
+        winners = winning_team.players
+        print(f"{winners[0]} and {winners[1]} win the game!")
 
     def misdealMsg(self):
         print("Misdeal, new dealer")
