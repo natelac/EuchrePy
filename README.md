@@ -26,6 +26,7 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 - Improved basicAI (smartAI)
 - Add farmers hand
+- Add heartbeat checking
 
 ## Other projects
 
