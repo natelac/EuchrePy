@@ -10,6 +10,19 @@ class WebPlayer(Player, abc.ABC):
     """A Player class for TCP connected players.
 
     Allows the server to communicate with players over the web.
+
+    DOES NOT validate player responses.
+
+    Attributes:
+        updates (dict):
+            'new_update' (bool): Whether there is an un-processed response
+            'response_type' (str): Type of the response
+                NOTE: This is NOT the value type
+            'response' (?): Value dependent on the response type
+        host (str): The name of the host
+        port (int): The port of the host
+        last_heartbeat (time): Time that the last heartbeat was recieved
+            from the client
     """
 
     def __init__(self, host='localhost', port=6001, name='WebPlayer'):
@@ -22,10 +35,6 @@ class WebPlayer(Player, abc.ABC):
         self.host = host
         self.port = int(port)
         self.last_heartbeat = time.perf_counter()
-        #TODO
-        # - Add enum, or bool, or string or something for current player state,
-        #   i.e., disconnected, timing out, timed out, etc.,
-        #   At the very least, for if they have timed out
 
     @property
     def address(self):
@@ -41,10 +50,9 @@ class WebPlayer(Player, abc.ABC):
         """Convert host:port pair to string.
 
         Args:
-            host (str / int): Host
-            port (str / int): Host port
+            host (str): Host
+            port (int): Host port
         """
-        # Worker.get_address(host, port)
         return str(host) + ":" + str(port)
 
     # Networking methods
@@ -53,8 +61,17 @@ class WebPlayer(Player, abc.ABC):
     def recvMessage(self, message):
         """Recieves a TCP message from a client.
 
+        Currently only takes message that are a response to a gameplay
+        related request, therefore it ignores the 'message_type'.
+
         Args:
-            message (dict): A dictionary that always contains the
+            message (dict):
+                # Response messages
+                'message_type' (str): Type of the message, 'response'
+                'response_type' (str): Type of response, fx 'order_up'
+                'response' (?): Response value
+                # Other Messages
+
         """
         self.updates['new_update'] = True
         self.updates['response_type'] = message['response_type']
@@ -69,22 +86,32 @@ class WebPlayer(Player, abc.ABC):
             sock.sendall(message.encode('utf-8'))
 
     def request(self, request_type):
-        """Send a TCP request to the client, and awaits a relevant response.
+        """Send a TCP request to the client and await a relevant response.
         """
-        #self.updates = {'new_update': False}
-        self.sendMessage({'message_type': 'request',
-                          'request_type': request_type})
-        while self.updates['new_update'] != True:
-            time.sleep(0.1)
-        if self.updates['response_type'] != request_type:
-            print("Error: Incorrect update type recieved.")
-            print(f"Expected: {request_type}\nrecieved: {self.updates['response_type']}")
-            self.updates['new_update'] = False
-            self.request(request_type)
+        while True:
+            # Send request to client
+            self.sendMessage({'message_type': 'request',
+                              'request_type': request_type})
+
+            # Wait for response
+            # Blocking is OK since game can't continue without client response
+            while self.updates['new_update'] != True:
+                time.sleep(0.1)
+
+            if self.updates['response_type'] != request_type:
+                # Invalid response
+                print("Error: Incorrect update type recieved.")
+                print(f"Expected: {request_type}\nrecieved: {self.updates['response_type']}")
+            else:
+                # Valid response
+                break
+
+        # Return valid response
         self.updates['new_update'] = False
         return self.updates['response']
 
-    # Decision methods that require a return value
+
+    # Decision methods that require a response from the client
     # -------------------------------------------------------------------------
     def orderUp(self):
         ans = self.request('order_up')
@@ -94,10 +121,9 @@ class WebPlayer(Player, abc.ABC):
         ans = self.request('order_trump')
         return ans == 'y'
 
-    def callTrump(self, topSuit):
+    def callTrump(self, top_suit):
         ans = self.request('call_trump')
-        while ans not in ['C', 'S', 'H', 'D'] and ans != topSuit:
-            #TODO: Update player they played an invalid suit
+        while ans not in ['C', 'S', 'H', 'D'] and ans != top_suit:
             ans = self.request('call_trump')
         return ans
 
@@ -105,32 +131,13 @@ class WebPlayer(Player, abc.ABC):
         ans = self.request('go_alone')
         return ans == 'y'
 
-    def playCard(self, leader, cardsPlayed, trump):
-        # Get card to play from user
+    def playCard(self, leader, cards_played, trump):
         ans = self.request('play_card')
-        # while ans not in cards:
-            # TODO: Update player that they played a card not in their hand
-            # ans = self.request('play_card')
-
-        # Remove card from hand, add to playedCards
-        # cardIndex = cards.index(ans)
-        # card = self.hand.pop(cardIndex)
-        # self._playedCards.append(card)
-
         return Card.str2card(ans)
 
-    @abc.abstractmethod
     def discardCard(self, top_card):
-        """Called when this Player is orderd up, passes the top Card.
-
-        Args:
-            top_card (Card): Card turned up on kitty
-
-        Returns:
-            (Card): Card to throw in kitty
-        """
-        # TODO
-        pass
+        ans = self.request('discard_card')
+        return ans
 
     # Information updates that don't require a return value
     # -------------------------------------------------------------------------
@@ -289,3 +296,12 @@ class WebPlayer(Player, abc.ABC):
                 'trump': trump
                 }
         self.sendMessage(msg)
+
+    def orderUpMsg(self, player, top_card):
+        msg = {
+            'message_type': 'info',
+            'info_type': 'ordered_up',
+            'orderer': str(player),
+            'top_card': str(top_card)
+        }
+        print(f"{player} ordered up {top_card}")

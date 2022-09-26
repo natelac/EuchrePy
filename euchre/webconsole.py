@@ -4,11 +4,16 @@ import threading
 import time
 import click
 
-from euchre.utils import messageToDictionary
+from euchre.utils import message_to_dictionary
 from euchre.utils import printCards
 from euchre.cards import Card
 
+
 class WebConsole:
+    """A console that can connect to a game of euchre over the web.
+
+    Sister class to euchre.players.online.webplayer.WebPlayer.
+    """
     def __init__(self, host, port, server_host, server_port, server_hb_port):
         self.socket_info = {
             'host': host,
@@ -19,8 +24,6 @@ class WebConsole:
         }
 
         # Game info
-        #TODO: these need to be reset after each round
-        #       played_cards just fills endlessly right now
         self.game_info = {
             'hand': None,
             'top_card': None,
@@ -35,15 +38,19 @@ class WebConsole:
                 args=(self.signals,))
         listen_thread.start()
 
+        # Registers the client with the server
         self.sendMessage({"message_type": "register"})
-
         self.signals["shutdown"] = False
 
         # Halts this flow until listen_thread gets shutdown message
         listen_thread.join()
 
     def sendMessage(self, message):
-        """Send TCP message to server"""
+        """Send a TCP message to the server.
+
+        Args:
+            message (dict):
+        """
         message['player_host'] = self.socket_info['host']
         message['player_port'] = self.socket_info['port']
         #print("Message being sent:", message)
@@ -55,15 +62,20 @@ class WebConsole:
             sock.sendall(message.encode('utf-8'))
 
     def listen(self, signals):
+        """Listen to a socket.
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             self.setSocket(sock)
             self.listenLoop(sock, signals)
 
     def listenLoop(self, sock, signals):
-        """Listen and handle messages over a TCP connection"""
+        """Listen and handle messages over a TCP connection
+        """
         while not self.signals["shutdown"]:
-            message_dict = messageToDictionary(sock)
+            message_dict = message_to_dictionary(sock)
 
+            # Decision methods that require a return value
+            # ------------------------------------------------------------------
             def orderUp():
                 printCards(self.game_info['hand'])
                 ans = input('Order up? y/n\n')
@@ -123,18 +135,46 @@ class WebConsole:
                     'response': ans
                 })
 
+            def discardCard():
+                # Add top card to the hand
+                hand = self.game_info['hand']
+                top_card = self.game_info['top_card']
+                hand.append(top_card)
+                printCards(hand)
+
+                # Get card to discard from user
+                cards = [str(card) for card in hand]
+                ans = input('Enter card to discard:\n')
+                while ans not in cards:
+                    ans = input('Not a card in your hand.\n')
+
+                # Remove and return discard card
+                card_index = cards.index(ans)
+                discard_card = hand.pop(card_index)
+
+                self.sendMessage({
+                    'message_type': 'response',
+                    'response_type': 'discard_card',
+                    'response': ans
+                })
+
+            # Information updates that don't require a return value
+            # ------------------------------------------------------------------
+
             def updateHandMsg():
-                self.game_info['hand'] = message_dict['new_hand']
+                hand  = message_dict['new_hand']
                 self.game_info['hand'] = \
-                    [Card.str2card(card) for card in self.game_info['hand']]
-                #printCards(self.game_info['hand'])
+                    [Card.str2card(card) for card in hand]
+                self.game_info['played_cards'] = []
 
             def pointsMsg():
                 team1 = message_dict['team1']
                 team2 = message_dict['team2']
+                print()
                 print(f"{team1['players'][0]}, {team1['players'][1]} have "
                     f"{team1['points']}\t{team2['players'][0]},"
                     f"{team2['players'][1]} have {team2['points']}")
+                print('-'*50)
 
             def dealerMsg():
                 dealer = message_dict['dealer']
@@ -151,7 +191,9 @@ class WebConsole:
 
             def orderedUpMsg():
                 orderer = message_dict['orderer']
-                top_card = message_dict['top_card']
+                top_card = Card.str2card(message_dict['top_card'])
+                self.game_state['top_card'] = top_card
+
                 print(f"{orderer} ordered up {top_card}")
 
             def deniedTrumpMsg():
@@ -198,17 +240,20 @@ class WebConsole:
             def takerMsg():
                 print(f"{message_dict['taker']} takes the trick")
 
-            def roundResults():
+            def roundResultsMsg():
                 winners = message_dict['winners']
                 points_scored = message_dict['points_scored']
                 team_tricks = message_dict['tricks_taken']
-                print("{} and {} win the round with {} points and {} trick taken"
+                print("{} and {} win the round with {} point(s) and {} tricks taken"
                       .format(winners[0], winners[1],
                               points_scored, team_tricks))
 
             def gameResultsMsg():
                 winners = message_dict['winners']
-                print(f"{winners[0]} and {winners[1]} win the game!"))
+                print(f"{winners[0]} and {winners[1]} win the game!")
+
+            # Handle the message
+            # ------------------------------------------------------------------
 
             if message_dict == -1:
                 continue
@@ -230,7 +275,7 @@ class WebConsole:
                 'trick_start': trickStartMsg,
                 'new_trump':  newTrumpMsg,
                 'taker': takerMsg,
-                'round_results': roundResults,
+                'round_results': roundResultsMsg,
                 'game_results': gameResultsMsg,
             }
 
@@ -240,6 +285,7 @@ class WebConsole:
                 'call_trump': callTrump,
                 'go_alone': goAlone,
                 'play_card': playCard,
+                'discard_card': discardCard,
             }
             #print("Message from server:", message_dict)
 
@@ -249,16 +295,12 @@ class WebConsole:
                 request_options[message_dict['request_type']]()
 
     def setSocket(self, sock):
-        """Bind the socket to the server."""
+        """Bind the socket to the server.
+        """
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.socket_info["host"], self.socket_info["port"]))
         sock.listen()
         sock.settimeout(1)
-
-def playWebConsole():
-    #TODO: So that euchrepy.runWebConsole() can be called
-    pass
-
 
 
 @click.command()
@@ -268,7 +310,6 @@ def playWebConsole():
 @click.option("--server-port", "server_port", default=6000)
 @click.option("--server-hb-port", "server_hb_port", default=5999)
 def main(host, port, server_host, server_port, server_hb_port):
-    """TCP console client"""
     WebConsole(host, port, server_host, server_port, server_hb_port)
 
 if __name__ == "__main__":

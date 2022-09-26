@@ -9,12 +9,27 @@ import time
 
 from euchre.players import WebPlayer
 from euchre.players import BasicAIPlayer
-from euchre.utils import messageToDictionary
+from euchre.utils import message_to_dictionary
 from euchre.players import Team
 from euchre.games import StandardGame
 
 
 class GameServer:
+    """Server that runs games of euchre.
+
+    Attributes:
+        socket_info (dict):
+            'host' (str): Hosting port of the server
+            'port' (int): Port of this server
+            'hb_port' (int): Port for heartbeats sent to this server
+        signals (dict):
+            'shutdown' (bool): True when server is shutting down,
+                otherwise False. Passed to looping functions so they don't block
+        local_players (list): Local Players
+        online_players (dict): String addresses of web connected players mapped to
+            their Player object
+        threads (list): Threads for asynchronous functions of the server
+    """
     def __init__(self, host, port, hb_port):
         self.socket_info = {
             'host': host,
@@ -27,65 +42,82 @@ class GameServer:
 
         # {self.host + ":" + str(self.port) : PlayerInfo(host, port)
         self.local_players = []
-        self.online_players = {}
+        self.online_players = dict()
 
-        #
+        # Start threads
         self.threads = []
-        self.startThreads()
+        self.startThreads(self.threads)
 
-    def startThreads(self):
+    def startThreads(self, threads):
         """Create threads for TCP and UDP connections.
 
-        Creates a listening thread for TCP connections, a heartbeat thread for
-        communicating server state
+        Creates a listening thread for TCP connections, a listening thread for
+        UDP heartbeat connections, and a computational thread for checking
+        the time deltas for client heartbeats.
+
+        Args:
+            threads (list): List to store threads for future use
         """
-        # Make heartbeat thread for UDP connections
+        # Make listening thread for heartbeat UDP connections
         hb_thread = threading.Thread(
                 target=self.listenHeartbeat,
                 args=(self.signals,))
         hb_thread.start()
-        self.threads.append(hb_thread)
-
-        # Make heartbeat checking thread
-        hb_ck_thread = threading.Thread(
-                target=self.checkHeartbeat,
-                args=(self.signals,))
-        hb_ck_thread.start()
-        self.threads.append(hb_ck_thread)
+        threads.append(hb_thread)
 
         # Make listening thread for TCP connections
         listen_thread = threading.Thread(
                 target=self.listen,
                 args=(self.signals,))
         listen_thread.start()
-        self.threads.append(listen_thread)
+        threads.append(listen_thread)
+
+        # Make heartbeat checking thread
+        hb_ck_thread = threading.Thread(
+                target=self.checkHeartbeat,
+                args=(self.signals,))
+        hb_ck_thread.start()
+        threads.append(hb_ck_thread)
 
     def shutdown(self):
-        self.signals['shutdown'] = True # Will cause heartbeat threads to shutdown
-        #TODO
-        ## You probabably need to tell clients server is shutting down
-        # Send shutdown message to workers
-        # for worker in self.workers.values():
-        #     if worker.status != Worker.Status.DEAD:
-        #         message = {"message_type": "shutdown"}
-        #         worker.send_message(message)
+        """Shuts down the server.
 
-        # terminate the server itself
+        TODO: Message clients that server is shutting down. Should not message
+        clients that are determined dead.
+        """
+        # The signal is in the while loop of every thread, when it is false
+        #   all loops will terminate and threads join
         self.signals['shutdown'] = True
         for thread in self.threads:
             thread.join()
 
     def checkHeartbeat(self, signals):
-        """Check worker hearbeat messages"""
+        """Check client heartbeats.
+
+        Args:
+            signals (dict):
+                'shutdown' (bool): True when the server is shutting down and
+                    threads need to be joined
+
+        TODO: Handle what happens when a player no longer sends heartbeats.
+        """
         while not signals["shutdown"]:
+
+            # Check if each player missed a heartbeat
             for player in self.online_players.values():
                 if time.perf_counter() - player.last_heartbeat >= 10:
-                    pass
                     #print(player, "missed a heartbeat")
+                    pass
             time.sleep(2)
 
     def listenHeartbeat(self, signals):
-        """Listen for UDP heartbeat messages from players."""
+        """Listen for UDP heartbeat messages from players.
+
+        Args:
+            signals (dict):
+                'shutdown' (bool): True when the server is shutting down and
+                    threads need to be joined
+        """
         # Connect to socket
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -105,23 +137,39 @@ class GameServer:
                 worker.last_heartbeat = time.perf_counter()
 
     def listen(self, signals):
+        """Loop for listening to TCP connections
+
+        Args:
+            signals (dict):
+                'shutdown' (bool): True when the server is shutting down and
+                    threads need to be joined
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             self.setSocket(sock)
             self.listenLoop(sock, signals)
 
     def listenLoop(self, sock, signals):
-        """Loop for listen."""
+        """Loop for listening to TCP connections.
+
+        Handles players registering and recieving messages from web players.
+
+        Args:
+            sock (socket): Socket for TCP connections
+            signals (dict):
+                'shutdown' (bool): True when the server is shutting down and
+                    threads need to be joined
+        """
         print("Server listening for registers...")
         while not signals['shutdown']:
-            message_dict = messageToDictionary(sock)
+            message_dict = message_to_dictionary(sock)
 
             def handleRegister():
-                """Handle register."""
+                """Handle web players registering.
+                """
                 print("Registering player...")
                 if len(self.online_players) + len(self.local_players)  >= 4:
                     print("Error: Too many players registered")
                     return
-
                 web_player = WebPlayer(message_dict['player_host'],
                                         message_dict['player_port'])
                 self.online_players[web_player.address] = web_player
@@ -135,13 +183,11 @@ class GameServer:
                         'player_port': web_player.port
                     })
                     sock.sendall(message.encode('utf-8'))
-
-                #TODO
-                #   - If full with 4 players, change game_state to ready,
-                #       call a function for playing the game
                 print("Player", web_player, "registered")
 
             def webPlayerMsg():
+                """Handle a message from a web player.
+                """
                 player_host = message_dict['player_host']
                 player_port = message_dict['player_port']
                 address = WebPlayer.getAddress(player_host, player_port)
@@ -153,25 +199,31 @@ class GameServer:
                         # 'shutdown': handleShutdown
                       }
 
-            # Execute handle message based on type
+            # Handle the recieved message
             if message_dict == -1:
                 continue
             print("Message recieved:", message_dict)
             options[message_dict['message_type']]()
 
     def setSocket(self, sock):
-        """Bind the socket to the server."""
+        """Bind the socket to the server.
+        """
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.socket_info["host"], self.socket_info["port"]))
         sock.listen()
         sock.settimeout(1)
 
     def getPlayer(self, host, port):
-        """Return the player object given a unique host and port."""
+        """Return the player object given a unique host and port.
+        """
         address = PlayerInfo.get_address(host, port)
         return self.players[address]
 
     def playGame(self):
+        """Play a game of euchre online.
+
+        Waits for an online client to join then starts the game.
+        """
         while len(self.online_players) == 0:
             time.sleep(1)
         p1 = list(self.online_players.values())[0]

@@ -2,7 +2,8 @@ class Team:
     """"Stores basic data for teams.
 
     Attributes:
-        points: How many points the team has.
+        points (int): How many points the team has
+        players (list): Players on the team
     """
     def __init__(self, player1, player2):
         self.points = 0
@@ -17,14 +18,6 @@ class Team:
 
         Returns:
             (list): Players on the team
-        """
-        return [self._p1, self._p2]
-
-    def getPlayers(self):
-        """Gets all players on the team.
-
-        Returns:
-            (list): Players on team.
         """
         return [self._p1, self._p2]
 

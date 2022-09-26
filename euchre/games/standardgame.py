@@ -242,7 +242,7 @@ class StandardGame:
 
         # Figure out points
         points = 1
-        if self.maker in teaking_team.getPlayers():
+        if self.maker in teaking_team.players:
             if going_alone and team_tricks[teaking_team] == 5:
                 points = 4
             elif team_tricks[teaking_team] == 5:
@@ -317,8 +317,8 @@ class StandardGame:
         """Seats the players randomly around table (preserving teams).
         """
         self.players = []
-        t1 = self.teams[0].getPlayers()
-        t2 = self.teams[1].getPlayers()
+        t1 = self.teams[0].players
+        t2 = self.teams[1].players
 
         # Shuffle within each team
         np.random.shuffle(t1)

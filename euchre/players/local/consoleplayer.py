@@ -3,7 +3,6 @@ import abc
 from euchre.players.player import Player
 
 
-
 class ConsolePlayer(Player, abc.ABC):
     """A Player class that prints to and takes input from the console.
     """
@@ -23,9 +22,9 @@ class ConsolePlayer(Player, abc.ABC):
         ans = input('Call trump? y/n\n')
         return ans == 'y'
 
-    def callTrump(self, topSuit):
+    def callTrump(self, top_suit):
         ans = input('Enter suit to pick:\n')
-        while ans not in ['C', 'S', 'H', 'D'] and ans != topSuit:
+        while ans not in ['C', 'S', 'H', 'D'] and ans != top_suit:
             ans = input('Not a valid suit.\n')
         return ans
 
@@ -33,9 +32,9 @@ class ConsolePlayer(Player, abc.ABC):
         ans = input('Go alone? y/n\n')
         return ans == 'y'
 
-    def playCard(self, leader, cardsPlayed, trump):
+    def playCard(self, leader, cards_played, trump):
         # Print cards (and trump?)
-        #print("Trump Suit:", trump)
+        print("Trump Suit:", trump)
         cards = [str(card) for card in self.hand]
         self.printCards()
 
@@ -86,7 +85,7 @@ class ConsolePlayer(Player, abc.ABC):
 
     def roundResultsMsg(self, taking_team, points_scored,
                         team_tricks):
-        winners = taking_team.getPlayers()
+        winners = taking_team.players
         print("{} and {} win the round with {} point(s) and {} tricks taken"
               .format(winners[0], winners[1],
                       points_scored, team_tricks))
