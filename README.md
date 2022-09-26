@@ -1,10 +1,12 @@
 # EuchrePy: Euchre Game With Modifiable Player Interface
 
-An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. EuchrePy was created to train AI and interface easily with a web app to display AI information and player IO.
+An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. It can be run locally or as a flask server connecting up to four players.
 
-Furthermore, this is meant to be able to run as an instance of a euchre game running on a flask server between 4 players.
+EuchrePy was created to train AI and interface easily with a web app to display AI information and player IO.
 
 The goal of the 'rework' branch is to simplify the game logic, and simplify how information is passed between objects.
+
+## AI goals
 
 [Monte Carlo Tree Search (MCTS)](https://github.com/matgrioni/Euchre-bot) and [Neural Fictitious Self-Play (NFSP)](https://arxiv.org/pdf/1603.01121.pdf) have been used to different levels of success to create AI for imperfect-information games (Euchre and Poker respectively). I am looking to use Monte Carlo Neural Fictitious Self-Play (MC-NFSP) to create an AI for playing Euchre. My goal is to implement the methods used for poker described by [Zhang et. al](https://arxiv.org/pdf/1903.09569.pdf) to create an MC-NFSP Euchre AI.
 
