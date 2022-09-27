@@ -12,24 +12,21 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 *NSFP was [already implemented](https://github.com/elipugh/euchre) in Euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. The MCTS and NFSP papers do not explicitly discuss feature selection. I think I could get better performance by creating better features. There was [another paper](https://sites.ualberta.ca/~amw8/hearts.pdf) that talked about what features to select for a game of hearts, which might be a good reference.*
 
+
 # Install
 - Run 'sudo pip install -e .'
 
-# TODO
+# Features
+- [ ] Complete game state object that can be exported for play by play
+- [ ] Run PEP8 on all of the code
+- [ ] Start using semantic versioning describe in this [stackoverflow post](https://stackoverflow.com/questions/37814286/how-to-manage-the-version-number-in-git)
 
-## Complete euchre game
+# Future ideas
+- [ ] Add heartbeat checking
+- [ ] Implement farmers hand
+- [ ] Create a smartAI Player
 
-- Complete game state object that can be exported for play by play
-- Run PEP8 on all of the code
-
-## Long-term goals
-
-- Improved basicAI (smartAI)
-- Add farmers hand
-- Add heartbeat checking
-
-## Other projects
-
+# Other projects
 - AI project
   - Move all AI stuff to a separate project
   - Explore coding different strategies and having them compete against each other
