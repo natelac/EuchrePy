@@ -17,16 +17,18 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 - Run 'sudo pip install -e .'
 
 # Features
-- [ ] Complete game state object that can be exported for play by play
+- [x] Complete game state object that can be exported at end of play
 - [ ] Add heartbeat checking
 - [ ] Create a smartAI Player
 - [ ] Run PEP8 on all of the code
 - [ ] Start using semantic versioning describe in this [stackoverflow post](https://stackoverflow.com/questions/37814286/how-to-manage-the-version-number-in-git), and release "v0.1.0" !
 
-# Future ideas
-- [ ] Implement farmers hand
-- [ ] Add lobby system - User can connect to server, host games, and see other games
+# Known Bugs
+- Only first renege should be penalized OR redo reneging logic so valid plays don't get miscounted
 
+# Future ideas
+- Implement farmers hand
+- Add lobby system - User can connect to server, host games, and see other games
 
 # Other projects
 - AI project
