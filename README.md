@@ -18,13 +18,15 @@ The goal of the 'rework' branch is to simplify the game logic, and simplify how 
 
 # Features
 - [ ] Complete game state object that can be exported for play by play
+- [ ] Add heartbeat checking
+- [ ] Create a smartAI Player
 - [ ] Run PEP8 on all of the code
-- [ ] Start using semantic versioning describe in this [stackoverflow post](https://stackoverflow.com/questions/37814286/how-to-manage-the-version-number-in-git)
+- [ ] Start using semantic versioning describe in this [stackoverflow post](https://stackoverflow.com/questions/37814286/how-to-manage-the-version-number-in-git), and release "v0.1.0" !
 
 # Future ideas
-- [ ] Add heartbeat checking
 - [ ] Implement farmers hand
-- [ ] Create a smartAI Player
+- [ ] Add lobby system - User can connect to server, host games, and see other games
+
 
 # Other projects
 - AI project
