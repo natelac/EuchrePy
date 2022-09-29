@@ -115,7 +115,8 @@ class StandardGame:
                 self.gs['maker'] = player
                 self.gs['trump'] = self.gs['top_card'].suit
                 for p in self.gs['players']:
-                    p.orderUpMsg(self.gs['maker'], self.gs['top_card'])
+                    if p is not self.gs['maker']:
+                        p.orderUpMsg(self.gs['maker'], self.gs['top_card'])
                 for p in self.gs['players']:
                     p.newTrumpMsg(self.gs['trump'])
 
@@ -151,7 +152,8 @@ class StandardGame:
                 self.gs['maker'] = player
                 self.gs['trump'] = call
                 for p in self.gs['players']:
-                    p.orderedTrumpMsg(self.gs['maker'], self.gs['trump'])
+                    if p is not self.gs['maker']:
+                        p.orderedTrumpMsg(self.gs['maker'], self.gs['trump'])
                 for p in self.gs['players']:
                     p.newTrumpMsg(self.gs['trump'])
                 return False
@@ -206,7 +208,10 @@ class StandardGame:
                     continue
                 card = player.playCard(taker, cards_played, self.gs['trump'])
                 cards_played[player].append(card)
-                for p in self.gs['players']: p.playedMsg(player, card)
+                for p in self.gs['players']: 
+                    if p is not player:
+                        p.playedMsg(player, card)
+                    
 
             # Decide Taker
             trick = {player: cards[j] for player, cards in cards_played.items()}

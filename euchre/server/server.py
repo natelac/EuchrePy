@@ -40,7 +40,7 @@ class GameServer:
         self.signals = {'shutdown': False,
                         'game_state': 'not_full'} # 'not_full', 'full', 'playing', 'disconnect'
 
-        # {self.host + ":" + str(self.port) : PlayerInfo(host, port)
+        # {self.host + ":" + str(self.port) : WebPlayer
         self.local_players = []
         self.online_players = dict()
 
@@ -81,15 +81,19 @@ class GameServer:
 
     def shutdown(self):
         """Shuts down the server.
-
-        TODO: Message clients that server is shutting down. Should not message
-        clients that are determined dead.
         """
         # The signal is in the while loop of every thread, when it is false
         #   all loops will terminate and threads join
+        for player in self.online_players.values():
+            message = {'message_type': 'shutdown'}
+            player.sendMessage(message)
+            # print(player.address)
+        time.sleep(100)
+        
         self.signals['shutdown'] = True
-        for thread in self.threads:
-            thread.join()
+        # time.sleep(1)
+        # for thread in self.threads:
+        #     thread.join()
 
     def checkHeartbeat(self, signals):
         """Check client heartbeats.
@@ -106,7 +110,7 @@ class GameServer:
             # Check if each player missed a heartbeat
             for player in self.online_players.values():
                 if time.perf_counter() - player.last_heartbeat >= 10:
-                    #print(player, "missed a heartbeat")
+                    print(player, "missed a heartbeat")
                     pass
             time.sleep(2)
 
@@ -132,9 +136,11 @@ class GameServer:
                     continue
                 message_str = message_bytes.decode("utf-8")
                 message_dict = json.loads(message_str)
-                worker = self.getPlayer(message_dict["player_host"],
-                                         message_dict["player_port"])
-                worker.last_heartbeat = time.perf_counter()
+                address = WebPlayer.getAddress(message_dict["player_host"],
+                                               message_dict["player_port"])
+                player = self.online_players[address]
+                player.last_heartbeat = time.perf_counter()
+                # print("Recieved heartbeat")
 
     def listen(self, signals):
         """Loop for listening to TCP connections
@@ -193,16 +199,21 @@ class GameServer:
                 address = WebPlayer.getAddress(player_host, player_port)
                 self.online_players[address].recvMessage(message_dict)
 
+            def handleShutdown():
+                """Shut down the server
+                """
+                self.shutdown()
+
             options = {
                         'register': handleRegister,
-                        'response': webPlayerMsg
-                        # 'shutdown': handleShutdown
+                        'response': webPlayerMsg,
+                        'shutdown': handleShutdown
                       }
 
             # Handle the recieved message
             if message_dict == -1:
                 continue
-            print("Message recieved:", message_dict)
+            #print("Message recieved:", message_dict)
             options[message_dict['message_type']]()
 
     def setSocket(self, sock):

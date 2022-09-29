@@ -31,18 +31,160 @@ class WebConsole:
         }
 
         # Threading
-        self.signals = {"shutdown": False}
+        self.signals = {"shutdown": False,
+                        "request": None}
+        self.threads = []
         listen_thread = threading.Thread(
                 target=self.listen,
                 args=(self.signals,))
         listen_thread.start()
+        self.threads.append(listen_thread)
+
+        decision_thread = threading.Thread(
+                target=self.decisionLoop,
+                args=(self.signals,))
+        decision_thread.start()
+        self.threads.append(decision_thread)
 
         # Registers the client with the server
         self.sendMessage({"message_type": "register"})
-        self.signals["shutdown"] = False
 
         # Halts this flow until listen_thread gets shutdown message
         listen_thread.join()
+
+    def decisionLoop(self, signals):
+        while not signals['shutdown']:
+            time.sleep(0.1)
+            if signals['request']:
+                # Decision methods that require a return value
+                # ------------------------------------------------------------------
+                def orderUp():
+                    printCards(self.game_info['hand'])
+                    ans = input('Order up? y/n\n')
+                    if signals['shutdown']:
+                        print("Server closed")
+                        return
+                    self.sendMessage({
+                        'message_type': 'response',
+                        'response_type': 'order_up',
+                        'response': ans
+                        })
+
+                def orderTrump():
+                    ans = input('Call trump? y/n\n')
+                    if signals['shutdown']:
+                        print("Server closed")
+                        return
+                    self.sendMessage({
+                        'message_type': 'response',
+                        'response_type': 'order_trump',
+                        'response': ans
+                        })
+
+                def callTrump():
+                    ans = input('Enter suit to pick\n')
+                    while ans not in ['C', 'S', 'H', 'D'] \
+                            and ans != self.game_info['top_card'].suit:
+                        ans = input('Not a valid suit.\n')
+                    if signals['shutdown']:
+                        print("Server closed")
+                        return
+                    self.sendMessage({
+                        'message_type': 'response',
+                        'response_type': 'call_trump',
+                        'response': ans
+                        })
+
+                def goAlone():
+                    ans = input('Go alone? y/n\n')
+                    if signals['shutdown']:
+                        print("Server closed")
+                        return
+                    self.sendMessage({
+                        'message_type': 'response',
+                        'response_type': 'go_alone',
+                        'response': ans
+                        })
+
+                def playCard():
+                    # Print trump and cards
+                    print("Trump Suit:", self.game_info['trump'])
+                    printCards(self.game_info['hand'])
+
+                    # Get card to play from user
+                    cards = [str(card) for card in self.game_info['hand']]
+                    ans = input('Enter card to play\n')
+                    while ans not in cards:
+                        ans = input('Not a card in your hand.\n')
+
+                    # Remove card from hand, add to playedCards
+                    cardIndex = cards.index(ans)
+                    card = self.game_info['hand'].pop(cardIndex)
+                    self.game_info['played_cards'].append(card)
+
+                    #self._playedCards.append(card)
+                    if signals['shutdown']:
+                        print("Server closed")
+                        return
+                    self.sendMessage({
+                        'message_type': 'response',
+                        'response_type': 'play_card',
+                        'response': ans
+                    })
+
+                def discardCard():
+                    # Add top card to the hand
+                    hand = self.game_info['hand']
+                    top_card = self.game_info['top_card']
+                    hand.append(top_card)
+                    printCards(hand)
+
+                    # Get card to discard from user
+                    cards = [str(card) for card in hand]
+                    ans = input('Enter card to discard:\n')
+                    while ans not in cards:
+                        ans = input('Not a card in your hand.\n')
+
+                    # Remove and return discard card
+                    card_index = cards.index(ans)
+                    discard_card = hand.pop(card_index)
+
+                    if signals['shutdown']:
+                        print("Server closed")
+                        return
+                    self.sendMessage({
+                        'message_type': 'response',
+                        'response_type': 'discard_card',
+                        'response': ans
+                    })
+
+                request_options = {
+                    'order_up': orderUp,
+                    'order_trump': orderTrump,
+                    'call_trump': callTrump,
+                    'go_alone': goAlone,
+                    'play_card': playCard,
+                    'discard_card': discardCard,
+                }
+
+                request_options[signals['request']]()
+                signals['request'] = None
+
+
+    def heartbeat(self, signals):
+        """Send UDP heartbeat message at regular intervals."""
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            while not signals['shutdown']:
+                sock.connect((self.socket_info['server_host'],
+                              self.socket_info['server_hb_port']))
+                message = json.dumps({
+                    "message_type": "heartbeat",
+                    "player_host": self.socket_info['host'],
+                    "player_port": self.socket_info['port']
+                    })
+                sock.sendall(message.encode('utf-8'))
+                #print("Sent heartbeat")
+                time.sleep(2)
 
     def sendMessage(self, message):
         """Send a TCP message to the server.
@@ -70,93 +212,28 @@ class WebConsole:
     def listenLoop(self, sock, signals):
         """Listen and handle messages over a TCP connection
         """
-        while not self.signals["shutdown"]:
+        while not signals["shutdown"]:
             message_dict = message_to_dictionary(sock)
 
-            # Decision methods that require a return value
+            # Networking functions
             # ------------------------------------------------------------------
-            def orderUp():
-                printCards(self.game_info['hand'])
-                ans = input('Order up? y/n\n')
-                self.sendMessage({
-                    'message_type': 'response',
-                    'response_type': 'order_up',
-                    'response': ans
-                    })
+            def handleRegisterAck():
+                """Handle a registration acknowledgement.
+                """
+                hb_thread = threading.Thread(
+                        target=self.heartbeat,
+                        args=(signals,))
+                hb_thread.start()
+                self.threads.append(hb_thread)
 
-            def orderTrump():
-                ans = input('Call trump? y/n\n')
-                self.sendMessage({
-                    'message_type': 'response',
-                    'response_type': 'order_trump',
-                    'response': ans
-                    })
-
-            def callTrump():
-                ans = input('Enter suit to pick\n')
-                while ans not in ['C', 'S', 'H', 'D'] \
-                        and ans != self.game_info['top_card'].suit:
-                    ans = input('Not a valid suit.\n')
-                self.sendMessage({
-                    'message_type': 'response',
-                    'response_type': 'call_trump',
-                    'response': ans
-                    })
-
-            def goAlone():
-                ans = input('Go alone? y/n\n')
-                self.sendMessage({
-                    'message_type': 'response',
-                    'response_type': 'go_alone',
-                    'response': ans
-                    })
-
-            def playCard():
-                # Print trump and cards
-                print("Trump Suit:", self.game_info['trump'])
-                printCards(self.game_info['hand'])
-
-                # Get card to play from user
-                cards = [str(card) for card in self.game_info['hand']]
-                ans = input('Enter card to play\n')
-                while ans not in cards:
-                    ans = input('Not a card in your hand.\n')
-
-                # Remove card from hand, add to playedCards
-                cardIndex = cards.index(ans)
-                card = self.game_info['hand'].pop(cardIndex)
-                self.game_info['played_cards'].append(card)
-
-                #self._playedCards.append(card)
-                self.sendMessage({
-                    'message_type': 'response',
-                    'response_type': 'play_card',
-                    'response': ans
-                })
-
-            def discardCard():
-                # Add top card to the hand
-                hand = self.game_info['hand']
-                top_card = self.game_info['top_card']
-                hand.append(top_card)
-                printCards(hand)
-
-                # Get card to discard from user
-                cards = [str(card) for card in hand]
-                ans = input('Enter card to discard:\n')
-                while ans not in cards:
-                    ans = input('Not a card in your hand.\n')
-
-                # Remove and return discard card
-                card_index = cards.index(ans)
-                discard_card = hand.pop(card_index)
-
-                self.sendMessage({
-                    'message_type': 'response',
-                    'response_type': 'discard_card',
-                    'response': ans
-                })
-
+            def handleShutdown():
+                """Handle shutdown message.
+                """
+                self.signals['shutdown'] = True
+                # time.sleep(1)
+                # for thread in self.threads:
+                #     thread.join()
+                
             # Information updates that don't require a return value
             # ------------------------------------------------------------------
 
@@ -191,8 +268,7 @@ class WebConsole:
             def orderedUpMsg():
                 orderer = message_dict['orderer']
                 top_card = Card.str2card(message_dict['top_card'])
-                self.game_state['top_card'] = top_card
-
+                self.game_info['top_card'] = top_card
                 print(f"{orderer} ordered up {top_card}")
 
             def deniedTrumpMsg():
@@ -224,7 +300,7 @@ class WebConsole:
                 player = message_dict['player']
                 card = message_dict['card']
                 print(
-                f"{player} reneged by playing {card} and your team was awarded 2 points")
+                f"{player} reneged by playing {card}")
 
             def invalidSuitMsg():
                 print("Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
@@ -278,20 +354,22 @@ class WebConsole:
                 'game_results': gameResultsMsg,
             }
 
-            request_options = {
-                'order_up': orderUp,
-                'order_trump': orderTrump,
-                'call_trump': callTrump,
-                'go_alone': goAlone,
-                'play_card': playCard,
-                'discard_card': discardCard,
+
+            networking_options = {
+                    'register_ack': handleRegisterAck,
+                    'shutdown': handleShutdown
             }
-            #print("Message from server:", message_dict)
+            # print("Message from server:", message_dict)
 
             if message_dict['message_type'] == 'info':
                 info_options[message_dict['info_type']]()
             elif message_dict['message_type'] == 'request':
-                request_options[message_dict['request_type']]()
+                signals['request'] = message_dict['request_type']
+            elif message_dict['message_type'] == 'register_ack':
+                networking_options['register_ack']()
+            elif message_dict['message_type'] == 'shutdown':
+                networking_options['shutdown']()
+
 
     def setSocket(self, sock):
         """Bind the socket to the server.

@@ -304,4 +304,4 @@ class WebPlayer(Player, abc.ABC):
             'orderer': str(player),
             'top_card': str(top_card)
         }
-        print(f"{player} ordered up {top_card}")
+        self.sendMessage(msg)
