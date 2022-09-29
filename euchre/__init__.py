@@ -1,11 +1,11 @@
-# from euchre.cards import Card
-# from euchre.euchre.cards.deck import Deck
-# from euchre.games.standardgame import StandardGame
-# from euchre.players.player import Player
-# from euchre.players.team import Team
-# from euchre.players.local.basicai import BasicAiPlayer
-# from euchre.players.local.consoleplayer import HumanPlayer
-# from euchre.players.online.webplayer import WebPlayer
-# from euchre.server.server import GameServer
-# # from players.online.consolewebplayer import ###
-#import players
+"""An extendible package for playing euchre locally and hosting and playing
+games of euchre online.
+"""
+from euchre import games
+from euchre import players
+from euchre import clients
+from euchre import server
+from euchre.cards import Card
+from euchre.cards import Deck
+from euchre.play import play
+from euchre.play import connect

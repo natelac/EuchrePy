@@ -18,8 +18,8 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'euchre-server = euchre.server:main',
-            'euchre-console = euchre.players.online.console:main'
+            'euchre-server = euchre.server.server:main',
+            'euchre-console = euchre.clients.webconsole:main',
         ]
     },
 )

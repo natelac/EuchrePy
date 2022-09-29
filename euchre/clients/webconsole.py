@@ -11,10 +11,9 @@ from euchre.cards import Card
 
 class WebConsole:
     """A console that can connect to a game of euchre over the web.
-
-    Sister class to euchre.players.online.webplayer.WebPlayer.
     """
-    def __init__(self, host, port, server_host, server_port, server_hb_port):
+    def __init__(self, host='localhost', port=6001, server_host='localhost',
+            server_port=6000, server_hb_port=5999):
         self.socket_info = {
             'host': host,
             'port': int(port),
