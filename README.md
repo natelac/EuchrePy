@@ -1,28 +1,81 @@
 # EuchrePy: Euchre game with modifiable player class
 
-An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to train AI and interface easily with a web app to display AI information and player IO.
+An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to develop and train AI and interface easily with a web app to display AI information and player IO.
 
- 
+Also implements a euchre server that can be run on a linux computer. 
 
+## Example
 
+### Playing a local game
+In a python3 interactive shell:
+```python
+>>> import euchre
+>>> euchre.play()
 
+User, AI0 have 0 points  AI1, AI2 have 0 points
+--------------------------------------------------
+The dealer is AI2
+The top card is [ QC ]
+AI0 denied ordering up
+AI1 denied ordering up
+Cards: [ AC ], [ 9S ], [ 1C ], [ KS ], [ QD ]
+Order up? y/n
+```
 
+From the terminal:
+```
+$ euchre-play
 
-[Monte Carlo Tree Search (MCTS)](https://github.com/matgrioni/Euchre-bot) and [Neural Fictitious Self-Play (NFSP)](https://arxiv.org/pdf/1603.01121.pdf) have been used to different levels of success to create AI for imperfect-information games (Euchre and Poker respectively). I am looking to use Monte Carlo Neural Fictitious Self-Play (MC-NFSP) to create an AI for playing Euchre. My goal is to implement the methods used for poker described by [Zhang et. al](https://arxiv.org/pdf/1903.09569.pdf) to create an MC-NFSP Euchre AI.
+User, AI0 have 0 points  AI1, AI2 have 0 points
+--------------------------------------------------
+The dealer is AI2
+...
+```
 
-(Maybe I'll implement MCTS, then NFSP, then MC-NFSP)
+### Hosting and playing an online game
+Server terminal:
+```
+$ euchre-server --host localhost --port 6000 --hb-port 5999 --player-count 2
+server listening for registers...
+Player Alice registered
+Waiting for 1 player(s)
+Player Bob registered
+starting game...
+```
 
-*NSFP was [already implemented](https://github.com/elipugh/euchre) in Euchre. The paper for NFSP and Q-learning in Euchre is actually a student paper. I think for MCTS you should link to an actual paper, not a bot by a single person. The MCTS and NFSP papers do not explicitly discuss feature selection. I think I could get better performance by creating better features. There was [another paper](https://sites.ualberta.ca/~amw8/hearts.pdf) that talked about what features to select for a game of hearts, which might be a good reference.*
+Alice's terminal
+```
+$ euchre-console --port 6001 --server-port 6000 --name 'Alice'
+Alice, Bob have 0  AI0, AI1 have 0
+--------------------------------------------------
+The dealer is Bob
+The top card is 9H
+AI1 denied ordering up
+Cards: [ KC ], [ JS ], [ 1H ], [ 9S ], [ JC ]
+Order up? y/n
+```
 
+Bob's terminal
+```
+$ euchre-webconsole --port 6002 --server-port 6000 --name 'Bob'
+Alice, Bob have 0  AI0, AI1 have 0
+--------------------------------------------------
+The dealer is Bob
+The top card is 9H
+AI1 denied ordering up
+```
 
-## Install
+## Installing
 - Run 'sudo pip install -e .'
 
-## Known Bugs
-- Only first renege should be penalized OR redo reneging logic so valid plays don't get miscounted
+## Hosting a server and connecting
+
+## Making your own Player class
 
 ## Future ideas
 - [ ] Create a smart AI player
 - [ ] Implement farmers hand
 - [ ] Add lobby system - User can connect to server, host games, and see other games
 
+## Known Bugs
+- Only first renege should be penalized OR redo reneging logic so valid plays don't get miscounted
