@@ -77,12 +77,49 @@ EuchrePy
 $ pip install -e EuchrePy
 ```
 
-## Making your own Player class
+## Custom Players
+
+You can create custom AI and use them in games as long as they are a sub-class of ```euchre.Player```.
+
+### Creating a custom Player class
+
+For a list of helper functions and abstract methods to implement, use ```help(euchre.Player)```
+
+```python
+import abc
+import euchre
+
+class CustomPlayer(euchre.Player, abc.ABC):
+  pass
+  
+# The code below will error, giving you a list of abstract methods you need to implement
+player = CustomPlayer()
+```
+### Playing a game with custom Players
+
+```python
+import euchre
+
+player = euchre.players.ConsolePlayer('User')
+
+# Create a list of your custom AI
+for i in range(3):
+  ai.append(euchre.players.CustomPlayer('AI' + str(i)))
+
+# Choose the teams for the game
+team1 = euchre.players.Team(p1, ai[0])
+team2 = euchre.players.Team(ai[1], ai[2])
+
+# Start the game!
+game = euchre.games.StandardGame(team1, team2)
+game.play()
+```
 
 ## Future ideas
 - [ ] Create a smart AI player
 - [ ] Implement farmers hand
 - [ ] Add lobby system - User can connect to server, host games, and see other games
+  - This will give a purpose to ```bin/server```, continuosly host games on the server
 
 ## Known Bugs
 - Only first renege should be penalized OR redo reneging logic so valid plays don't get miscounted
