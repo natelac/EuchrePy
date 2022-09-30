@@ -1,4 +1,5 @@
 import abc
+import time
 
 from euchre.players.player import Player
 
@@ -10,6 +11,7 @@ class ConsolePlayer(Player, abc.ABC):
     def __init__(self, name='Human'):
         Player.__init__(self, name)
         self.top_card = None
+        self.print_delay = 0.5
 
     # Decision methods that require a return value
     # -------------------------------------------------------------------------
@@ -75,13 +77,16 @@ class ConsolePlayer(Player, abc.ABC):
         print()
         print(f"{team1._p1}, {team1._p2} have {team1.points} points\t {team2._p1}, {team2._p2} have {team2.points} points")
         print('-'*50)
+        time.sleep(self.print_delay)
 
     def dealerMsg(self, dealer):
         print(f"The dealer is {dealer}")
+        time.sleep(self.print_delay)
 
     def topCardMsg(self, top_card):
         self.top_card = top_card
         print(f"The top card is {top_card.prettyString()}")
+        time.sleep(self.print_delay)
 
     def roundResultsMsg(self, taking_team, points_scored,
                         team_tricks):
@@ -89,34 +94,44 @@ class ConsolePlayer(Player, abc.ABC):
         print("{} and {} win the round with {} point(s) and {} tricks taken"
               .format(winners[0], winners[1],
                       points_scored, team_tricks))
+        time.sleep(self.print_delay)
 
     def orderUpMsg(self, player, top_card):
         print(f"{player} ordered up {top_card}")
+        time.sleep(self.print_delay)
 
     def deniedUpMsg(self, player):
         print(f"{player} denied ordering up")
+        time.sleep(self.print_delay)
 
     def orderedTrumpMsg(self, player, trump_suit):
         print(f"{player} chose {trump_suit} as the trump suit")
+        time.sleep(self.print_delay)
 
     def deniedTrumpMsg(self, player):
         print(f"{player} denied ordering trump")
+        time.sleep(self.print_delay)
 
     def gameResultsMsg(self, winning_team):
         winners = winning_team.players
         print(f"{winners[0]} and {winners[1]} win the game!")
+        time.sleep(self.print_delay)
 
     def misdealMsg(self):
         print("Misdeal, new dealer")
+        time.sleep(self.print_delay)
 
     def leaderMsg(self, leader):
         print(f"{leader} starts the first trick")
+        time.sleep(self.print_delay)
 
     def playedMsg(self, player, card):
         print(f"{player} played {card.prettyString()}")
+        time.sleep(self.print_delay)
 
     def takerMsg(self, taker):
         print(f"{taker} takes the hand")
+        time.sleep(self.print_delay)
 
     def penaltyMsg(self, player, card):
         if player is self:
@@ -125,6 +140,7 @@ class ConsolePlayer(Player, abc.ABC):
         else:
             print(
                 f"{player} reneged by playing {card}")
+        time.sleep(self.print_delay)
 
     def invalidSuitMsg(self):
         print(
