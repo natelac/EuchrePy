@@ -106,6 +106,7 @@ from customplayer import CustomPlayer
 player = euchre.players.ConsolePlayer('User')
 
 # Create a list of your custom AI
+ai = []
 for i in range(3):
   ai.append(CustomPlayer('AI' + str(i)))
 
