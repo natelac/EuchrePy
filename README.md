@@ -66,9 +66,13 @@ AI1 denied ordering up
 ```
 
 ## Installing
-- Run 'sudo pip install -e .'
 
-## Hosting a server and connecting
+From local repository:
+```
+$ ls
+EuchrePy
+$ pip install -e EuchrePy
+```
 
 ## Making your own Player class
 
