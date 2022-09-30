@@ -104,14 +104,14 @@ player = euchre.players.ConsolePlayer('User')
 
 # Create a list of your custom AI
 for i in range(3):
-  ai.append(euchre.players.CustomPlayer('AI' + str(i)))
+  ai.append(CustomPlayer('AI' + str(i)))
 
 # Choose the teams for the game
-team1 = euchre.players.Team(p1, ai[0])
-team2 = euchre.players.Team(ai[1], ai[2])
+team1 = euchre.Team(p1, ai[0])
+team2 = euchre.Team(ai[1], ai[2])
 
 # Start the game!
-game = euchre.games.StandardGame(team1, team2)
+game = euchre.StandardGame(team1, team2)
 game.play()
 ```
 
