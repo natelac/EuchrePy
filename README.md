@@ -59,7 +59,7 @@ Order up? y/n
 Bob's interactive python shell:
 ```python
 >>> import euchre
->>> euchre.connect(port=6001, server_port=6000, name='Bob')
+>>> euchre.connect(port=6002, server_port=6000, name='Bob')
 
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
