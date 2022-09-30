@@ -24,19 +24,23 @@ class GameServer:
             'hb_port' (int): Port for heartbeats sent to this server
         signals (dict):
             'shutdown' (bool): True when server is shutting down,
-                otherwise False. Passed to looping functions so they don't block
+                    otherwise False. Passed to looping functions
+                    so they don't block
         local_players (list): Local Players
-        online_players (dict): String addresses of web connected players mapped to
-            their Player object
+        online_players (dict): String addresses of web connected players
+                    their Player object
         threads (list): Threads for asynchronous functions of the server
+        player_count (int): Number of players in an online lobby, rest filled
+                    mapped to with AI
     """
 
-    def __init__(self, host, port, hb_port):
+    def __init__(self, host, port, hb_port, player_count):
         self.socket_info = {
             'host': host,
             'port': int(port),
             'hb_port': int(hb_port)
         }
+        self.player_count = player_count
         # Could this just be the gamestate, and is passed to all player classes?
         self.signals = {'shutdown': False,
                         'game_state': 'not_full'}  # 'not_full', 'full', 'playing', 'disconnect'
@@ -103,8 +107,6 @@ class GameServer:
             signals (dict):
                 'shutdown' (bool): True when the server is shutting down and
                     threads need to be joined
-
-        TODO: Handle what happens when a player no longer sends heartbeats.
         """
         while not signals["shutdown"]:
 
@@ -166,19 +168,21 @@ class GameServer:
                 'shutdown' (bool): True when the server is shutting down and
                     threads need to be joined
         """
-        print("Server listening for registers...")
+        print("server listening for registers...")
         while not signals['shutdown']:
             message_dict = message_to_dictionary(sock)
 
             def handleRegister():
                 """Handle web players registering.
                 """
-                print("Registering player...")
+                #print("Registering player...")
                 if len(self.online_players) + len(self.local_players) >= 4:
                     print("Error: Too many players registered")
                     return
+                #print(message_dict)
                 web_player = WebPlayer(message_dict['player_host'],
-                                       message_dict['player_port'])
+                                       message_dict['player_port'],
+                                       message_dict['player_name'])
                 self.online_players[web_player.address] = web_player
 
                 # Send TCP acknowledgement to web player
@@ -191,6 +195,10 @@ class GameServer:
                     })
                     sock.sendall(message.encode('utf-8'))
                 print("Player", web_player, "registered")
+
+                if len(self.online_players) != self.player_count:
+                    slots_avail = self.player_count - len(self.online_players)
+                    print(f"Waiting for {slots_avail} player(s)")
 
             def webPlayerMsg():
                 """Handle a message from a web player.
@@ -231,20 +239,21 @@ class GameServer:
         address = PlayerInfo.get_address(host, port)
         return self.players[address]
 
-    def playGame(self):
+    def playGame(self, player_count=1):
         """Play a game of euchre online.
 
         Waits for an online client to join then starts the game.
         """
-        while len(self.online_players) == 0:
+        while len(self.online_players) != player_count:
             time.sleep(1)
-        p1 = list(self.online_players.values())[0]
-        ai = []
-        for i in range(3):
-            ai.append(BasicAIPlayer('AI' + str(i)))
-        team1 = Team(p1, ai[0])
-        team2 = Team(ai[1], ai[2])
+        players = list(self.online_players.values())
+        for i in range(4 - player_count):
+            players.append(BasicAIPlayer('AI' + str(i)))
+        team1 = Team(players[0], players[1])
+        team2 = Team(players[2], players[3])
         game = StandardGame(team1, team2)
+
+        print("starting game...")
         game.play()
 
 
@@ -252,9 +261,10 @@ class GameServer:
 @click.option("--host", "host", default="localhost")
 @click.option("--port", "port", default=6000)
 @click.option("--hb-port", "hb_port", default=5999)
-def main(host, port, hb_port):
-    server = GameServer(host, port, hb_port)
-    server.playGame()
+@click.option("--player-count", "player_count", default=4)
+def main(host, port, hb_port, player_count):
+    server = GameServer(host, port, hb_port, player_count)
+    server.playGame(player_count)
 
 
 if __name__ == '__main__':

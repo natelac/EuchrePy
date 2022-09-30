@@ -18,7 +18,7 @@ class WebPlayer(Player, abc.ABC):
         updates (dict):
             'new_update' (bool): Whether there is an un-processed response
             'response_type' (str): Type of the response
-                NOTE: This is NOT the value type
+                    NOTE: This is NOT the value type
             'response' (?): Value dependent on the response type
         host (str): The name of the host
         port (int): The port of the host

@@ -50,7 +50,7 @@ class Player(abc.ABC):
     @abc.abstractmethod
     def orderUp(self):
         """Determines whether player will order up.
-
+        
         Returns:
             (bool): True if player is ordering up, otherwise False.
         """

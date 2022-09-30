@@ -15,8 +15,8 @@ def play():
 
 
 def connect(host='localhost', port=6001, server_host='localhost',
-            server_port=6000, server_hb_port=5999):
+            server_port=6000, server_hb_port=5999, name='WebConsole'):
     """Connect and play a web game of euchre in the console
     """
     euchre.clients.WebConsole(host, port, server_host, server_port,
-                              server_hb_port)
+                              server_hb_port, name)

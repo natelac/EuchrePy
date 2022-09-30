@@ -14,7 +14,8 @@ class WebConsole:
     """
 
     def __init__(self, host='localhost', port=6001, server_host='localhost',
-                 server_port=6000, server_hb_port=5999):
+                 server_port=6000, server_hb_port=5999, name='WebConsole'):
+        self.name = name
         self.socket_info = {
             'host': host,
             'port': int(port),
@@ -48,7 +49,10 @@ class WebConsole:
         self.threads.append(decision_thread)
 
         # Registers the client with the server
-        self.sendMessage({"message_type": "register"})
+        self.sendMessage({
+            "message_type": "register",
+            "player_name": self.name
+        })
 
         # Halts this flow until listen_thread gets shutdown message
         listen_thread.join()
@@ -248,7 +252,7 @@ class WebConsole:
                 team2 = message_dict['team2']
                 print()
                 print(f"{team1['players'][0]}, {team1['players'][1]} have "
-                      f"{team1['points']}\t{team2['players'][0]},"
+                      f"{team1['points']}\t{team2['players'][0]}, "
                       f"{team2['players'][1]} have {team2['points']}")
                 print('-'*50)
 
@@ -385,8 +389,9 @@ class WebConsole:
 @click.option("--server-host", "server_host", default="localhost")
 @click.option("--server-port", "server_port", default=6000)
 @click.option("--server-hb-port", "server_hb_port", default=5999)
-def main(host, port, server_host, server_port, server_hb_port):
-    WebConsole(host, port, server_host, server_port, server_hb_port)
+@click.option("--name", "name", default="WebConsole")
+def main(host, port, server_host, server_port, server_hb_port, name):
+    WebConsole(host, port, server_host, server_port, server_hb_port, name)
 
 
 if __name__ == "__main__":

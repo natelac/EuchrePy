@@ -19,7 +19,8 @@ setup(
     entry_points={
         'console_scripts': [
             'euchre-server = euchre.server.server:main',
-            'euchre-console = euchre.clients.webconsole:main',
+            'euchre-webconsole = euchre.clients.webconsole:main',
+            'euchre-play = euchre.play:play'
         ]
     },
 )
