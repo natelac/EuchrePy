@@ -7,7 +7,7 @@ Also implements a euchre server that can be run on a linux computer. Up to four 
 ## Example
 
 ### Playing a local game
-In a python3 interactive shell:
+In a python interactive shell:
 ```python
 >>> import euchre
 >>> euchre.play()
@@ -43,9 +43,10 @@ Player Bob registered
 starting game...
 ```
 
-Alice's terminal
+Alice's terminal:
 ```
 $ euchre-console --port 6001 --server-port 6000 --name 'Alice'
+
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
 The dealer is Bob
@@ -55,9 +56,11 @@ Cards: [ KC ], [ JS ], [ 1H ], [ 9S ], [ JC ]
 Order up? y/n
 ```
 
-Bob's terminal
-```
-$ euchre-webconsole --port 6002 --server-port 6000 --name 'Bob'
+Bob's interactive python shell:
+```python
+>>> import euchre
+>>> euchre.connect(port=6001, server_port=6000, name='Bob')
+
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
 The dealer is Bob
