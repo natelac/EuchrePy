@@ -4,6 +4,8 @@ An implementation of Euchre designed to be easily extendible. The player input-o
 
 Also implements a euchre server that can be run on a linux computer. Up to four other players can connect to the server and play a game of euchre.
 
+If you're unsure of how to play euchre, check out the [wikipedia page](https://en.wikipedia.org/wiki/Euchre)!
+
 ## Example
 
 ### Playing a local game
