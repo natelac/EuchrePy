@@ -42,6 +42,7 @@ def message_to_dictionary(sock):
 
     return message_dict
 
+
 def printCards(cards):
     """Prints a 'nice' view of player's hand to console.
     """

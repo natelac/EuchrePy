@@ -128,7 +128,7 @@ class ConsolePlayer(Player, abc.ABC):
 
     def invalidSuitMsg(self):
         print(
-                "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
+            "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
 
     def trickStartMsg(self):
         print()

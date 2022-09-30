@@ -1,5 +1,6 @@
 import euchre
 
+
 def play():
     """Play a singleplayer game of euchre in the console
     """
@@ -12,9 +13,10 @@ def play():
     game = euchre.StandardGame(team1, team2)
     game.play()
 
+
 def connect(host='localhost', port=6001, server_host='localhost',
-        server_port=6000, server_hb_port=5999):
+            server_port=6000, server_hb_port=5999):
     """Connect and play a web game of euchre in the console
     """
     euchre.clients.WebConsole(host, port, server_host, server_port,
-            server_hb_port)
+                              server_hb_port)

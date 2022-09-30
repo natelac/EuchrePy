@@ -12,8 +12,9 @@ from euchre.cards import Card
 class WebConsole:
     """A console that can connect to a game of euchre over the web.
     """
+
     def __init__(self, host='localhost', port=6001, server_host='localhost',
-            server_port=6000, server_hb_port=5999):
+                 server_port=6000, server_hb_port=5999):
         self.socket_info = {
             'host': host,
             'port': int(port),
@@ -35,14 +36,14 @@ class WebConsole:
                         "request": None}
         self.threads = []
         listen_thread = threading.Thread(
-                target=self.listen,
-                args=(self.signals,))
+            target=self.listen,
+            args=(self.signals,))
         listen_thread.start()
         self.threads.append(listen_thread)
 
         decision_thread = threading.Thread(
-                target=self.decisionLoop,
-                args=(self.signals,))
+            target=self.decisionLoop,
+            args=(self.signals,))
         decision_thread.start()
         self.threads.append(decision_thread)
 
@@ -68,7 +69,7 @@ class WebConsole:
                         'message_type': 'response',
                         'response_type': 'order_up',
                         'response': ans
-                        })
+                    })
 
                 def orderTrump():
                     ans = input('Call trump? y/n\n')
@@ -79,7 +80,7 @@ class WebConsole:
                         'message_type': 'response',
                         'response_type': 'order_trump',
                         'response': ans
-                        })
+                    })
 
                 def callTrump():
                     ans = input('Enter suit to pick\n')
@@ -93,7 +94,7 @@ class WebConsole:
                         'message_type': 'response',
                         'response_type': 'call_trump',
                         'response': ans
-                        })
+                    })
 
                 def goAlone():
                     ans = input('Go alone? y/n\n')
@@ -104,7 +105,7 @@ class WebConsole:
                         'message_type': 'response',
                         'response_type': 'go_alone',
                         'response': ans
-                        })
+                    })
 
                 def playCard():
                     # Print trump and cards
@@ -122,7 +123,7 @@ class WebConsole:
                     card = self.game_info['hand'].pop(cardIndex)
                     self.game_info['played_cards'].append(card)
 
-                    #self._playedCards.append(card)
+                    # self._playedCards.append(card)
                     if signals['shutdown']:
                         print("Server closed")
                         return
@@ -170,7 +171,6 @@ class WebConsole:
                 request_options[signals['request']]()
                 signals['request'] = None
 
-
     def heartbeat(self, signals):
         """Send UDP heartbeat message at regular intervals."""
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
@@ -181,7 +181,7 @@ class WebConsole:
                     "message_type": "heartbeat",
                     "player_host": self.socket_info['host'],
                     "player_port": self.socket_info['port']
-                    })
+                })
                 sock.sendall(message.encode('utf-8'))
                 #print("Sent heartbeat")
                 time.sleep(2)
@@ -221,8 +221,8 @@ class WebConsole:
                 """Handle a registration acknowledgement.
                 """
                 hb_thread = threading.Thread(
-                        target=self.heartbeat,
-                        args=(signals,))
+                    target=self.heartbeat,
+                    args=(signals,))
                 hb_thread.start()
                 self.threads.append(hb_thread)
 
@@ -233,12 +233,12 @@ class WebConsole:
                 # time.sleep(1)
                 # for thread in self.threads:
                 #     thread.join()
-                
+
             # Information updates that don't require a return value
             # ------------------------------------------------------------------
 
             def updateHandMsg():
-                hand  = message_dict['new_hand']
+                hand = message_dict['new_hand']
                 self.game_info['hand'] = \
                     [Card.str2card(card) for card in hand]
                 self.game_info['played_cards'] = []
@@ -248,8 +248,8 @@ class WebConsole:
                 team2 = message_dict['team2']
                 print()
                 print(f"{team1['players'][0]}, {team1['players'][1]} have "
-                    f"{team1['points']}\t{team2['players'][0]},"
-                    f"{team2['players'][1]} have {team2['points']}")
+                      f"{team1['points']}\t{team2['players'][0]},"
+                      f"{team2['players'][1]} have {team2['points']}")
                 print('-'*50)
 
             def dealerMsg():
@@ -300,10 +300,11 @@ class WebConsole:
                 player = message_dict['player']
                 card = message_dict['card']
                 print(
-                f"{player} reneged by playing {card}")
+                    f"{player} reneged by playing {card}")
 
             def invalidSuitMsg():
-                print("Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
+                print(
+                    "Must call valid suit ['C','S','H','D'] that does not match the suit of the top card")
 
             def trickStartMsg():
                 print()
@@ -354,10 +355,9 @@ class WebConsole:
                 'game_results': gameResultsMsg,
             }
 
-
             networking_options = {
-                    'register_ack': handleRegisterAck,
-                    'shutdown': handleShutdown
+                'register_ack': handleRegisterAck,
+                'shutdown': handleShutdown
             }
             # print("Message from server:", message_dict)
 
@@ -369,7 +369,6 @@ class WebConsole:
                 networking_options['register_ack']()
             elif message_dict['message_type'] == 'shutdown':
                 networking_options['shutdown']()
-
 
     def setSocket(self, sock):
         """Bind the socket to the server.
@@ -388,6 +387,7 @@ class WebConsole:
 @click.option("--server-hb-port", "server_hb_port", default=5999)
 def main(host, port, server_host, server_port, server_hb_port):
     WebConsole(host, port, server_host, server_port, server_hb_port)
+
 
 if __name__ == "__main__":
     main()

@@ -19,10 +19,10 @@ class StandardGame:
 
         # Game state
         self.gs = {
-            'players': [], # List of players, initially equivelant to self.gs['table']
+            'players': [],  # List of players, initially equivelant to self.gs['table']
             'teams': (team1, team2),
-            'table': [], # Ordered players where index 3 is dealer
-            'play_order': [], # Ordered players where index 0 is leader
+            'table': [],  # Ordered players where index 3 is dealer
+            'play_order': [],  # Ordered players where index 0 is leader
             'trick_play_orders': None,
             'kitty': [],
             'maker': None,
@@ -51,8 +51,10 @@ class StandardGame:
         while not self.getWinner():
 
             # Inform players of current game state
-            for p in self.gs['players']: p.pointsMsg(*self.gs['teams'])
-            for p in self.gs['players']: p.dealerMsg(self.gs['table'][3])
+            for p in self.gs['players']:
+                p.pointsMsg(*self.gs['teams'])
+            for p in self.gs['players']:
+                p.dealerMsg(self.gs['table'][3])
 
             # Enter dealing phase
             maker_selected = self.dealPhase()
@@ -62,7 +64,8 @@ class StandardGame:
                 self.playTricks()
             else:
                 # Inform players about misdeal
-                for p in self.gs['players']: p.misdealMsg()
+                for p in self.gs['players']:
+                    p.misdealMsg()
 
             # Save game state
             self.logGameState()
@@ -72,7 +75,8 @@ class StandardGame:
 
         winning_team = self.getWinner()
         if winning_team:
-            for p in self.gs['players']: p.gameResultsMsg(winning_team)
+            for p in self.gs['players']:
+                p.gameResultsMsg(winning_team)
 
     def dealPhase(self):
         """Deals cards and determines trump.
@@ -87,7 +91,8 @@ class StandardGame:
         self.gs['top_card'] = self.gs['kitty'].pop(0)
         for i in range(4):
             self.gs['play_order'][i].updateHand(hands[i])
-        for p in self.gs['players']: p.topCardMsg(self.gs['top_card'])
+        for p in self.gs['players']:
+            p.topCardMsg(self.gs['top_card'])
 
         # Ask players to order up
         all_passed = self.orderPhase()
@@ -121,12 +126,14 @@ class StandardGame:
                     p.newTrumpMsg(self.gs['trump'])
 
                 # Have dealer discard a card
-                discard_card = self.gs['table'][3].discardCard(self.gs['top_card'])
+                discard_card = self.gs['table'][3].discardCard(
+                    self.gs['top_card'])
                 self.gs['kitty'].append(discard_card)
                 return False
 
             # Inform players that player denied up
-            for p in self.gs['players']: p.deniedUpMsg(player)
+            for p in self.gs['players']:
+                p.deniedUpMsg(player)
         return True
 
     def trumpPhase(self):
@@ -160,7 +167,8 @@ class StandardGame:
 
             # Player denies trump
             else:
-                for p in self.gs['players']: p.deniedTrumpMsg(player)
+                for p in self.gs['players']:
+                    p.deniedTrumpMsg(player)
         return True
 
     def playTricks(self):
@@ -168,9 +176,9 @@ class StandardGame:
         """
         # Initialize trick information
         going_alone = self.gs['maker'].goAlone()
-        cards_played = {} # Maps player to cards played
-        tricks_taken = {} # Maps players to tricks taken
-        takers = [] # Who took what trick, ordered by trick number
+        cards_played = {}  # Maps player to cards played
+        tricks_taken = {}  # Maps players to tricks taken
+        takers = []  # Who took what trick, ordered by trick number
         trick_play_orders = []  # Order that tricks are played
 
         # Initialize cards_played and tricks_taken
@@ -189,7 +197,8 @@ class StandardGame:
 
         # Init list of leaders for each trick
         leader_list = []
-        for p in self.gs['players']: p.leaderMsg(taker)
+        for p in self.gs['players']:
+            p.leaderMsg(taker)
 
         # Play tricks
         for j in range(5):
@@ -199,7 +208,8 @@ class StandardGame:
             self.updatePlayOrder(taker)
 
             # Inform players of trick start
-            for p in self.gs['players']: p.trickStartMsg()
+            for p in self.gs['players']:
+                p.trickStartMsg()
 
             # Play a trick
             for player in self.gs['play_order']:
@@ -208,18 +218,19 @@ class StandardGame:
                     continue
                 card = player.playCard(taker, cards_played, self.gs['trump'])
                 cards_played[player].append(card)
-                for p in self.gs['players']: 
+                for p in self.gs['players']:
                     if p is not player:
                         p.playedMsg(player, card)
-                    
 
             # Decide Taker
-            trick = {player: cards[j] for player, cards in cards_played.items()}
+            trick = {player: cards[j]
+                     for player, cards in cards_played.items()}
             led_suit = trick[taker].suit
             taker = max(trick,
                         key=lambda player: trick[player].value(
                             led_suit, self.gs['trump']))
-            for p in self.gs['players']: p.takerMsg(taker)
+            for p in self.gs['players']:
+                p.takerMsg(taker)
             tricks_taken[taker] += 1
             takers.append(taker)
             trick_play_orders.append(self.gs['play_order'][:])
@@ -337,7 +348,8 @@ class StandardGame:
                 if (len(playable) != 0) and (cards[0] not in playable):
 
                     # Inform players that they reneged
-                    for p in self.gs['players']: p.penaltyMsg(player, cards[0])
+                    for p in self.gs['players']:
+                        p.penaltyMsg(player, cards[0])
                     renegers.append(player) if player not in renegers else None
 
         return renegers

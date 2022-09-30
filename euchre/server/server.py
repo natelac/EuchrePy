@@ -30,6 +30,7 @@ class GameServer:
             their Player object
         threads (list): Threads for asynchronous functions of the server
     """
+
     def __init__(self, host, port, hb_port):
         self.socket_info = {
             'host': host,
@@ -38,7 +39,7 @@ class GameServer:
         }
         # Could this just be the gamestate, and is passed to all player classes?
         self.signals = {'shutdown': False,
-                        'game_state': 'not_full'} # 'not_full', 'full', 'playing', 'disconnect'
+                        'game_state': 'not_full'}  # 'not_full', 'full', 'playing', 'disconnect'
 
         # {self.host + ":" + str(self.port) : WebPlayer
         self.local_players = []
@@ -60,22 +61,22 @@ class GameServer:
         """
         # Make listening thread for heartbeat UDP connections
         hb_thread = threading.Thread(
-                target=self.listenHeartbeat,
-                args=(self.signals,))
+            target=self.listenHeartbeat,
+            args=(self.signals,))
         hb_thread.start()
         threads.append(hb_thread)
 
         # Make listening thread for TCP connections
         listen_thread = threading.Thread(
-                target=self.listen,
-                args=(self.signals,))
+            target=self.listen,
+            args=(self.signals,))
         listen_thread.start()
         threads.append(listen_thread)
 
         # Make heartbeat checking thread
         hb_ck_thread = threading.Thread(
-                target=self.checkHeartbeat,
-                args=(self.signals,))
+            target=self.checkHeartbeat,
+            args=(self.signals,))
         hb_ck_thread.start()
         threads.append(hb_ck_thread)
 
@@ -89,7 +90,7 @@ class GameServer:
             player.sendMessage(message)
             # print(player.address)
         time.sleep(100)
-        
+
         self.signals['shutdown'] = True
         # time.sleep(1)
         # for thread in self.threads:
@@ -173,11 +174,11 @@ class GameServer:
                 """Handle web players registering.
                 """
                 print("Registering player...")
-                if len(self.online_players) + len(self.local_players)  >= 4:
+                if len(self.online_players) + len(self.local_players) >= 4:
                     print("Error: Too many players registered")
                     return
                 web_player = WebPlayer(message_dict['player_host'],
-                                        message_dict['player_port'])
+                                       message_dict['player_port'])
                 self.online_players[web_player.address] = web_player
 
                 # Send TCP acknowledgement to web player
@@ -205,10 +206,10 @@ class GameServer:
                 self.shutdown()
 
             options = {
-                        'register': handleRegister,
-                        'response': webPlayerMsg,
-                        'shutdown': handleShutdown
-                      }
+                'register': handleRegister,
+                'response': webPlayerMsg,
+                'shutdown': handleShutdown
+            }
 
             # Handle the recieved message
             if message_dict == -1:
@@ -246,6 +247,7 @@ class GameServer:
         game = StandardGame(team1, team2)
         game.play()
 
+
 @click.command()
 @click.option("--host", "host", default="localhost")
 @click.option("--port", "port", default=6000)
@@ -253,6 +255,7 @@ class GameServer:
 def main(host, port, hb_port):
     server = GameServer(host, port, hb_port)
     server.playGame()
+
 
 if __name__ == '__main__':
     main()

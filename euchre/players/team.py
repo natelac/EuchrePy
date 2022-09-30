@@ -5,6 +5,7 @@ class Team:
         points (int): How many points the team has
         players (list): Players on the team
     """
+
     def __init__(self, player1, player2):
         self.points = 0
         self._p1 = player1

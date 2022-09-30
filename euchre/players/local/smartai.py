@@ -3,7 +3,6 @@ import abc
 from euchre.players.player import Player
 
 
-
 class SmartAIPlayer(Player, abc.ABC):
     """A Player class that returns smart responses.
 
