@@ -86,6 +86,8 @@ You can create custom AI and use them in games as long as they are a sub-class o
 For a list of helper functions and abstract methods to implement, use ```help(euchre.Player)```
 
 ```python
+# customplayer.py
+
 import abc
 import euchre
 
@@ -99,6 +101,7 @@ player = CustomPlayer()
 
 ```python
 import euchre
+from customplayer import CustomPlayer
 
 player = euchre.players.ConsolePlayer('User')
 
