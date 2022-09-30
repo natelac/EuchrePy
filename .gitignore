@@ -160,3 +160,9 @@ cython_debug/
 #.idea/
 *.swp
 *.swo
+
+# json
+*.json
+
+# gitattributes
+.gitattributes
