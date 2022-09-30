@@ -45,7 +45,7 @@ starting game...
 
 Alice's terminal:
 ```
-$ euchre-console --port 6001 --server-port 6000 --name 'Alice'
+$ euchre-webconsole --port 6001 --server-port 6000 --name 'Alice'
 
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
