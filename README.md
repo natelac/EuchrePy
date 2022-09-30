@@ -111,7 +111,7 @@ for i in range(3):
   ai.append(CustomPlayer('AI' + str(i)))
 
 # Choose the teams for the game
-team1 = euchre.Team(p1, ai[0])
+team1 = euchre.Team(player, ai[0])
 team2 = euchre.Team(ai[1], ai[2])
 
 # Start the game!
