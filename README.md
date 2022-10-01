@@ -35,9 +35,10 @@ The dealer is AI2
 ```
 
 ### Hosting and playing an online game
+
 Server terminal:
 ```
-$ euchre-server --host localhost --port 6000 --hb-port 5999 --player-count 2
+$ euchre-server --player-count 2
 server listening for registers...
 Player Alice registered
 Waiting for 1 player(s)
@@ -47,7 +48,7 @@ starting game...
 
 Alice's terminal:
 ```
-$ euchre-webconsole --port 6001 --server-port 6000 --name 'Alice'
+$ euchre-webconsole --port 6001 --name 'Alice'
 
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
@@ -61,7 +62,7 @@ Order up? y/n
 Bob's interactive python shell:
 ```python
 >>> import euchre
->>> euchre.connect(port=6002, server_port=6000, name='Bob')
+>>> euchre.connect(port=6002, name='Bob')
 
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
@@ -69,6 +70,8 @@ The dealer is Bob
 The top card is 9H
 AI1 denied ordering up
 ```
+
+For more options on the terminal commands use the ```--help``` flag. Similarily, use ```help(euchre.connect)``` for a full list of parameters.
 
 ## Installing
 
