@@ -84,7 +84,7 @@ $ pip install -e EuchrePy
 
 ## Custom Players
 
-You can create custom AI and use them in games as long as they are a sub-class of ```euchre.Player```.
+You can create custom AI and use them in games as long as they are a sub-class of ```euchre.Player```. You can find its source code in ```euchre/players/player.py```
 
 ### Creating a custom Player class
 
