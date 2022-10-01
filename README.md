@@ -75,7 +75,7 @@ For more options on the terminal commands use the ```--help``` flag. Similarily,
 
 ## Installing
 
-From local repository:
+From a local repository:
 ```
 $ ls
 EuchrePy
