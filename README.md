@@ -1,6 +1,6 @@
 # EuchrePy: Euchre game with modifiable player class
 
-An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to develop and train AI and interface easily with a web app to display AI information and player IO.
+Euchre is a 4 player trick taking card game. This is an implementation of euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to develop and train AI and interface easily with a web app to display AI information and player IO.
 
 Also implements a euchre server that can be run on a linux computer. Up to four other players can connect to the server and play a game of euchre.
 
