@@ -10,9 +10,15 @@ class StandardGame:
     """Standard game of euchre
 
     Source: https://en.wikipedia.org/wiki/Euchre
+
+    Args:
+        team1, team2 (Team): Teams to seat around table, players on same team
+                are seated opposite of each other
+        log_file (path): Path to of file to log to, default is None which means
+                no logging
     """
 
-    def __init__(self, team1, team2, log_file='default_log.json'):
+    def __init__(self, team1, team2, log_file=None):
         # Game info
         self.deck = Deck()
         self.oppo_team = {team1: team2, team2: team1}
@@ -39,6 +45,7 @@ class StandardGame:
         # Randomly seat players around the table
         self.seatPlayers()
 
+        # File to log to
         self.log_file = log_file
 
     def play(self):
@@ -310,7 +317,7 @@ class StandardGame:
         Args:
             leader_list (list): Players ordered by when they lead the trick
             cards_played (dict): Maps players to a list of cards played.
-                The list of cards is ordered by trick
+                    The list of cards is ordered by trick
             going_alone (bool): Whether the maker went alone
 
         Returns:
@@ -418,8 +425,13 @@ class StandardGame:
         return None
 
     def logGameState(self, maker_selected=False):
+        # If no log file specified, don't log
+        if self.log_file is None:
+            return
+
+        # Simply log 'misdeal' if a misdeal
         if not maker_selected:
-            loggable_gs = 'Misdeal'
+            loggable_gs = 'misdeal'
             with open(self.log_file, 'a') as f:
                 json.dump(loggable_gs, f)
                 f.write('\n')
@@ -456,6 +468,7 @@ class StandardGame:
             'trick_play_orders': trick_play_orders,
         }
 
+        # Log the game
         with open(self.log_file, 'a') as f:
             json.dump(loggable_gs, f)
             f.write('\n')
