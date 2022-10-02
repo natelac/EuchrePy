@@ -71,7 +71,7 @@ The top card is 9H
 AI1 denied ordering up
 ```
 
-For more options on the terminal commands use the ```--help``` flag. Similarily, use ```help(euchre.connect)``` for a full list of parameters.
+For more options on the terminal commands use the ```--help``` flag. Similarily, use ```help(euchre.connect)``` for a full list of python parameters.
 
 ## Installing
 
