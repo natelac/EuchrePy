@@ -108,6 +108,7 @@ player = CustomPlayer()
 import euchre
 from customplayer import CustomPlayer
 
+# Create "your" player
 player = euchre.players.ConsolePlayer('User')
 
 # Create a list of your custom AI
@@ -122,6 +123,68 @@ team2 = euchre.Team(ai[1], ai[2])
 # Start the game!
 game = euchre.StandardGame(team1, team2)
 game.play()
+```
+
+## Logging games
+
+Games can be logged. This is a very useful feature when training AI or exploring the statistics behind euchre.
+
+### Creating a game that logs
+
+```python
+import euchre
+
+# Create "your" player
+player = euchre.players.ConsolePlayer('User')
+
+# Create a list of AI
+ai = []
+for i in range(3):
+  ai.append(CustomPlayer('AI' + str(i)))
+
+# Choose the teams for the game
+team1 = euchre.Team(player, ai[0])
+team2 = euchre.Team(ai[1], ai[2])
+
+# Specify path to log to and play!
+logged_game = euchre.StandardGame(team1, team2, log_file='euchre.log')
+logged_game.play()
+```
+
+### Logging format
+
+A game that has a misdeal simply logs "misdeal". Subsequent rounds are deliminated by newlines. The example below has the json pretty printed for readability- there are no newlines in the actual output.
+```json
+"misdeal"
+{
+    "players": ["AI2", "AI0", "AI1", "User"], 
+    "teams": [
+        ["User", "AI0"], 
+        ["AI1", "AI2"]
+    ], 
+    "table": ["AI2", "AI0", "AI1", "User"], 
+    "play_order": ["AI0", "AI1", "User", "AI2"], 
+    "kitty": ["1C", "KS", "JC", "QH"], 
+    "maker": "User", 
+    "trump": "D", 
+    "top_card": "KD", 
+    "going_alone": false, 
+    "cards_played": {
+        "AI0": ["QC", "AS", "JD", "AD", "AC"], 
+        "AI1": ["1H", "9S", "9C", "QS", "KC"], 
+        "User": ["AH", "JS", "1D", "KD", "JH"], 
+        "AI2": ["KH", "1S", "9D", "QD", "9H"]
+    }, 
+    "renegers": [], 
+    "takers": ["User", "AI0", "AI0", "AI0", "User"], 
+    "trick_play_orders": [
+        ["AI2", "AI0", "AI1", "User"], 
+        ["User", "AI2", "AI0", "AI1"], 
+        ["AI0", "AI1", "User", "AI2"], 
+        ["AI0", "AI1", "User", "AI2"], 
+        ["AI0", "AI1", "User", "AI2"]
+    ]
+}
 ```
 
 ## Future ideas
