@@ -1,8 +1,10 @@
 # EuchrePy: Euchre game with modifiable player class
 
-An implementation of Euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to develop and train AI and interface easily with a web app to display AI information and player IO.
+Euchre is a four player trick taking card game. This is an implementation of euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to develop and train AI and interface easily with a web app to display AI information and player IO.
 
 Also implements a euchre server that can be run on a linux computer. Up to four other players can connect to the server and play a game of euchre.
+
+If you're unsure of how to play euchre, check out the [wikipedia page](https://en.wikipedia.org/wiki/Euchre#Rules)!
 
 ## Example
 
@@ -33,9 +35,10 @@ The dealer is AI2
 ```
 
 ### Hosting and playing an online game
+
 Server terminal:
 ```
-$ euchre-server --host localhost --port 6000 --hb-port 5999 --player-count 2
+$ euchre-server --player-count 2
 server listening for registers...
 Player Alice registered
 Waiting for 1 player(s)
@@ -45,7 +48,7 @@ starting game...
 
 Alice's terminal:
 ```
-$ euchre-console --port 6001 --server-port 6000 --name 'Alice'
+$ euchre-webconsole --port 6001 --name 'Alice'
 
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
@@ -59,7 +62,7 @@ Order up? y/n
 Bob's interactive python shell:
 ```python
 >>> import euchre
->>> euchre.connect(port=6002, server_port=6000, name='Bob')
+>>> euchre.connect(port=6002, name='Bob')
 
 Alice, Bob have 0  AI0, AI1 have 0
 --------------------------------------------------
@@ -68,9 +71,11 @@ The top card is 9H
 AI1 denied ordering up
 ```
 
+For more options on the terminal commands use the ```--help``` flag. Similarily, use ```help(euchre.connect)``` for a full list of parameters.
+
 ## Installing
 
-From local repository:
+From a local repository:
 ```
 $ ls
 EuchrePy
@@ -79,13 +84,15 @@ $ pip install -e EuchrePy
 
 ## Custom Players
 
-You can create custom AI and use them in games as long as they are a sub-class of ```euchre.Player```.
+You can create custom AI and use them in games as long as they are a sub-class of ```euchre.Player```. You can find its source code in ```euchre/players/player.py```
 
 ### Creating a custom Player class
 
 For a list of helper functions and abstract methods to implement, use ```help(euchre.Player)```
 
 ```python
+# customplayer.py
+
 import abc
 import euchre
 
@@ -99,19 +106,21 @@ player = CustomPlayer()
 
 ```python
 import euchre
+from customplayer import CustomPlayer
 
 player = euchre.players.ConsolePlayer('User')
 
 # Create a list of your custom AI
+ai = []
 for i in range(3):
-  ai.append(euchre.players.CustomPlayer('AI' + str(i)))
+  ai.append(CustomPlayer('AI' + str(i)))
 
 # Choose the teams for the game
-team1 = euchre.players.Team(p1, ai[0])
-team2 = euchre.players.Team(ai[1], ai[2])
+team1 = euchre.Team(player, ai[0])
+team2 = euchre.Team(ai[1], ai[2])
 
 # Start the game!
-game = euchre.games.StandardGame(team1, team2)
+game = euchre.StandardGame(team1, team2)
 game.play()
 ```
 
