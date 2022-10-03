@@ -35,7 +35,6 @@ The dealer is AI2
 ```
 
 ### Hosting and playing an online game
-
 Server terminal:
 ```
 $ euchre-server --player-count 2
@@ -87,7 +86,6 @@ $ pip install -e EuchrePy
 You can create custom AI and use them in games as long as they are a sub-class of ```euchre.Player```. You can find its source code in ```euchre/players/player.py```
 
 ### Creating a custom Player class
-
 For a list of helper functions and abstract methods to implement, use ```help(euchre.Player)```
 
 ```python
@@ -103,7 +101,6 @@ class CustomPlayer(euchre.Player, abc.ABC):
 player = CustomPlayer()
 ```
 ### Playing a game with custom Players
-
 ```python
 import euchre
 from customplayer import CustomPlayer
@@ -130,7 +127,6 @@ game.play()
 Games can be logged. This is a very useful feature when training AI or exploring the statistics behind euchre.
 
 ### Creating a game that logs
-
 ```python
 import euchre
 
@@ -152,7 +148,6 @@ logged_game.play()
 ```
 
 ### Logging format
-
 A game that has a misdeal simply logs "misdeal". Subsequent rounds are deliminated by newlines. The example below has the json pretty printed for readability- there are no newlines in the actual output.
 ```json
 "misdeal"
@@ -186,6 +181,24 @@ A game that has a misdeal simply logs "misdeal". Subsequent rounds are deliminat
     ]
 }
 ```
+
+## Design decisions
+
+The game of euchre can be coded in a lot less lines than was used in this project. However, the game would be very static and any major changes to the codebase would have knock-on effects to other parts of the code. The goal of this implementation is to be very modular and extendible.
+
+### The ```Player``` class
+The ```Player``` class's functions are called by the game.
+
+The ```Player``` class is dynamic and can represent AI players (e.g. ```BasicAIPlayer```), human players (e.g. ```ConsolePlayer```), or even web connected players (e.g. ```WebPlayer```). Since card games are linear (each player takes one turn at a time), it is okay for the class functions to block the IO while waiting for player responses. 
+
+The ```WebPlayer``` class uses standardized messages to communicate information to the player's client over the network. When it is called by the game it will block the games thread until it recieves a TCP message back from its client. The server creates its networking threads before it starts the game so thread blocking is okay.
+
+### The ```GameServer``` class
+The ```GameServer``` class is almost entirely game agnostic. All it does is register clients to a ```WebPlayer```, pass client responses to their ```WebPlayer```, and handle heartbeat checking.
+
+### The StandardGame class
+The ```StandardGame``` class is the least modular of the classes. Since the flow of a game is very exact, there is not alot of room for extendibility/modularity. 
+
 
 ## Future ideas
 - [ ] Create a smart AI player
