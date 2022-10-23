@@ -201,6 +201,7 @@ The ```StandardGame``` class is the least modular of the classes. Since the flow
 
 
 ## Future ideas
+- [ ] Have player ports automatically picked
 - [ ] Create a smart AI player
 - [ ] Implement farmers hand
 - [ ] Add lobby system - User can connect to server, host games, and see other games
