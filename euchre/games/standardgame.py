@@ -7,7 +7,7 @@ from euchre.players import Player
 
 
 class StandardGame:
-    """Standard game of euchre
+    """Standard game of euchre.
 
     Source: https://en.wikipedia.org/wiki/Euchre
 
@@ -430,6 +430,10 @@ class StandardGame:
         return None
 
     def logGameState(self, maker_selected=False):
+        """Logs the final gamestate of a round.
+        
+        Writes to self.log_file, or does nothing if self.log_file is None.
+        """
         # If no log file specified, don't log
         if self.log_file is None:
             return
