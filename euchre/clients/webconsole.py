@@ -8,12 +8,11 @@ from euchre.utils import message_to_dictionary
 from euchre.utils import printCards
 from euchre.cards import Card
 
-
 class WebConsole:
     """A console that can connect to a game of euchre over the web.
     """
 
-    def __init__(self, host='localhost', port=6001, server_host='localhost',
+    def __init__(self, host='localhost', port=0, server_host='localhost',
                  server_port=6000, server_hb_port=5999, name='WebConsole'):
         self.name = name
         self.socket_info = {
@@ -379,13 +378,14 @@ class WebConsole:
         """
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.socket_info["host"], self.socket_info["port"]))
+        self.socket_info["host"], self.socket_info["port"] = sock.getsockname()
         sock.listen()
         sock.settimeout(1)
 
 
 @click.command()
 @click.option("--host", "host", default="localhost")
-@click.option("--port", "port", default=6001)
+@click.option("--port", "port", default=0)
 @click.option("--server-host", "server_host", default="localhost")
 @click.option("--server-port", "server_port", default=6000)
 @click.option("--server-hb-port", "server_hb_port", default=5999)

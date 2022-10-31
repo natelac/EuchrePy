@@ -14,7 +14,7 @@ def play():
     game.play()
 
 
-def connect(host='localhost', port=6001, server_host='localhost',
+def connect(host='localhost', port=0, server_host='localhost',
             server_port=6000, server_hb_port=5999, name='WebConsole'):
     """Connect and play a web game of euchre in the console
     """
