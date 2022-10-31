@@ -192,7 +192,12 @@ class StandardGame:
             tricks_taken = {player: 0 for player in self.gs['play_order']}
 
         # Init taker to player left of dealer
+        # Because previous taker is leader
         taker = self.gs['table'][0]
+        if going_alone and self.gs['maker'].getTeammate() is taker:
+            # If player left of dealer is the partner of the player going
+            # alone, init taker to next player around table
+            taker = self.gs['table'][1]
 
         # Init list of leaders for each trick
         leader_list = []
