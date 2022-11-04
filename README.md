@@ -2,7 +2,7 @@
 
 Euchre is a four player trick taking card game. This is a python implementation of euchre designed to be easily extendible. The player input-output (IO) is separated from the game logic by a Player class. This project was created to develop and train AI and interface easily with a web app to display AI information and player IO.
 
-Also implements a euchre server that can be run on a linux computer. Up to four other players can connect to the server and play a game of euchre.
+EuchrePy also implements a euchre server that can be run on a linux computer. Up to four other players can connect to the server and play a game of euchre.
 
 If you're unsure of how to play euchre, check out the [wikipedia page](https://en.wikipedia.org/wiki/Euchre#Rules)!
 
