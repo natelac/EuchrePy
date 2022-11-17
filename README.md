@@ -206,6 +206,7 @@ The ```StandardGame``` class is the least modular of the classes. Since the flow
 - [ ] Implement farmers hand
 - [ ] Add lobby system - User can connect to server, host games, and see other games
   - This will give a purpose to ```bin/server```, continuosly host games on the server
+- [ ] Create unit testing
 
 ## Known Bugs
 - Only first renege should be penalized OR redo reneging logic so valid plays don't get miscounted
