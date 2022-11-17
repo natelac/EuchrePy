@@ -199,14 +199,14 @@ The ```GameServer``` class is almost entirely game agnostic. All it does is regi
 ### The StandardGame class
 The ```StandardGame``` class is the least modular of the classes. Since the flow of a game is very exact, there is not alot of room for extendibility/modularity. 
 
-
 ## Future ideas
-- [ ] Have player ports automatically picked
-- [ ] Create a smart AI player
-- [ ] Implement farmers hand
-- [ ] Add lobby system - User can connect to server, host games, and see other games
+- Have player ports automatically picked
+- Create a smart AI player
+- Create a UI web client
+- Add lobby system - User can connect to server, host games, and see other games
   - This will give a purpose to ```bin/server```, continuosly host games on the server
-- [ ] Create unit testing
+- Create unit testing
+- Implement farmers hand
 
 ## Known Bugs
 - Only first renege should be penalized OR redo reneging logic so valid plays don't get miscounted
