@@ -206,6 +206,7 @@ The ```StandardGame``` class is the least modular of the classes. Since the flow
 - Add lobby system - User can connect to server, host games, and see other games
   - This will give a purpose to ```bin/server```, continuosly host games on the server
 - Create unit testing
+  - [Great real python article](https://realpython.com/python-testing/#executing-your-first-test)
 - Implement farmers hand
 
 ## Known Bugs
