@@ -14,11 +14,11 @@ class Card:
     def __init__(self, rank, suit):
         """
         Args:
-            rank (str): Shorthand rank of the card
-            suit (str): Shorthand suit of the card
+            rank (str): Longform rank of card with first character capitalized
+            suit (str): Longform suit of card with first character capitalized
         """
-        self._rank = rank
-        self._suit = suit
+        self._rank = str(rank)
+        self._suit = str(suit)
         self._off_suit = {
             'C': 'S',
             'S': 'C',
@@ -69,7 +69,7 @@ class Card:
         Returns:
             suit (str): Shorthand suit of the Card given trump
         """
-        if self.isLeftBower(trump_suit):
+        if self.isLeftBower(trump_suit[0]):
             return self._off_suit[self.suit]
         return self.suit
 
@@ -138,13 +138,13 @@ class Card:
             (int): Value of card relative to other cards
         """
         val = self._values[self.rank]
-        if self.isRightBower(trump_suit):
+        if self.isRightBower(trump_suit[0]):
             return 52
-        elif self.isLeftBower(trump_suit):
+        elif self.isLeftBower(trump_suit[0]):
             return 51
-        elif self.suit == trump_suit:
+        elif self.suit == trump_suit[0]:
             return val + 6
-        elif self.suit == led_suit:
+        elif self.suit == led_suit[0]:
             return val
         else:
             return 0
@@ -158,7 +158,7 @@ class Card:
         Returns:
             (bool): True if left bower, otherwise False
         """
-        if self.rank == 'J' and self.suit == self._off_suit[trump_suit]:
+        if self.rank == 'J' and self.suit == self._off_suit[trump_suit[0]]:
             return True
         else:
             return False
@@ -172,7 +172,7 @@ class Card:
         Returns:
             (bool): True if right bower, otherwise False
         """
-        if self.rank == 'J' and self.suit == trump_suit:
+        if self.rank == 'J' and self.suit == trump_suit[0]:
             return True
         else:
             return False
