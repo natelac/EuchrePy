@@ -13,8 +13,12 @@ class Deck:
         size (int): Number of cards in the deck
     """
 
+    # Full names of ranks and suits
     ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
     suits = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
+
+    # Disable shuffling for testing 
+    disable_shuffle = False
 
     def __init__(self):
         self.cards: List[Card] = []
@@ -43,6 +47,8 @@ class Deck:
     def shuffle(self):
         """Randomizes the order of the cards in the deck.
         """
+        if self.disable_shuffle:
+            return
         random.shuffle(self.cards)
 
     def print(self):
