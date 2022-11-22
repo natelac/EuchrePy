@@ -127,6 +127,9 @@ class Card:
         """
         return self._rank[0] + self._suit[0]
 
+    def __repr__(self):
+        return self.__str__()
+
     def value(self, led_suit, trump_suit):
         """Value of card in context of the led suit and the trump suit.
 
