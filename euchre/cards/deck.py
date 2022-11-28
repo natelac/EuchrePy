@@ -14,8 +14,8 @@ class Deck:
     """
 
     # Full names of ranks and suits
-    ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
-    suits = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
+    suits = Card.suits
+    ranks = Card.ranks
 
     # Disable shuffling for testing 
     disable_shuffle = False

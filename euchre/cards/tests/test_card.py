@@ -2,12 +2,11 @@ import unittest
 
 from euchre import Card
 
-
 class TestCard(unittest.TestCase):
     
     # All suits and ranks in euchre
-    suits = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
-    ranks = ['Ace', 'King', 'Queen', 'Joker', '10', '9']
+    suits = Card.suits
+    ranks = Card.ranks
 
     # Cards and tuples of their ranks and suits
     card_tups = []
@@ -90,3 +89,15 @@ class TestCard(unittest.TestCase):
         left_bower_value = Card("Jack", "Spades").value(led_suit, trump_suit)
         right_bower_value = Card("Jack", "Clubs").value(led_suit, trump_suit)
         self.assertTrue(left_bower_value < right_bower_value)
+
+    def test_str2card(self):
+        """
+        Test conversion of shorthand string to a card.
+        """
+        str2card = Card.str2card
+
+        for card in self.cards:
+            name_short = str(card)
+            name_long = card.name
+            name_recovered = str2card(name_short).name
+            self.assertEqual(name_recovered, name_long)

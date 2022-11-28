@@ -10,6 +10,9 @@ class Card:
         rank (str): The shorthand rank of the card, i.e. 'Ace' is 'A'.
         suit (str): The shorthand suit of the card, i.e. 'Clubs' is 'C'.
     """
+    
+    ranks = ['Ace', 'King', 'Queen', 'Jack', '10', '9']
+    suits = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
 
     def __init__(self, rank, suit):
         """
@@ -113,8 +116,13 @@ class Card:
         rank = shorthand[0]
         suit = shorthand[1]
 
-        if rank == '1':
-            rank = '10'
+        for rank_long in cls.ranks:
+            if rank_long[0] == rank:
+                rank = rank_long
+
+        for suit_long in cls.suits:
+            if suit_long[0] == suit:
+                suit = suit_long
 
         return Card(rank, suit)
 
