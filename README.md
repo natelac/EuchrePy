@@ -207,6 +207,7 @@ The ```StandardGame``` class is the least modular of the classes. Since the flow
   - This will give a purpose to ```bin/server```, continuosly host games on the server
 - Create unit testing
   - [Great real python article](https://realpython.com/python-testing/#executing-your-first-test)
+  - Create a module for testing customplayers to confirm they are compatible
 - Implement farmers hand
 
 ## Known Bugs
