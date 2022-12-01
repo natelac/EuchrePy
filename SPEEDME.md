@@ -7,6 +7,9 @@ work!
 
 - Implement a `TestPlayer` `Player` class that can be fed a list of responses to
   make
+  - 0.5 to 1 hr goal
+
+
 - Finish all tests in test\_standardgame.py
 
 ## Testing tool for custom Players

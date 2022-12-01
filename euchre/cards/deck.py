@@ -20,6 +20,11 @@ class Deck:
     # Disable shuffling for testing 
     disable_shuffle = False
 
+    # Set deals for testing
+    #   'low_suit': 
+    #   '
+    set_deal = None
+
     def __init__(self):
         self.cards: List[Card] = []
         self.size = 24
@@ -63,3 +68,4 @@ class Deck:
         """
         for card in self.cards:
             print(card.toString())
+
