@@ -84,6 +84,12 @@ class StandardGame:
     def dealPhase(self):
         """Deals cards and determines trump.
 
+        Modifies:
+            self.deck
+            self.gs['kitty']
+            self.gs['top_card']
+            self.gs['play_order']
+
         Returns:
             (bool): True if there was a misdeal, False otherwise.
         """
@@ -109,6 +115,11 @@ class StandardGame:
     def orderPhase(self):
         """Asks all players if they want to order up the top card.
 
+        Modifies:
+            self.gs['maker']
+            self.gs['trump']
+            self.gs['kitty']
+
         Returns:
             (bool): True if everyone passes ordering up, otherwise False.
         """
@@ -118,6 +129,7 @@ class StandardGame:
 
             # Someone ordered up
             if order_up:
+
                 # Update game state and inform players
                 self.gs['maker'] = player
                 self.gs['trump'] = self.gs['top_card'].suit
@@ -138,6 +150,10 @@ class StandardGame:
 
     def trumpPhase(self):
         """Asks all players if they want to order trump.
+
+        Modifies:
+            self.gs['maker']
+            self.gs['trump']
 
         Returns:
             (bool): True if everyone passes ordering trump, otherwise False.
@@ -168,10 +184,20 @@ class StandardGame:
             # Player denies trump
             else:
                 for p in self.gs['players']: p.deniedTrumpMsg(player)
+
         return True
 
     def playTricks(self):
         """Plays 5 tricks.
+
+        Modifies:
+            self.gs['going_alone']
+            self.gs['cards_played']
+            self.gs['tricks_taken']
+            self.gs['leader_list']
+            self.gs['renegers']
+            self.gs['takers']
+            self.gs['trick_play_orders']
         """
         # Initialize trick information
         going_alone = self.gs['maker'].goAlone()
@@ -191,9 +217,9 @@ class StandardGame:
             cards_played = {player: [] for player in self.gs['play_order']}
             tricks_taken = {player: 0 for player in self.gs['play_order']}
 
-        # Init taker to player left of dealer
-        # Because previous taker is leader
+        # Init taker to player left of dealer because previous taker is leader
         taker = self.gs['table'][0]
+
         if going_alone and self.gs['maker'].getTeammate() is taker:
             # If player left of dealer is the partner of the player going
             # alone, init taker to next player around table
@@ -307,7 +333,7 @@ class StandardGame:
             renegers (list): Players to be penalized
         """
         # Use sets to figure out teams to give points to,
-        #   if both teams renege no one gets points
+        # if both teams renege no one gets points
         reneging_teams = {player.team for player in renegers}
         teams = {team for team in self.gs['teams']}
         for team in teams - reneging_teams:
@@ -381,11 +407,11 @@ class StandardGame:
         self.gs['players'].append(teams[1][1])
 
         # Table order is initially just the players in order
-        #   where the 0th index is for the dealer
+        # where the 0th index is for the dealer
         self.gs['table'] = self.gs['players'].copy()
 
         # The player left of the dealer (at 3rd index) should start the trick
-        #   (be at the 0th index)
+        # (be at the 0th index)
         self.gs['play_order'] = []
         self.gs['play_order'] = self.gs['players'].copy()
         new_leader = self.gs['play_order'].pop(0)
