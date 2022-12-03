@@ -5,10 +5,14 @@ work!
 
 ## Unit testing for `StandardGame`
 
-- Implement a `TestPlayer` `Player` class that can be fed a list of responses to
-  make
-  - 0.5 to 1 hr goal
-
+- Modify `StandardGame` / `Deck` for a testing mode:
+    - Does not randomize seating
+    - Does not shuffle deck
+    - Let's deck state be directly set
+    - Can set the points manually
+    - Implement a `TestPlayer` `Player` class that can be fed a list of responses to
+      make
+    - 1 hr goal
 
 - Finish all tests in test\_standardgame.py
 
