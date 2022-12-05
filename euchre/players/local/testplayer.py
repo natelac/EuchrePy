@@ -1,79 +1,102 @@
 import abc
 
 from euchre.players.player import Player
+from euchre.cards.card import Card
 
 
 class TestPlayer(Player, abc.ABC):
     """A Player class that can be fed valid responses to a game.
     """
 
-    def __init__(self, name='AI', cmd_queue=None):
+    def __init__(self, name='AI', commands=None, debug=False):
         Player.__init__(self, name)
+
+        self.debug = debug
 
         # List (queue) of commands to return to game:
         #   'T' = return True
         #   'F' = return False
         #   'AC' = return Ace of Clubs 
         #   Empty list returns BasicAI answer 
-        if cmd_queue is None:
-            self.cmd_queue = []
+        if commands is None:
+            self.commands = []
         else:
-            self.cmd_queue = cmd_queue
+            self.commands = commands
+
+
+    def dprint(self, *args):
+        if self.debug:
+            print(*args)
 
     # Decision methods that require a return value
     # -------------------------------------------------------------------------
     def orderUp(self):
-        if len(cmd_queue) != 0:
-            if cmd_queue[0] not in ['T', 'F']:
-                raise ValueError("Must be 'T' or 'F'")
-            ans = cmd_queue.pop(0)
-            return ans == 'T'
+
+        self.dprint(self.name, 'asked to order up')
+
+        if len(self.commands) != 0:
+            if self.commands[0] not in ['y', 'n']:
+                raise ValueError("Must be 'y' or 'n'")
+            ans = self.commands.pop(0)
+
+            self.dprint(self.name, 'answered', ans)
+
+            return ans == 'y'
+
         else:
             return False
 
     def discardCard(self, top_card):
-        if len(cmd_queue) != 0:
+        self.dprint(self.name, 'asked to discard')
+        if len(self.commands) != 0:
+            self.dprint(self.name, 'has cards', self.hand, 
+                       'and is looking to discard', self.commands[0])
             self.hand.append(top_card) # Order matters
-            discard_card = cmd_queue.pop(0)
+            discard_card_str = self.commands.pop(0)
+            discard_card = Card.str2card(discard_card_str)
             self.hand.remove(discard_card)
         else:
             # Put an arbitrary card in kitty
             discard_card = self.hand.pop() # Order matters
             self.hand.append(top_card)
+
         return discard_card
 
     def orderTrump(self):
-        if len(cmd_queue) != 0:
-            if cmd_queue[0] not in ['T', 'F']:
-                raise ValueError("Must be 'T' or 'F'")
-            ans = cmd_queue.pop(0)
-            return ans == 'T'
+        if len(self.commands) != 0:
+            if self.commands[0] not in ['y', 'n']:
+                raise ValueError("Must be 'y' or 'n'")
+            ans = self.commands.pop(0)
+            return ans == 'y'
         else:
             return False
 
     def callTrump(self, up_suit):
-        if len(cmd_queue) != 0:
-            if cmd_queue[0] not in ['C', 'S', 'H', 'D']:
+        if len(self.commands) != 0:
+            if self.commands[0] not in ['C', 'S', 'H', 'D']:
                 raise ValueError("Must be a suit in 'C', 'S', 'H', or 'D'")
-            ans = cmd_queue.pop(0)
+            ans = self.commands.pop(0)
             return ans
         else:
             return None
 
     def goAlone(self):
-        if len(cmd_queue) != 0:
-            if cmd_queue[0] not in ['T', 'F']:
-                raise ValueError("Must be 'T' or 'F'")
-            ans = cmd_queue.pop(0)
-            return ans == 'T'
+        if len(self.commands) != 0:
+            if self.commands[0] not in ['y', 'n']:
+                raise ValueError("Must be 'y' or 'y'")
+            ans = self.commands.pop(0)
+            return ans == 'y'
         else:
             return False
 
     def playCard(self, leader, cards_played, trump):
-        if len(cmd_queue) != 0:
-            ans = cmd_queue.pop(0)
-            self.hand.remove(ans)
-            return ans
+        if len(self.commands) != 0:
+            self.dprint(self.name, 'has cards:', self.hand)
+            self.dprint(self.name, 'is is playing', self.commands[0])
+            card_str = self.commands.pop(0)
+            card = Card.str2card(card_str)
+            self.hand.remove(card)
+            return card
         else:
             # Play an arbitrary card if player is leader
             if leader is self:

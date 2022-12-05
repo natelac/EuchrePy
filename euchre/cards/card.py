@@ -43,6 +43,9 @@ class Card:
             'D': '♦'
         }
 
+    def __eq__(self, other):
+        return self.__str__() == other.__str__()
+
     @property
     def rank(self):
         """Shorthand rank of card.

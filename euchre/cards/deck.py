@@ -17,21 +17,41 @@ class Deck:
     suits = Card.suits
     ranks = Card.ranks
 
-    # Disable shuffling for testing 
-    disable_shuffle = False
+    # Preset deals for testing
+    #   'balanced':
+    #       Attempts to get the win-rate of picking arbitrary cards close
+    #       to 50%. The dealer decides to discard clubs or diamonds which
+    #       benefits either their team or the opposing team. based on play
+    #       order where first hand is left of dealer
+    raw_preset_decks = {
+            'balanced':
+                 [['JC', 'AD', 'QC', 'KD', 'QH'],
+                  ['AS', 'QD', 'AC', 'KH', 'KC'],
+                  ['KS', '9D', '9C', 'AH', '1S'],
+                  ['JS', '1D', '1C', '1H', '9H'],
+                  ['9S', 'QS', 'JH', 'JD']],
+            }
 
-    # Set deals for testing
-    #   'low_suit': 
-    #   '
-    set_deal = None
+    # Convert each string to card
+    preset_decks = dict()
+    for k, hands in raw_preset_decks.items():
+        new_hands = []
+        for hand in hands:
+            new_hand = []
+            for card in hand:
+                new_hand.append(Card.str2card(card))
+            new_hands.append(new_hand)
+        preset_decks[k] = new_hands
 
-    def __init__(self):
+    def __init__(self, deck_preset=None):
         self.cards: List[Card] = []
         self.size = 24
+        self.disable_shuffle = False
+        self.deck_preset = deck_preset
 
         # Construct deck with each card.
-        for suit in Deck.suits:
-            for rank in Deck.ranks:
+        for suit in self.suits:
+            for rank in self.ranks:
                 self.cards.append(Card(rank, suit))
 
     def deal(self):
@@ -44,6 +64,8 @@ class Deck:
             hands (tuple): First element is a list of list of cards
                 and second element is the up card
         """
+        if self.deck_preset:
+            return self.preset_decks[self.deck_preset]
         hands = [[], [], [], [], []]
         for i in range(self.size):
             hands[i % 5].append(self.cards[i])

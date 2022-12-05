@@ -16,18 +16,38 @@ class StandardGame:
                 are seated opposite of each other
         log_file (path): Path to of file to log to, default is None which means
                 no logging
+        shuffle (bool): Whether the players and deck should be shuffled before
+                each game
+        deck_preset (str): A string for a deck preset as defined in Deck
+        points (Tuple(int, int)): starting points of team1 and team2
+        debug (bool): Whether debug information should be displayed
+        round_count (int): Number of rounds to play (used for testing).
+            Ignored if None
     """
 
-    def __init__(self, team1, team2, log_file=None):
-        # Game info
-        self.deck = Deck()
-        self.oppo_team = {team1: team2, team2: team1}
+    def __init__(self, team1, team2, log_file=None, shuffle=True, 
+                 deck_preset=None, points=None, debug=True, round_count=None):
+        self.log_file = log_file
+        self.shuffle = shuffle
+        self.debug = debug
+        self.round_count = round_count
+
+        # Setup deck
+        self.deck = Deck(deck_preset=deck_preset)
+        if not self.shuffle:
+            self.deck.disable_shuffle = True
+
+
+        # Setup starting points
+        if points:
+            team1.points = points[0]
+            team2.points = points[1]
 
         # Game state
         self.gs = {
             'players': [], # List of players, initially equivelant to self.gs['table']
             'teams': (team1, team2),
-            'table': [], # Ordered players where index 3 is dealer
+            'table': [], # Ordered players where index 0 is dealer
             'play_order': [], # Ordered players where index 0 is leader
             'trick_play_orders': None,
             'kitty': [],
@@ -42,11 +62,8 @@ class StandardGame:
             'takers': None,
         }
 
-        # Randomly seat players around the table
+        # Seat players around the table
         self.seatPlayers()
-
-        # File to log to
-        self.log_file = log_file
 
     def play(self):
         """Plays a game of euchre until a team reaches 10 points.
@@ -57,11 +74,20 @@ class StandardGame:
         # Game loop
         while not self.getWinner():
 
+            if self.round_count and self.round_count > 0:
+                # Count down to 0 as rounds played
+                self.round_count -= 1
+            elif self.round_count:
+                # Stop playing when round count reaches 0
+                return
+
             # Inform players of current game state
             for p in self.gs['players']: p.pointsMsg(*self.gs['teams'])
-            for p in self.gs['players']: p.dealerMsg(self.gs['table'][3])
+            for p in self.gs['players']: p.dealerMsg(self.gs['table'][0])
 
             # Enter dealing phase
+            if self.debug:
+                print("Entering dealing phase")
             maker_selected = self.dealPhase()
 
             if maker_selected:
@@ -77,6 +103,11 @@ class StandardGame:
             # Update dealer
             self.updateTableOrder()
 
+        # Don't declare winner of playing with round count
+        if self.round_count:
+            return
+
+        # Declare winning team
         winning_team = self.getWinner()
         if winning_team:
             for p in self.gs['players']: p.gameResultsMsg(winning_team)
@@ -123,7 +154,7 @@ class StandardGame:
         Returns:
             (bool): True if everyone passes ordering up, otherwise False.
         """
-        for player in self.gs['table']:
+        for player in self.gs['play_order']:
             # Ask players if they want to order up top card
             order_up = player.orderUp()
 
@@ -140,7 +171,7 @@ class StandardGame:
                     p.newTrumpMsg(self.gs['trump'])
 
                 # Have dealer discard a card
-                discard_card = self.gs['table'][3].discardCard(self.gs['top_card'])
+                discard_card = self.gs['table'][0].discardCard(self.gs['top_card'])
                 self.gs['kitty'].append(discard_card)
                 return False
 
@@ -159,7 +190,7 @@ class StandardGame:
             (bool): True if everyone passes ordering trump, otherwise False.
         """
         # Ask players if they want to call trump
-        for player in self.gs['table']:
+        for player in self.gs['play_order']:
             order_trump = player.orderTrump()
 
             # Player calls trump
@@ -218,12 +249,12 @@ class StandardGame:
             tricks_taken = {player: 0 for player in self.gs['play_order']}
 
         # Init taker to player left of dealer because previous taker is leader
-        taker = self.gs['table'][0]
+        taker = self.gs['table'][1]
 
         if going_alone and self.gs['maker'].getTeammate() is taker:
             # If player left of dealer is the partner of the player going
             # alone, init taker to next player around table
-            taker = self.gs['table'][1]
+            taker = self.gs['table'][2]
 
         # Init list of leaders for each trick
         leader_list = []
@@ -392,13 +423,18 @@ class StandardGame:
         t1 = self.gs['teams'][0].players
         t2 = self.gs['teams'][1].players
 
-        # Shuffle within each team
-        np.random.shuffle(t1)
-        np.random.shuffle(t2)
+        if self.shuffle:
+            # Shuffle within each team
+            np.random.shuffle(t1)
+            np.random.shuffle(t2)
 
-        # Shuffle order of teams
-        teams = [t1, t2]
-        np.random.shuffle(teams)
+            # Shuffle order of teams
+            teams = [t1, t2]
+            np.random.shuffle(teams)
+
+        else:
+            # Don't shuffle
+            teams = [t1, t2]
 
         # Teammates must be across from each other
         self.gs['players'].append(teams[0][0])
@@ -410,9 +446,9 @@ class StandardGame:
         # where the 0th index is for the dealer
         self.gs['table'] = self.gs['players'].copy()
 
-        # The player left of the dealer (at 3rd index) should start the trick
-        # (be at the 0th index)
-        self.gs['play_order'] = []
+        # The dealer starts the first trick by going last 
+        # (being at the 3rd index)
+        # self.gs['play_order'] = []
         self.gs['play_order'] = self.gs['players'].copy()
         new_leader = self.gs['play_order'].pop(0)
         self.gs['play_order'].append(new_leader)
@@ -439,8 +475,8 @@ class StandardGame:
         Modifies:
             self.gs['table']
         """
-        new_dealer = self.gs['table'].pop(0)
-        self.gs['table'].append(new_dealer)
+        old_dealer = self.gs['table'].pop(0)
+        self.gs['table'].append(old_dealer)
 
     def getWinner(self):
         """Fetches the winning team.
@@ -451,7 +487,7 @@ class StandardGame:
             (Team): Team that won, otherwise None
         """
         for team in self.gs['teams']:
-            if team.points == 10:
+            if team.points >= 10:
                 return team
         return None
 
@@ -490,6 +526,7 @@ class StandardGame:
         loggable_gs = {
             'players': [str(player) for player in self.gs['players']],
             'teams': (team1, team2),
+            'points': (self.gs['teams'][0].points, self.gs['teams'][1].points),
             'table': [str(player) for player in self.gs['players']],
             'play_order': [str(player) for player in self.gs['play_order']],
             'kitty': [str(card) for card in self.gs['kitty']],
@@ -507,3 +544,4 @@ class StandardGame:
         with open(self.log_file, 'a') as f:
             json.dump(loggable_gs, f)
             f.write('\n')
+
