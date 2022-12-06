@@ -166,3 +166,6 @@ cython_debug/
 
 # gitattributes
 .gitattributes
+
+# testing folders
+logs/tmp

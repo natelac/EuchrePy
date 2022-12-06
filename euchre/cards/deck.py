@@ -64,11 +64,13 @@ class Deck:
             hands (tuple): First element is a list of list of cards
                 and second element is the up card
         """
-        if self.deck_preset:
-            return self.preset_decks[self.deck_preset].copy()
         hands = [[], [], [], [], []]
-        for i in range(self.size):
-            hands[i % 5].append(self.cards[i])
+        if self.deck_preset:
+            for i in range(5):
+                hands[i] = self.preset_decks[self.deck_preset][i].copy()
+        else:
+            for i in range(self.size):
+                hands[i % 5].append(self.cards[i])
         return hands
 
     def shuffle(self):

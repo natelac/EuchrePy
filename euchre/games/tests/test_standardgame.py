@@ -37,10 +37,43 @@ class TestGame(unittest.TestCase):
     def test_ordering_trump(self):
         pass
 
+    # def test_single_round(self):
+    #     pass
+    #     """
+    #     Test that playing a single round has identical results to a
+    #     previous correct output.
+    #     """
+    #     # Paths to logs
+    #     log_correct = self.logs / "correct/single_round.log"
+    #     log_test = self.logs / "tmp/single_round.log"
+
+    #     # Create game
+    #     game = StandardGame(self.team1, self.team2, log_file=log_test,
+    #                         shuffle=False, deck_preset='balanced', debug=False,
+    #                         round_count=1)
+
+    #     # Using 'balanced' deck
+    #     self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
+    #     self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
+    #     self.p4.commands = ['n'           , '9D', 'AH', 'KS', '9C', '1S']
+    #     self.p1.commands = ['y', '1C', 'n', '1D', '1H', 'JS', '9S', '9H']
+
+    #     # Play 1 round of the game
+    #     game.play()
+
+    #     # Load in points from game
+    #     with open(log_correct) as f:
+    #         correct = json.load(f)
+    #     with open(log_test) as f:
+    #         test = json.load(f)
+
+    #     # Check points from correct and test log
+    #     self.assertEqual(correct, test)
+
     def test_misdeal(self):
         """
         Test that a misdeal occurs when everyone passes ordering up
-        and ordering trump
+        and ordering trump.
         """
 
         # Paths to logs
@@ -49,7 +82,8 @@ class TestGame(unittest.TestCase):
 
         # Create game
         game = StandardGame(self.team1, self.team2, log_file=log_test,
-                            shuffle=False, debug=False, round_count=1)
+                            shuffle=False, debug=self.debug, round_count=1,
+                            points=(0,0))
 
         # All players deny ordering up and ordering trump
         self.p3.commands = ['n', 'n']
@@ -77,18 +111,67 @@ class TestGame(unittest.TestCase):
         Test makers winning with 3 tricks and getting 1 point.
         """
         # Paths to logs
-        log_correct = self.logs / "correct/maker_wins.log"
-        log_test = self.logs / "tmp/maker_wins.log"
+        log_correct = self.logs / "correct/makers_win.log"
+        log_test = self.logs / "tmp/makers_win.log"
 
         # Create game
         game = StandardGame(self.team1, self.team2, log_file=log_test,
-                            shuffle=False, deck_preset='balanced', debug=False,
-                            round_count=1)
+                            shuffle=False, deck_preset='balanced', 
+                            debug=self.debug, round_count=1, points=(0,0))
 
         # Using 'balanced' deck
         self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
         self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
         self.p4.commands = ['n'           , '9D', 'AH', 'KS', '9C', '1S']
+        self.p1.commands = ['y', '1D', 'n', '9S', '1H', 'JS', '1C', '9H']
+
+        # Play 1 round of the game
+        game.play()
+
+        # Load in points from game
+        with open(log_correct) as f:
+            correct = json.load(f)
+        with open(log_test) as f:
+            test = json.load(f)
+
+        # Check that team1 (team of makers) get 1 point
+        self.assertEqual(test['points'], [1,0])
+
+    def test_scoring_makers_march(self):
+        """
+        Test makers winning with 5 tricks and getting 2 points.
+        """
+        pass
+
+    def test_scoring_maker_alone_win(self):
+        """
+        Test maker going alone and winning with 3 tricks for 1 point.
+        """
+        pass
+
+    def test_scoring_maker_alone_march(self):
+        """
+        Test maker going alone and winning with 5 tricks for 4 points.
+        """
+        pass
+
+    def test_scoring_defenders_win(self):
+        """
+        Test defenders winning with 3 tricks getting 2 points.
+        """
+        # Paths to logs
+        log_correct = self.logs / "correct/defenders_win.log"
+        log_test = self.logs / "tmp/defenders_win.log"
+
+        # Create game
+        game = StandardGame(self.team1, self.team2, log_file=log_test,
+                            shuffle=False, deck_preset='balanced', 
+                            debug=self.debug, round_count=1, points=(0,0))
+
+        # Using 'balanced' deck
+        self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
+        self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
+        self.p4.commands = ['n'           , '9D', 'AH', 'KS', '1S', '9C']
         self.p1.commands = ['y', '1C', 'n', '1D', '1H', 'JS', '9S', '9H']
 
         # Play 1 round of the game
@@ -100,57 +183,5 @@ class TestGame(unittest.TestCase):
         with open(log_test) as f:
             test = json.load(f)
 
-        # Check points from correct and test log
-        self.assertEqual(correct['points'], test['points'])
-
-def test_scoring_makers_march(self):
-    """
-    Test makers winning with 5 tricks and getting 2 points.
-    """
-    pass
-
-def test_scoring_maker_alone_win(self):
-    """
-    Test maker going alone and winning with 3 tricks for 1 point.
-    """
-    pass
-
-def test_scoring_maker_alone_march(self):
-    """
-    Test maker going alone and winning with 5 tricks for 4 points.
-    """
-    pass
-
-def test_scoring_defenders_win(self):
-    """
-    Test defenders winning with 3 tricks getting 2 points.
-    """
-    # TODO
-    # TODO
-    # TODO
-    # Paths to logs
-    log_correct = self.logs / "correct/maker_wins.log"
-    log_test = self.logs / "tmp/maker_wins.log"
-
-    # Create game
-    game = StandardGame(self.team1, self.team2, log_file=log_test,
-                        shuffle=False, deck_preset='balanced', debug=False,
-                        round_count=1)
-
-    # Using 'balanced' deck
-    self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
-    self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
-    self.p4.commands = ['n'           , '9D', 'AH', 'KS', '9C', '1S']
-    self.p1.commands = ['y', '1C', 'n', '1D', '1H', 'JS', '9S', '9H']
-
-    # Play 1 round of the game
-    game.play()
-
-    # Load in points from game
-    with open(log_correct) as f:
-        correct = json.load(f)
-    with open(log_test) as f:
-        test = json.load(f)
-
-    # Check points from correct and test log
-    self.assertEqual(correct['points'], test['points'])
+        # Check that team2 (team of defenders) get 2 points
+        self.assertEqual(test['points'], [0, 2])
