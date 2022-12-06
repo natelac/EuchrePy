@@ -65,7 +65,7 @@ class Deck:
                 and second element is the up card
         """
         if self.deck_preset:
-            return self.preset_decks[self.deck_preset]
+            return self.preset_decks[self.deck_preset].copy()
         hands = [[], [], [], [], []]
         for i in range(self.size):
             hands[i % 5].append(self.cards[i])

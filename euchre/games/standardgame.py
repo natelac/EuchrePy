@@ -74,11 +74,11 @@ class StandardGame:
         # Game loop
         while not self.getWinner():
 
-            if self.round_count and self.round_count > 0:
-                # Count down to 0 as rounds played
+            if self.round_count:
+                # Round is an integer that is not 0
                 self.round_count -= 1
-            elif self.round_count:
-                # Stop playing when round count reaches 0
+            elif self.round_count is not None:
+                # Round has reached 0
                 return
 
             # Inform players of current game state
