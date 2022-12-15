@@ -199,6 +199,7 @@ The ```GameServer``` class is almost entirely game agnostic. All it does is regi
 ### The StandardGame class
 The ```StandardGame``` class is the least modular of the classes. Since the flow of a game is very exact, there is not alot of room for extendibility/modularity. 
 
+
 ## Future ideas
 - Have player ports automatically picked
 - Create a smart AI player

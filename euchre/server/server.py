@@ -30,7 +30,7 @@ class GameServer:
         online_players (dict): String addresses of web connected players
                     their Player object
         threads (list): Threads for asynchronous functions of the server
-        player_count (int): Number of players in an online lobby, rest filled
+        player_count (int): Number of players in an online lobby, rest
                     mapped to with AI
     """
 

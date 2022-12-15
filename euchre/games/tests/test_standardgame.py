@@ -13,12 +13,18 @@ from euchre import Team
 class TestGame(unittest.TestCase):
 
     debug = False
+    create_correct_logs = False
     logs = Path(__file__).parent / "logs/"
+    
+    # Create new logs to check test logs against,
+    # always check the correct logs to make sure they are actually correct
+    if create_correct_logs:
+        for f in os.listdir(logs / 'correct'):
+            os.remove(logs / 'correct' / f)
 
     # Clean up tmp directory for logs created during testing
     for f in os.listdir(logs / 'tmp'):
         os.remove(logs / 'tmp' / f)
-
 
     # Create players
     p1 = TestPlayer('P1', debug=debug)
@@ -32,43 +38,56 @@ class TestGame(unittest.TestCase):
 
 
     def test_ordering_up(self):
-        pass
+        # Paths to logs
+        log_correct = self.logs / "correct/ordering_up.log"
+        log_test = self.logs / "tmp/ordering_up.log"
+        if self.create_correct_logs:
+            log_test = log_correct
+
+        # Create game
+        game = StandardGame(self.team1, self.team2, log_file=log_test,
+                            shuffle=False, deck_preset='balanced', 
+                            debug=self.debug, round_count=1, points=(0,0))
+
+        # Test p3 ordering up
+        self.p3.commands = ['y',         'n', 'AD', 'QH', 'JC', 'QC', 'KD']
+        self.p2.commands = [                 'QD', 'KH', 'AS', 'AC', 'KC']
+        self.p4.commands = [                 '9D', 'AH', 'KS', '9C', '1S']
+        self.p1.commands = [            '1D','9S', '1H', 'JS', '1C', '9H']
+        game.play()
+
+        # Test p2 ordering up
+        self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
+        self.p2.commands = ['y',       'n', 'QD', 'KH', 'AS', 'AC', 'KC']
+        self.p4.commands = [                '9D', 'AH', 'KS', '9C', '1S']
+        self.p1.commands = [          '1D', '9S', '1H', 'JS', '1C', '9H']
+        game.play()
+
+        # Test p4 ordering up
+        self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
+        self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
+        self.p4.commands = ['y'        'n', '9D', 'AH', 'KS', '9C', '1S']
+        self.p1.commands = [          '1D', '9S', '1H', 'JS', '1C', '9H']
+        game.play()
+
+        # Test p1 ordering up
+        self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
+        self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
+        self.p4.commands = ['n'           , '9D', 'AH', 'KS', '9C', '1S']
+        self.p1.commands = ['y', '1D', 'n', '9S', '1H', 'JS', '1C', '9H']
+        game.play()
+
+        # Load in log of game
+        # TODO: Load in test in line by line
+        # with open(log_correct) as f:
+            # correct = json.load(f)
+        with open(log_test) as f:
+            test = json.load(f)
+        print(correct)
+
 
     def test_ordering_trump(self):
         pass
-
-    # def test_single_round(self):
-    #     pass
-    #     """
-    #     Test that playing a single round has identical results to a
-    #     previous correct output.
-    #     """
-    #     # Paths to logs
-    #     log_correct = self.logs / "correct/single_round.log"
-    #     log_test = self.logs / "tmp/single_round.log"
-
-    #     # Create game
-    #     game = StandardGame(self.team1, self.team2, log_file=log_test,
-    #                         shuffle=False, deck_preset='balanced', debug=False,
-    #                         round_count=1)
-
-    #     # Using 'balanced' deck
-    #     self.p3.commands = ['n'           , 'AD', 'QH', 'JC', 'QC', 'KD']
-    #     self.p2.commands = ['n'           , 'QD', 'KH', 'AS', 'AC', 'KC']
-    #     self.p4.commands = ['n'           , '9D', 'AH', 'KS', '9C', '1S']
-    #     self.p1.commands = ['y', '1C', 'n', '1D', '1H', 'JS', '9S', '9H']
-
-    #     # Play 1 round of the game
-    #     game.play()
-
-    #     # Load in points from game
-    #     with open(log_correct) as f:
-    #         correct = json.load(f)
-    #     with open(log_test) as f:
-    #         test = json.load(f)
-
-    #     # Check points from correct and test log
-    #     self.assertEqual(correct, test)
 
     def test_misdeal(self):
         """
@@ -79,6 +98,8 @@ class TestGame(unittest.TestCase):
         # Paths to logs
         log_correct = self.logs / "correct/misdeal.log"
         log_test = self.logs / "tmp/misdeal.log"
+        if self.create_correct_logs:
+            log_test = log_correct
 
         # Create game
         game = StandardGame(self.team1, self.team2, log_file=log_test,
@@ -95,13 +116,8 @@ class TestGame(unittest.TestCase):
         game.play()
 
         # Assert correct and new log are identical
+        # this could also just check that the file reads "Misdeal"
         self.assertTrue(filecmp.cmp(log_correct, log_test))
-
-    def test_passing(self):
-        pass
-   
-    def test_taking(self):
-        pass
 
     def test_reneging(self):
         pass
@@ -113,6 +129,8 @@ class TestGame(unittest.TestCase):
         # Paths to logs
         log_correct = self.logs / "correct/makers_win.log"
         log_test = self.logs / "tmp/makers_win.log"
+        if self.create_correct_logs:
+            log_test = log_correct
 
         # Create game
         game = StandardGame(self.team1, self.team2, log_file=log_test,
@@ -162,6 +180,8 @@ class TestGame(unittest.TestCase):
         # Paths to logs
         log_correct = self.logs / "correct/defenders_win.log"
         log_test = self.logs / "tmp/defenders_win.log"
+        if self.create_correct_logs:
+            log_test = log_correct
 
         # Create game
         game = StandardGame(self.team1, self.team2, log_file=log_test,

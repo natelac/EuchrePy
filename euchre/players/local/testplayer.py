@@ -36,7 +36,7 @@ class TestPlayer(Player, abc.ABC):
 
         if len(self.commands) != 0:
             if self.commands[0] not in ['y', 'n']:
-                raise ValueError("Must be 'y' or 'n'")
+                raise ValueError(f"Must be 'y' or 'n', got '{self.commands[0]}'")
             ans = self.commands.pop(0)
 
             self.dprint(self.name, 'answered', ans)
@@ -65,7 +65,7 @@ class TestPlayer(Player, abc.ABC):
     def orderTrump(self):
         if len(self.commands) != 0:
             if self.commands[0] not in ['y', 'n']:
-                raise ValueError("Must be 'y' or 'n'")
+                raise ValueError(f"Must be 'y' or 'n', got '{self.commands[0]}'")
             ans = self.commands.pop(0)
             return ans == 'y'
         else:
@@ -74,7 +74,7 @@ class TestPlayer(Player, abc.ABC):
     def callTrump(self, up_suit):
         if len(self.commands) != 0:
             if self.commands[0] not in ['C', 'S', 'H', 'D']:
-                raise ValueError("Must be a suit in 'C', 'S', 'H', or 'D'")
+                raise ValueError(f"Must be a suit in 'C', 'S', 'H', or 'D', got '{self.commands[0]}'")
             ans = self.commands.pop(0)
             return ans
         else:
@@ -83,7 +83,7 @@ class TestPlayer(Player, abc.ABC):
     def goAlone(self):
         if len(self.commands) != 0:
             if self.commands[0] not in ['y', 'n']:
-                raise ValueError("Must be 'y' or 'y'")
+                raise ValueError(f"Must be 'y' or 'n', got '{self.commands[0]}'")
             ans = self.commands.pop(0)
             return ans == 'y'
         else:
