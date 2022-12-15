@@ -6,6 +6,23 @@ EuchrePy also implements a euchre server that can be run on a linux computer. Up
 
 If you're unsure of how to play euchre, check out the [wikipedia page](https://en.wikipedia.org/wiki/Euchre#Rules)!
 
+## Development
+Goals for the next four days:
+
+- Create web client AI that can make basic random valid moves.
+- Split server into master server and game server
+    - Master server creates game servers and fills them with players as they connect
+    - Game server starts and plays the game when it is full
+- Create network logging for the server and clients
+- Setup a grafana server / dashboard for monitoring the network
+
+What these match in the job description:
+
+- Network / systems programming experience
+- Measure performance of networking equipment
+- Create datasets for researching low latency events
+- Monitor behavior of system changes...
+
 ## Example
 
 ### Playing a local game
