@@ -446,9 +446,7 @@ class StandardGame:
         # where the 0th index is for the dealer
         self.gs['table'] = self.gs['players'].copy()
 
-        # The dealer starts the first trick by going last 
-        # (being at the 3rd index)
-        # self.gs['play_order'] = []
+        # Player left of dealer goes first (is at position 0 of play_order)
         self.gs['play_order'] = self.gs['players'].copy()
         new_leader = self.gs['play_order'].pop(0)
         self.gs['play_order'].append(new_leader)
@@ -475,8 +473,13 @@ class StandardGame:
         Modifies:
             self.gs['table']
         """
+        # Player left of old dealer deals
         old_dealer = self.gs['table'].pop(0)
         self.gs['table'].append(old_dealer)
+
+        # Player left of new dealer leads
+        new_leader = self.gs['play_order'].pop(0)
+        self.gs['play_order'].append(new_leader)
 
     def getWinner(self):
         """Fetches the winning team.

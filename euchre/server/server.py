@@ -88,17 +88,12 @@ class GameServer:
         """Shuts down the server.
         """
         # The signal is in the while loop of every thread, when it is false
-        #   all loops will terminate and threads join
+        # all loops will terminate and threads join
         for player in self.online_players.values():
             message = {'message_type': 'shutdown'}
             player.sendMessage(message)
-            # print(player.address)
         time.sleep(100)
-
         self.signals['shutdown'] = True
-        # time.sleep(1)
-        # for thread in self.threads:
-        #     thread.join()
 
     def checkHeartbeat(self, signals):
         """Check client heartbeats.
@@ -115,6 +110,7 @@ class GameServer:
                 if time.perf_counter() - player.last_heartbeat >= 10:
                     print(player, "missed a heartbeat")
                     pass
+
             time.sleep(2)
 
     def listenHeartbeat(self, signals):
@@ -244,8 +240,11 @@ class GameServer:
 
         Waits for an online client to join then starts the game.
         """
+        # Wait for lobby to fill
         while len(self.online_players) != player_count:
             time.sleep(1)
+
+        # Initialize game with players and AI
         players = list(self.online_players.values())
         for i in range(4 - player_count):
             players.append(BasicAIPlayer('AI' + str(i)))
@@ -253,6 +252,7 @@ class GameServer:
         team2 = Team(players[2], players[3])
         game = StandardGame(team1, team2)
 
+        # Start game
         print("starting game...")
         game.play()
 
