@@ -35,12 +35,15 @@ class WebConsole:
         self.signals = {"shutdown": False,
                         "request": None}
         self.threads = []
+
+        # Thread for listening on the network
         listen_thread = threading.Thread(
             target=self.listen,
             args=(self.signals,))
         listen_thread.start()
         self.threads.append(listen_thread)
 
+        # Thread for player input
         decision_thread = threading.Thread(
             target=self.decisionLoop,
             args=(self.signals,))
@@ -55,123 +58,127 @@ class WebConsole:
 
         # Halts this flow until listen_thread gets shutdown message
         listen_thread.join()
+        decision_thread.join()
+
+    def handleRequest(self, request):
+        """Process request from server and respond.
+
+        Enables asynchronous player input and networking.
+        """
+        def orderUp():
+            printCards(self.game_info['hand'])
+            ans = input('Order up? y/n\n')
+            if signals['shutdown']:
+                print("Server closed")
+                return
+            self.sendMessage({
+                'message_type': 'response',
+                'response_type': 'order_up',
+                'response': ans
+            })
+
+        def orderTrump():
+            ans = input('Call trump? y/n\n')
+            if signals['shutdown']:
+                print("Server closed")
+                return
+            self.sendMessage({
+                'message_type': 'response',
+                'response_type': 'order_trump',
+                'response': ans
+            })
+
+        def callTrump():
+            ans = input('Enter suit to pick\n')
+            while ans not in ['C', 'S', 'H', 'D'] \
+                    and ans != self.game_info['top_card'].suit:
+                ans = input('Not a valid suit.\n')
+            if signals['shutdown']:
+                print("Server closed")
+                return
+            self.sendMessage({
+                'message_type': 'response',
+                'response_type': 'call_trump',
+                'response': ans
+            })
+
+        def goAlone():
+            ans = input('Go alone? y/n\n')
+            if signals['shutdown']:
+                print("Server closed")
+                return
+            self.sendMessage({
+                'message_type': 'response',
+                'response_type': 'go_alone',
+                'response': ans
+            })
+
+        def playCard():
+            # Print trump and cards
+            print("Trump Suit:", self.game_info['trump'])
+            printCards(self.game_info['hand'])
+
+            # Get card to play from user
+            cards = [str(card) for card in self.game_info['hand']]
+            ans = input('Enter card to play\n')
+            while ans not in cards:
+                ans = input('Not a card in your hand.\n')
+
+            # Remove card from hand, add to playedCards
+            cardIndex = cards.index(ans)
+            card = self.game_info['hand'].pop(cardIndex)
+            self.game_info['played_cards'].append(card)
+
+            # self._playedCards.append(card)
+            if signals['shutdown']:
+                print("Server closed")
+                return
+            self.sendMessage({
+                'message_type': 'response',
+                'response_type': 'play_card',
+                'response': ans
+            })
+
+        def discardCard():
+            # Add top card to the hand
+            hand = self.game_info['hand']
+            top_card = self.game_info['top_card']
+            hand.append(top_card)
+            printCards(hand)
+
+            # Get card to discard from user
+            cards = [str(card) for card in hand]
+            ans = input('Enter card to discard:\n')
+            while ans not in cards:
+                ans = input('Not a card in your hand.\n')
+
+            # Remove and return discard card
+            card_index = cards.index(ans)
+            discard_card = hand.pop(card_index)
+
+            self.sendMessage({
+                'message_type': 'response',
+                'response_type': 'discard_card',
+                'response': ans
+            })
+
+        request_options = {
+            'order_up': orderUp,
+            'order_trump': orderTrump,
+            'call_trump': callTrump,
+            'go_alone': goAlone,
+            'play_card': playCard,
+            'discard_card': discardCard,
+        }
+
+        request_options[request]()
 
     def decisionLoop(self, signals):
+        """Wait for requests from server."""
         while not signals['shutdown']:
             time.sleep(0.1)
             if signals['request']:
-                # Decision methods that require a return value
-                # ------------------------------------------------------------------
-                def orderUp():
-                    printCards(self.game_info['hand'])
-                    ans = input('Order up? y/n\n')
-                    if signals['shutdown']:
-                        print("Server closed")
-                        return
-                    self.sendMessage({
-                        'message_type': 'response',
-                        'response_type': 'order_up',
-                        'response': ans
-                    })
-
-                def orderTrump():
-                    ans = input('Call trump? y/n\n')
-                    if signals['shutdown']:
-                        print("Server closed")
-                        return
-                    self.sendMessage({
-                        'message_type': 'response',
-                        'response_type': 'order_trump',
-                        'response': ans
-                    })
-
-                def callTrump():
-                    ans = input('Enter suit to pick\n')
-                    while ans not in ['C', 'S', 'H', 'D'] \
-                            and ans != self.game_info['top_card'].suit:
-                        ans = input('Not a valid suit.\n')
-                    if signals['shutdown']:
-                        print("Server closed")
-                        return
-                    self.sendMessage({
-                        'message_type': 'response',
-                        'response_type': 'call_trump',
-                        'response': ans
-                    })
-
-                def goAlone():
-                    ans = input('Go alone? y/n\n')
-                    if signals['shutdown']:
-                        print("Server closed")
-                        return
-                    self.sendMessage({
-                        'message_type': 'response',
-                        'response_type': 'go_alone',
-                        'response': ans
-                    })
-
-                def playCard():
-                    # Print trump and cards
-                    print("Trump Suit:", self.game_info['trump'])
-                    printCards(self.game_info['hand'])
-
-                    # Get card to play from user
-                    cards = [str(card) for card in self.game_info['hand']]
-                    ans = input('Enter card to play\n')
-                    while ans not in cards:
-                        ans = input('Not a card in your hand.\n')
-
-                    # Remove card from hand, add to playedCards
-                    cardIndex = cards.index(ans)
-                    card = self.game_info['hand'].pop(cardIndex)
-                    self.game_info['played_cards'].append(card)
-
-                    # self._playedCards.append(card)
-                    if signals['shutdown']:
-                        print("Server closed")
-                        return
-                    self.sendMessage({
-                        'message_type': 'response',
-                        'response_type': 'play_card',
-                        'response': ans
-                    })
-
-                def discardCard():
-                    # Add top card to the hand
-                    hand = self.game_info['hand']
-                    top_card = self.game_info['top_card']
-                    hand.append(top_card)
-                    printCards(hand)
-
-                    # Get card to discard from user
-                    cards = [str(card) for card in hand]
-                    ans = input('Enter card to discard:\n')
-                    while ans not in cards:
-                        ans = input('Not a card in your hand.\n')
-
-                    # Remove and return discard card
-                    card_index = cards.index(ans)
-                    discard_card = hand.pop(card_index)
-
-                    if signals['shutdown']:
-                        print("Server closed")
-                        return
-                    self.sendMessage({
-                        'message_type': 'response',
-                        'response_type': 'discard_card',
-                        'response': ans
-                    })
-
-                request_options = {
-                    'order_up': orderUp,
-                    'order_trump': orderTrump,
-                    'call_trump': callTrump,
-                    'go_alone': goAlone,
-                    'play_card': playCard,
-                    'discard_card': discardCard,
-                }
-
-                request_options[signals['request']]()
+                self.handleRequest()
                 signals['request'] = None
 
     def heartbeat(self, signals):
@@ -233,10 +240,11 @@ class WebConsole:
                 """Handle shutdown message.
                 """
                 self.signals['shutdown'] = True
-                # time.sleep(1)
-                # for thread in self.threads:
-                #     thread.join()
 
+
+            def serverTransfer():
+                """Handle being transfered to a game server
+                """
             # Information updates that don't require a return value
             # ------------------------------------------------------------------
 
@@ -374,11 +382,15 @@ class WebConsole:
                 networking_options['shutdown']()
 
     def setSocket(self, sock):
-        """Bind the socket to the server.
+        """Bind the socket to the client.
         """
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.socket_info["host"], self.socket_info["port"]))
-        self.socket_info["host"], self.socket_info["port"] = sock.getsockname()
+
+        # Set host and port in event that either was '' or 0
+        self.socket_info["host"] = sock.getsockname()[0]
+        self.socket_info["port"] = sock.getsockname()[1]
+
         sock.listen()
         sock.settimeout(1)
 

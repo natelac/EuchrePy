@@ -1,4 +1,4 @@
-"""Server class for managing Euchre games.
+"""Server class for running a game of Euchre.
 """
 import json
 import subprocess
@@ -34,16 +34,14 @@ class GameServer:
                     mapped to with AI
     """
 
-    def __init__(self, host, port, hb_port, player_count):
+    def __init__(self, master_shutdown, host='localhost', port=0, hb_port=0, player_count=1):
         self.socket_info = {
             'host': host,
             'port': int(port),
             'hb_port': int(hb_port)
         }
         self.player_count = player_count
-        # Could this just be the gamestate, and is passed to all player classes?
-        self.signals = {'shutdown': False,
-                        'game_state': 'not_full'}  # 'not_full', 'full', 'playing', 'disconnect'
+        self.signals = {'shutdown': False}
 
         # {self.host + ":" + str(self.port) : WebPlayer
         self.local_players = []
@@ -52,6 +50,12 @@ class GameServer:
         # Start threads
         self.threads = []
         self.startThreads(self.threads)
+
+        # Shutdown if signaled by master or game done
+        while not master_shutdown.value or not self.signals['shutdown']:
+           time.sleep(1)
+        self.signals['shutdown'] = True
+
 
     def startThreads(self, threads):
         """Create threads for TCP and UDP connections.
@@ -84,6 +88,13 @@ class GameServer:
         hb_ck_thread.start()
         threads.append(hb_ck_thread)
 
+        # Make game thread
+        game_thread = threading.Thread(
+            target=self.playGame,
+            args=(self.player_count,))
+        game_thread.start()
+        threads.append(game_thread)
+
     def shutdown(self):
         """Shuts down the server.
         """
@@ -92,7 +103,7 @@ class GameServer:
         for player in self.online_players.values():
             message = {'message_type': 'shutdown'}
             player.sendMessage(message)
-        time.sleep(100)
+        time.sleep(5)
         self.signals['shutdown'] = True
 
     def checkHeartbeat(self, signals):
@@ -125,6 +136,11 @@ class GameServer:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind((self.socket_info["host"], self.socket_info["hb_port"]))
+
+            # Set host and port in event htat either was '' or 0
+            self.socket_info["host"] = sock.getsockname()[0]
+            self.socket_info["hb_port"] = sock.getsockname()[1]
+
             sock.settimeout(1)
 
             # Listen for UDP heartbeat messages until shutdown signal
@@ -139,7 +155,6 @@ class GameServer:
                                                message_dict["player_port"])
                 player = self.online_players[address]
                 player.last_heartbeat = time.perf_counter()
-                # print("Recieved heartbeat")
 
     def listen(self, signals):
         """Loop for listening to TCP connections
@@ -226,6 +241,11 @@ class GameServer:
         """
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.socket_info["host"], self.socket_info["port"]))
+
+        # Set host and port in event that either was '' or 0
+        self.socket_info["host"] = sock.getsockname()[0]
+        self.socket_info["port"] = sock.getsockname()[1]
+
         sock.listen()
         sock.settimeout(1)
 
@@ -256,16 +276,5 @@ class GameServer:
         print("starting game...")
         game.play()
 
-
-@click.command()
-@click.option("--host", "host", default="localhost")
-@click.option("--port", "port", default=6000)
-@click.option("--hb-port", "hb_port", default=5999)
-@click.option("--player-count", "player_count", default=4)
-def main(host, port, hb_port, player_count):
-    server = GameServer(host, port, hb_port, player_count)
-    server.playGame(player_count)
-
-
-if __name__ == '__main__':
-    main()
+        # Game concluded, shut down
+        self.signals['shutdown'] = True

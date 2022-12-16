@@ -19,7 +19,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'euchre-server = euchre.server.server:main',
+            'euchre-server = euchre.server.masterserver:main',
             'euchre-webconsole = euchre.clients.webconsole:main',
             'euchre-play = euchre.play:play'
         ]
