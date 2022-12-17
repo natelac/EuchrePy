@@ -6,7 +6,6 @@ Nathaniel F. Lacelle <natelac@umich.edu>
 
 from setuptools import setup, find_packages
 
-# TODO: What is name vs packages? What should these be?
 setup(
     name='euchre',
     version='0.1.0',
