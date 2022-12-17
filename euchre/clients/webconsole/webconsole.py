@@ -10,6 +10,10 @@ from euchre.cards import Card
 
 class WebConsole:
     """A console that can connect to a game of euchre over the web.
+
+    TODO:
+        - Separate 'switch' statements into separate functions / other files
+        - Figure out consistency for signals vs self.signals
     """
 
     def __init__(self, host='localhost', port=0, server_host='localhost',
@@ -36,10 +40,15 @@ class WebConsole:
                         "request": None}
         self.threads = []
 
-        # Thread for listening on the network
+        # Create listening thread on socket 
+        # TODO: Socket needs to be closed at some point
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # Set socket first before threading
+        self.setSocket(sock)
         listen_thread = threading.Thread(
-            target=self.listen,
-            args=(self.signals,))
+            target=self.listenLoop,
+            args=(sock, self.signals,))
         listen_thread.start()
         self.threads.append(listen_thread)
 
@@ -50,15 +59,25 @@ class WebConsole:
         decision_thread.start()
         self.threads.append(decision_thread)
 
-        # Registers the client with the server
+        print(self.socket_info['host'],
+              self.socket_info['port'])
+        self.registerWithServer() 
+
+        # Halts this flow until listen_thread gets shutdown message
+        listen_thread.join()
+        decision_thread.join()
+
+    # Imported methods
+    # Maybe list out explicitily?
+    # from ._requests import orderUp, orderTrump, callTrump, goAlone,
+    #         play_card, discardCard
+
+    def registerWithServer(self):
         self.sendMessage({
             "message_type": "register",
             "player_name": self.name
         })
 
-        # Halts this flow until listen_thread gets shutdown message
-        listen_thread.join()
-        decision_thread.join()
 
     def handleRequest(self, request):
         """Process request from server and respond.
@@ -68,7 +87,7 @@ class WebConsole:
         def orderUp():
             printCards(self.game_info['hand'])
             ans = input('Order up? y/n\n')
-            if signals['shutdown']:
+            if self.signals['shutdown']:
                 print("Server closed")
                 return
             self.sendMessage({
@@ -79,7 +98,7 @@ class WebConsole:
 
         def orderTrump():
             ans = input('Call trump? y/n\n')
-            if signals['shutdown']:
+            if self.signals['shutdown']:
                 print("Server closed")
                 return
             self.sendMessage({
@@ -93,7 +112,7 @@ class WebConsole:
             while ans not in ['C', 'S', 'H', 'D'] \
                     and ans != self.game_info['top_card'].suit:
                 ans = input('Not a valid suit.\n')
-            if signals['shutdown']:
+            if self.signals['shutdown']:
                 print("Server closed")
                 return
             self.sendMessage({
@@ -104,7 +123,7 @@ class WebConsole:
 
         def goAlone():
             ans = input('Go alone? y/n\n')
-            if signals['shutdown']:
+            if self.signals['shutdown']:
                 print("Server closed")
                 return
             self.sendMessage({
@@ -130,7 +149,7 @@ class WebConsole:
             self.game_info['played_cards'].append(card)
 
             # self._playedCards.append(card)
-            if signals['shutdown']:
+            if self.signals['shutdown']:
                 print("Server closed")
                 return
             self.sendMessage({
@@ -156,6 +175,9 @@ class WebConsole:
             card_index = cards.index(ans)
             discard_card = hand.pop(card_index)
 
+            if self.signals['shutdown']:
+                print("Server closed")
+                return
             self.sendMessage({
                 'message_type': 'response',
                 'response_type': 'discard_card',
@@ -178,7 +200,7 @@ class WebConsole:
         while not signals['shutdown']:
             time.sleep(0.1)
             if signals['request']:
-                self.handleRequest()
+                self.handleRequest(signals['request'])
                 signals['request'] = None
 
     def heartbeat(self, signals):
@@ -204,7 +226,7 @@ class WebConsole:
         """
         message['player_host'] = self.socket_info['host']
         message['player_port'] = self.socket_info['port']
-        #print("Message being sent:", message)
+        print("Message being sent:", message)
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((self.socket_info['server_host'],
@@ -224,6 +246,11 @@ class WebConsole:
         """
         while not signals["shutdown"]:
             message_dict = message_to_dictionary(sock)
+
+            if message_dict == -1:
+                continue
+
+            print("Messaged recieved:", message_dict)
 
             # Networking functions
             # ------------------------------------------------------------------
@@ -245,6 +272,11 @@ class WebConsole:
             def serverTransfer():
                 """Handle being transfered to a game server
                 """
+                self.socket_info['server_host'] = message_dict['new_host']
+                self.socket_info['server_port'] = message_dict['new_port']
+                self.socket_info['server_hb_port'] = message_dict['new_hb_port']
+                self.registerWithServer()
+
             # Information updates that don't require a return value
             # ------------------------------------------------------------------
 
@@ -342,9 +374,6 @@ class WebConsole:
             # Handle the message
             # ------------------------------------------------------------------
 
-            if message_dict == -1:
-                continue
-
             info_options = {
                 'update_hand': updateHandMsg,
                 'points': pointsMsg,
@@ -367,6 +396,7 @@ class WebConsole:
             }
 
             networking_options = {
+                'server_transfer': serverTransfer,
                 'register_ack': handleRegisterAck,
                 'shutdown': handleShutdown
             }
@@ -378,6 +408,8 @@ class WebConsole:
                 signals['request'] = message_dict['request_type']
             elif message_dict['message_type'] == 'register_ack':
                 networking_options['register_ack']()
+            elif message_dict['message_type'] == 'server_transfer':
+                networking_options['server_transfer']()
             elif message_dict['message_type'] == 'shutdown':
                 networking_options['shutdown']()
 

@@ -34,12 +34,14 @@ class GameServer:
                     mapped to with AI
     """
 
-    def __init__(self, master_shutdown, host='localhost', port=0, hb_port=0, player_count=1):
+    def __init__(self, master_shutdown, shared_info, player_count=1):
         self.socket_info = {
-            'host': host,
-            'port': int(port),
-            'hb_port': int(hb_port)
+            'host': shared_info['host'].value,
+            'port': shared_info['port'].value,
+            'hb_port': shared_info['hb_port'].value
         }
+        # print(self.socket_info['host'])
+        self.shared_info = shared_info
         self.player_count = player_count
         self.signals = {'shutdown': False}
 
@@ -58,11 +60,12 @@ class GameServer:
 
 
     def startThreads(self, threads):
-        """Create threads for TCP and UDP connections.
+        """Create threads for networking and playing games
 
         Creates a listening thread for TCP connections, a listening thread for
-        UDP heartbeat connections, and a computational thread for checking
-        the time deltas for client heartbeats.
+        UDP heartbeat connections, a computational thread for checking
+        the time deltas for client heartbeats, and a game thread for running 
+        the game.
 
         Args:
             threads (list): List to store threads for future use
@@ -119,7 +122,7 @@ class GameServer:
             # Check if each player missed a heartbeat
             for player in self.online_players.values():
                 if time.perf_counter() - player.last_heartbeat >= 10:
-                    print(player, "missed a heartbeat")
+                    # print(player, "missed a heartbeat")
                     pass
 
             time.sleep(2)
@@ -140,6 +143,7 @@ class GameServer:
             # Set host and port in event htat either was '' or 0
             self.socket_info["host"] = sock.getsockname()[0]
             self.socket_info["hb_port"] = sock.getsockname()[1]
+            self.shared_info["hb_port"].value = int(sock.getsockname()[1])
 
             sock.settimeout(1)
 
@@ -179,7 +183,8 @@ class GameServer:
                 'shutdown' (bool): True when the server is shutting down and
                     threads need to be joined
         """
-        print("server listening for registers...")
+        print("game server on port", self.socket_info['port'], 
+              "listening for registers...")
         while not signals['shutdown']:
             message_dict = message_to_dictionary(sock)
 
@@ -188,7 +193,7 @@ class GameServer:
                 """
                 #print("Registering player...")
                 if len(self.online_players) + len(self.local_players) >= 4:
-                    print("Error: Too many players registered")
+                    #print("Error: Too many players registered")
                     return
                 #print(message_dict)
                 web_player = WebPlayer(message_dict['player_host'],
@@ -205,11 +210,14 @@ class GameServer:
                         'player_port': web_player.port
                     })
                     sock.sendall(message.encode('utf-8'))
-                print("Player", web_player, "registered")
+                print("Player", web_player, "registered",
+                      "on server with port", self.socket_info['port'])
 
                 if len(self.online_players) != self.player_count:
                     slots_avail = self.player_count - len(self.online_players)
                     print(f"Waiting for {slots_avail} player(s)")
+                else:
+                    self.shared_info["server_full"].value = True
 
             def webPlayerMsg():
                 """Handle a message from a web player.
@@ -245,6 +253,7 @@ class GameServer:
         # Set host and port in event that either was '' or 0
         self.socket_info["host"] = sock.getsockname()[0]
         self.socket_info["port"] = sock.getsockname()[1]
+        self.shared_info["port"].value = int(sock.getsockname()[1])
 
         sock.listen()
         sock.settimeout(1)
@@ -273,7 +282,7 @@ class GameServer:
         game = StandardGame(team1, team2)
 
         # Start game
-        print("starting game...")
+        # print("starting game...")
         game.play()
 
         # Game concluded, shut down

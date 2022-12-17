@@ -1,1 +1,1 @@
-from .webconsole import WebConsole
+from .webconsole.webconsole import WebConsole

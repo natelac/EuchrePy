@@ -1,2 +1,2 @@
 from .gameserver import GameServer
-from .masterserver import MasterServer
+from .mainserver import MainServer
