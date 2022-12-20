@@ -67,11 +67,6 @@ class WebConsole:
         listen_thread.join()
         decision_thread.join()
 
-    # Imported methods
-    # Maybe list out explicitily?
-    # from ._requests import orderUp, orderTrump, callTrump, goAlone,
-    #         play_card, discardCard
-
     def registerWithServer(self):
         self.sendMessage({
             "message_type": "register",
@@ -148,7 +143,6 @@ class WebConsole:
             card = self.game_info['hand'].pop(cardIndex)
             self.game_info['played_cards'].append(card)
 
-            # self._playedCards.append(card)
             if self.signals['shutdown']:
                 print("Server closed")
                 return

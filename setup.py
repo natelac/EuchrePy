@@ -20,7 +20,8 @@ setup(
         'console_scripts': [
             'euchre-server = euchre.server.mainserver:main',
             'euchre-webconsole = euchre.clients.webconsole.webconsole:main',
-            'euchre-play = euchre.play:play'
+            'euchre-webai = euchre.clients.webai.webai:main',
+            'euchre-play = euchre.play:play',
         ]
     },
 )

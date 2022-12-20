@@ -9,11 +9,16 @@ If you're unsure of how to play euchre, check out the [wikipedia page](https://e
 ## Development
 Goals for the next four days:
 
-- Create web client AI that can make basic random valid moves.
+## Now
+
 - Split server into master server and game server
-    - Master server creates game servers and fills them with players as they connect
+    - Main server creates game servers and fills them with players as they connect
     - Game server starts and plays the game when it is full
-- Create network logging for the server and clients
+- Create web client AI that can make basic random valid moves.
+- Create script for having many AI connect to the single main server
+- Use scalene!
+    - Supports `multiprocessing` module
+- More logging for the server and clients
 - Setup a grafana server / dashboard for monitoring the network
 
 What these match in the job description:
@@ -22,6 +27,10 @@ What these match in the job description:
 - Measure performance of networking equipment
 - Create datasets for researching low latency events
 - Monitor behavior of system changes...
+
+### Later
+
+- Consolidate testing into one folder?
 
 ## Example
 
